@@ -6,9 +6,9 @@
 namespace coRing {
     class Exception final : public std::exception {
     public:
-        explicit Exception(const char *message) noexcept;
+        explicit Exception(const char *message);
 
-        explicit Exception(std::string_view message) noexcept;
+        explicit Exception(std::string_view message);
 
         explicit Exception(std::string &&message) noexcept;
 
