@@ -3,7 +3,7 @@
 #include <exception>
 #include <string>
 
-namespace coRing {
+namespace coContext {
     class Exception final : public std::exception {
     public:
         explicit Exception(const char *message);
@@ -17,4 +17,4 @@ namespace coRing {
     private:
         std::string message;
     };
-}    // namespace coRing
+}    // namespace coContext

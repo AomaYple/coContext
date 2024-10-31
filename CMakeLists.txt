@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.30.5)
 
-project(coRing)
+project(coContext)
 
 add_library(${PROJECT_NAME} SHARED)
 
