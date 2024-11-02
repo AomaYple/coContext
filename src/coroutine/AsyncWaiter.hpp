@@ -3,9 +3,9 @@
 #include "Task.hpp"
 
 namespace coContext {
-    class Awaiter {
+    class AsyncWaiter {
     public:
-        explicit Awaiter(const Submission &submission) noexcept;
+        explicit AsyncWaiter(const Submission &submission) noexcept;
 
         [[nodiscard]] constexpr auto await_ready() const noexcept { return false; }
 
