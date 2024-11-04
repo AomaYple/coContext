@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../ring/Outcome.hpp"
-#include "../ring/Submission.hpp"
+#include "ring/Outcome.hpp"
+#include "ring/Submission.hpp"
 
 #include <coroutine>
 
