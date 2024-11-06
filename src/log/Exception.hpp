@@ -1,20 +1,18 @@
 #pragma once
 
-#include <exception>
-#include <string>
+#include "Log.hpp"
 
 namespace coContext {
     class Exception final : public std::exception {
     public:
-        explicit Exception(const char *message);
-
-        explicit Exception(std::string_view message);
-
-        explicit Exception(std::string &&message) noexcept;
+        explicit Exception(Log &&log);
 
         [[nodiscard]] auto what() const noexcept -> const char * override;
 
+        [[nodiscard]] auto getLog() noexcept -> Log &;
+
     private:
         std::string message;
+        Log log;
     };
 }    // namespace coContext
