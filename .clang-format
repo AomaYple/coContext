@@ -6,6 +6,8 @@ AlignConsecutiveAssignments: None
 AlignConsecutiveBitFields: None
 AlignConsecutiveDeclarations: None
 AlignConsecutiveMacros: None
+AlignConsecutiveShortCaseStatements:
+  Enabled: false
 AlignEscapedNewlines: Left
 AlignOperands: Align
 AlignTrailingComments:
