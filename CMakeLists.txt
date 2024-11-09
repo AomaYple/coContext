@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.30)
 
 project(coContext)
 
@@ -6,7 +6,7 @@ add_library(${PROJECT_NAME} SHARED)
 
 set_target_properties(${PROJECT_NAME}
         PROPERTIES
-        CXX_STANDARD 26
+        CXX_STANDARD ${CMAKE_CXX_STANDARD_LATEST}
         CXX_STANDARD_REQUIRED ON
         COMPILE_WARNING_AS_ERROR ON
         INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
@@ -29,13 +29,13 @@ target_include_directories(${PROJECT_NAME}
 target_compile_options(${PROJECT_NAME}
         PRIVATE
         -Wall -Wextra -Wpedantic
-        $<$<CONFIG:Debug>:-Og -fsanitize=address>
+        $<$<CONFIG:Debug>:-Og -fsanitize=address -fsanitize=leak -fsanitize=undefined>
         $<$<CONFIG:Release>:-Ofast>
 )
 
 target_link_options(${PROJECT_NAME}
         PRIVATE
-        $<$<CONFIG:Debug>:-fsanitize=address>
+        $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=leak -fsanitize=undefined>
 )
 
 target_link_libraries(${PROJECT_NAME}
