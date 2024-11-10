@@ -35,7 +35,7 @@ auto coContext::Ring::getFileDescriptor() const noexcept -> int { return this->h
 auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sourceLocation) -> void {
     if (const int result{io_uring_register_ring_fd(&this->handle)}; result != 1) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::warn, std::error_code{std::abs(result), std::generic_category()}.message(),
                 sourceLocation}
         };
     }
@@ -44,7 +44,7 @@ auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sour
 auto coContext::Ring::registerCpuAffinity(const cpu_set_t &cpuSet, const std::source_location sourceLocation) -> void {
     if (const int result{io_uring_register_iowq_aff(&this->handle, sizeof(cpuSet), &cpuSet)}; result != 0) {
         throw Exception{
-            Log{Log::Level::fatal, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
                 sourceLocation}
         };
     }

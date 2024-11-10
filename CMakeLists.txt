@@ -46,8 +46,6 @@ target_link_libraries(${PROJECT_NAME}
 set(installTargets ${PROJECT_NAME}Targets)
 install(TARGETS ${PROJECT_NAME}
         EXPORT ${installTargets}
-        INCLUDES DESTINATION include
-        LIBRARY DESTINATION lib
 )
 
 install(EXPORT ${installTargets}
