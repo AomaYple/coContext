@@ -8,7 +8,7 @@ Linux内核6.10及以上，GCC14及以上，liburing2.8及以上
 
 ## 构建
 
-```shell 
+```shell
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release --install-prefix=your_absolute_path
 cd build
 ninja
