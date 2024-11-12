@@ -35,7 +35,7 @@ auto coContext::Ring::getFileDescriptor() const noexcept -> int { return this->h
 auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sourceLocation) -> void {
     if (const int result{io_uring_register_ring_fd(&this->handle)}; result != 1) {
         throw Exception{
-            Log{Log::Level::warn, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
                 sourceLocation}
         };
     }
@@ -48,6 +48,44 @@ auto coContext::Ring::registerCpuAffinity(const cpu_set_t &cpuSet, const std::so
                 sourceLocation}
         };
     }
+}
+
+auto coContext::Ring::getSqe(const std::source_location sourceLocation) -> io_uring_sqe * {
+    io_uring_sqe *const sqe{io_uring_get_sqe(&this->handle)};
+    if (sqe == nullptr) {
+        throw Exception{
+            Log{Log::Level::error, "no sqe available", sourceLocation}
+        };
+    }
+
+    return sqe;
+}
+
+auto coContext::Ring::submitAndWait(const unsigned int count, const std::source_location sourceLocation) -> void {
+    if (const int result{io_uring_submit_and_wait(&this->handle, count)}; result < 0) {
+        throw Exception{
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+                sourceLocation}
+        };
+    }
+}
+
+auto coContext::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->void> &&action) const -> int {
+    int count{};
+
+    unsigned int head;
+    const io_uring_cqe *cqe;
+    io_uring_for_each_cqe(&this->handle, head, cqe) {
+        action(cqe);
+        ++count;
+    }
+
+    return count;
+}
+
+auto coContext::Ring::advance(io_uring_buf_ring *ringBuffer, const int cqeCount, const int bufferCount) noexcept
+    -> void {
+    __io_uring_buf_ring_cq_advance(&this->handle, ringBuffer, cqeCount, bufferCount);
 }
 
 auto coContext::Ring::destroy() noexcept -> void {

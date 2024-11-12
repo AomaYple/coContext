@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <liburing.h>
 #include <source_location>
 
@@ -24,6 +25,16 @@ namespace coContext {
 
         auto registerCpuAffinity(const cpu_set_t &cpuSet,
                                  std::source_location sourceLocation = std::source_location::current()) -> void;
+
+        [[nodiscard]] auto getSqe(std::source_location sourceLocation = std::source_location::current())
+            -> io_uring_sqe *;
+
+        auto submitAndWait(unsigned int count, std::source_location sourceLocation = std::source_location::current())
+            -> void;
+
+        auto poll(std::move_only_function<auto(const io_uring_cqe *)->void> &&action) const -> int;
+
+        auto advance(io_uring_buf_ring *ringBuffer, int cqeCount, int bufferCount) noexcept -> void;
 
     private:
         auto destroy() noexcept -> void;
