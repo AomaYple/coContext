@@ -82,6 +82,30 @@ auto coContext::Ring::updateFileDescriptors(const unsigned int offset, const std
     }
 }
 
+auto coContext::Ring::setupRingBuffer(const unsigned int entries, const int id, const unsigned int flags,
+                                      const std::source_location sourceLocation) -> io_uring_buf_ring * {
+    int error;
+    io_uring_buf_ring *const handle{io_uring_setup_buf_ring(&this->handle, entries, id, flags, &error)};
+    if (handle == nullptr) {
+        throw Exception{
+            Log{Log::Level::error, std::error_code{std::abs(error), std::generic_category()}.message(),
+                sourceLocation}
+        };
+    }
+
+    return handle;
+}
+
+auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const unsigned int entries, const int id,
+                                     const std::source_location sourceLocation) -> void {
+    if (const int result{io_uring_free_buf_ring(&this->handle, ringBuffer, entries, id)}; result != 0) {
+        throw Exception{
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+                sourceLocation}
+        };
+    }
+}
+
 auto coContext::Ring::getSqe(const std::source_location sourceLocation) -> io_uring_sqe * {
     io_uring_sqe *const sqe{io_uring_get_sqe(&this->handle)};
     if (sqe == nullptr) {

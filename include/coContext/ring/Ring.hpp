@@ -37,6 +37,13 @@ namespace coContext {
         auto updateFileDescriptors(unsigned int offset, std::span<const int> fileDescriptors,
                                    std::source_location sourceLocation = std::source_location::current()) -> void;
 
+        [[nodiscard]] auto setupRingBuffer(unsigned int entries, int id, unsigned int flags,
+                                           std::source_location sourceLocation = std::source_location::current())
+            -> io_uring_buf_ring *;
+
+        auto freeRingBuffer(io_uring_buf_ring *ringBuffer, unsigned int entries, int id,
+                            std::source_location sourceLocation = std::source_location::current()) -> void;
+
         [[nodiscard]] auto getSqe(std::source_location sourceLocation = std::source_location::current())
             -> io_uring_sqe *;
 
