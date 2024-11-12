@@ -3,6 +3,7 @@
 #include <functional>
 #include <liburing.h>
 #include <source_location>
+#include <span>
 
 namespace coContext {
     class Ring {
@@ -25,6 +26,16 @@ namespace coContext {
 
         auto registerCpuAffinity(const cpu_set_t &cpuSet,
                                  std::source_location sourceLocation = std::source_location::current()) -> void;
+
+        auto registerSparseFileDescriptor(unsigned int count,
+                                          std::source_location sourceLocation = std::source_location::current())
+            -> void;
+
+        auto allocateFileDescriptorRange(unsigned int offset, unsigned int length,
+                                         std::source_location sourceLocation = std::source_location::current()) -> void;
+
+        auto updateFileDescriptors(unsigned int offset, std::span<const int> fileDescriptors,
+                                   std::source_location sourceLocation = std::source_location::current()) -> void;
 
         [[nodiscard]] auto getSqe(std::source_location sourceLocation = std::source_location::current())
             -> io_uring_sqe *;

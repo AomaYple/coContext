@@ -50,6 +50,38 @@ auto coContext::Ring::registerCpuAffinity(const cpu_set_t &cpuSet, const std::so
     }
 }
 
+auto coContext::Ring::registerSparseFileDescriptor(const unsigned int count, std::source_location sourceLocation)
+    -> void {
+    if (const int result{io_uring_register_files_sparse(&this->handle, count)}; result != 0) {
+        throw Exception{
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+                sourceLocation}
+        };
+    }
+}
+
+auto coContext::Ring::allocateFileDescriptorRange(const unsigned int offset, const unsigned int length,
+                                                  const std::source_location sourceLocation) -> void {
+    if (const int result{io_uring_register_file_alloc_range(&this->handle, offset, length)}; result != 0) {
+        throw Exception{
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+                sourceLocation}
+        };
+    }
+}
+
+auto coContext::Ring::updateFileDescriptors(const unsigned int offset, const std::span<const int> fileDescriptors,
+                                            const std::source_location sourceLocation) -> void {
+    if (const int result{
+            io_uring_register_files_update(&this->handle, offset, fileDescriptors.data(), fileDescriptors.size())};
+        result < 0) {
+        throw Exception{
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+                sourceLocation}
+        };
+    }
+}
+
 auto coContext::Ring::getSqe(const std::source_location sourceLocation) -> io_uring_sqe * {
     io_uring_sqe *const sqe{io_uring_get_sqe(&this->handle)};
     if (sqe == nullptr) {
