@@ -4,7 +4,7 @@ coContext::Submission::Submission(const int fileDescriptor, const unsigned int f
                                   parameterType &&parameter) noexcept :
     fileDescriptor{fileDescriptor}, flags{flags}, ioPriority{ioPriority}, parameter{std::move(parameter)} {}
 
-auto coContext::Submission::setUserData(unsigned long userData) noexcept -> void { this->userData = userData; }
+auto coContext::Submission::setUserData(const unsigned long userData) noexcept -> void { this->userData = userData; }
 
 auto coContext::Submission::setSqe(io_uring_sqe *const sqe) const noexcept -> void {
     switch (static_cast<Type>(this->parameter.index())) {
