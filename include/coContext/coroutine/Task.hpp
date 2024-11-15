@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ring/Outcome.hpp"
 #include "ring/Submission.hpp"
 
 #include <coroutine>
@@ -22,13 +21,13 @@ namespace coContext {
 
             [[nodiscard]] auto getSubmission() const noexcept -> const Submission &;
 
-            auto setOutcome(Outcome outcome) noexcept -> void;
+            auto setResult(int result) noexcept -> void;
 
-            [[nodiscard]] auto getOutcome() const noexcept -> Outcome;
+            [[nodiscard]] auto getResult() const noexcept -> int;
 
         private:
             Submission submission;
-            Outcome outcome;
+            int result;
         };
 
         explicit Task(std::coroutine_handle<promise_type> handle) noexcept;
@@ -45,7 +44,7 @@ namespace coContext {
 
         [[nodiscard]] auto getSubmission() const -> const Submission &;
 
-        auto operator()(Outcome outcome) const -> void;
+        auto operator()(int result) const -> void;
 
         [[nodiscard]] auto done() const noexcept -> bool;
 

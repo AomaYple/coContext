@@ -11,7 +11,7 @@ namespace coContext {
 
         auto await_suspend(std::coroutine_handle<Task::promise_type> handle) -> void;
 
-        [[nodiscard]] auto await_resume() const -> Outcome;
+        [[nodiscard]] auto await_resume() const -> int;
 
     private:
         std::coroutine_handle<Task::promise_type> handle;

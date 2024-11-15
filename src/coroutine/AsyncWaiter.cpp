@@ -8,4 +8,4 @@ auto coContext::AsyncWaiter::await_suspend(const std::coroutine_handle<Task::pro
     this->handle.promise().setSubmission(this->submission);
 }
 
-auto coContext::AsyncWaiter::await_resume() const -> Outcome { return this->handle.promise().getOutcome(); }
+auto coContext::AsyncWaiter::await_resume() const -> int { return this->handle.promise().getResult(); }

@@ -14,9 +14,9 @@ auto coContext::Task::promise_type::setSubmission(const Submission &submission) 
 
 auto coContext::Task::promise_type::getSubmission() const noexcept -> const Submission & { return this->submission; }
 
-auto coContext::Task::promise_type::setOutcome(const Outcome outcome) noexcept -> void { this->outcome = outcome; }
+auto coContext::Task::promise_type::setResult(const int result) noexcept -> void { this->result = result; }
 
-auto coContext::Task::promise_type::getOutcome() const noexcept -> Outcome { return this->outcome; }
+auto coContext::Task::promise_type::getResult() const noexcept -> int { return this->result; }
 
 coContext::Task::Task(const std::coroutine_handle<promise_type> handle) noexcept : handle{handle} {}
 
@@ -36,8 +36,8 @@ coContext::Task::~Task() { this->destroy(); }
 
 auto coContext::Task::getSubmission() const -> const Submission & { return this->handle.promise().getSubmission(); }
 
-auto coContext::Task::operator()(const Outcome outcome) const -> void {
-    this->handle.promise().setOutcome(outcome);
+auto coContext::Task::operator()(const int result) const -> void {
+    this->handle.promise().setResult(result);
     this->handle();
 }
 
