@@ -13,7 +13,7 @@ namespace coContext {
         using parameterType = std::variant<Close>;
 
         Submission(int fileDescriptor, unsigned int flags, unsigned short ioPriority,
-                   parameterType &&parameter) noexcept;
+                   const parameterType &parameter) noexcept;
 
         auto setUserData(unsigned long userData) noexcept -> void;
 

@@ -1,8 +1,8 @@
 #include "ring/Submission.hpp"
 
 coContext::Submission::Submission(const int fileDescriptor, const unsigned int flags, const unsigned short ioPriority,
-                                  parameterType &&parameter) noexcept :
-    fileDescriptor{fileDescriptor}, flags{flags}, ioPriority{ioPriority}, parameter{std::move(parameter)} {}
+                                  const parameterType &parameter) noexcept :
+    fileDescriptor{fileDescriptor}, flags{flags}, ioPriority{ioPriority}, parameter{parameter} {}
 
 auto coContext::Submission::setUserData(const unsigned long userData) noexcept -> void { this->userData = userData; }
 
