@@ -34,9 +34,9 @@ namespace coContext {
 
         Task(const Task &) = delete;
 
-        Task(Task &&) noexcept;
-
         auto operator=(const Task &) -> Task & = delete;
+
+        Task(Task &&) noexcept;
 
         auto operator=(Task &&) noexcept -> Task &;
 

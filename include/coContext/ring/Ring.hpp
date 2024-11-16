@@ -12,9 +12,9 @@ namespace coContext {
 
         Ring(const Ring &) = delete;
 
-        Ring(Ring &&) noexcept;
-
         auto operator=(const Ring &) -> Ring & = delete;
+
+        Ring(Ring &&) noexcept;
 
         auto operator=(Ring &&) noexcept -> Ring &;
 

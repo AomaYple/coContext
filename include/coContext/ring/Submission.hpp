@@ -15,6 +15,8 @@ namespace coContext {
         Submission(int fileDescriptor, unsigned int flags, unsigned short ioPriority,
                    const parameterType &parameter) noexcept;
 
+        [[nodiscard]] auto getUserData() const noexcept -> unsigned long;
+
         auto setUserData(unsigned long userData) noexcept -> void;
 
         auto setSqe(io_uring_sqe *sqe) const noexcept -> void;

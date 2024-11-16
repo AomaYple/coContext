@@ -4,6 +4,8 @@ coContext::Submission::Submission(const int fileDescriptor, const unsigned int f
                                   const parameterType &parameter) noexcept :
     fileDescriptor{fileDescriptor}, flags{flags}, ioPriority{ioPriority}, parameter{parameter} {}
 
+auto coContext::Submission::getUserData() const noexcept -> unsigned long { return this->userData; }
+
 auto coContext::Submission::setUserData(const unsigned long userData) noexcept -> void { this->userData = userData; }
 
 auto coContext::Submission::setSqe(io_uring_sqe *const sqe) const noexcept -> void {
