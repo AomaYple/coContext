@@ -107,15 +107,15 @@ auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const 
     }
 }
 
-auto coContext::Ring::getSqe(const std::source_location sourceLocation) -> io_uring_sqe * {
-    io_uring_sqe *const sqe{io_uring_get_sqe(&this->handle)};
-    if (sqe == nullptr) {
+auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceLocation) -> io_uring_sqe * {
+    io_uring_sqe *const submissionQueueEntry{io_uring_get_sqe(&this->handle)};
+    if (submissionQueueEntry == nullptr) {
         throw Exception{
-            Log{Log::Level::error, "no sqe available", sourceLocation}
+            Log{Log::Level::error, "no submission queue entry available", sourceLocation}
         };
     }
 
-    return sqe;
+    return submissionQueueEntry;
 }
 
 auto coContext::Ring::submitAndWait(const unsigned int count, const std::source_location sourceLocation) -> void {
