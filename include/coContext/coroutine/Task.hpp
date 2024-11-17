@@ -35,7 +35,7 @@ namespace coContext {
 
         ~Task();
 
-        [[nodiscard]] auto getHash() const noexcept -> std::size_t;
+        [[nodiscard]] auto getHash() const noexcept -> unsigned long;
 
         auto operator()(int result) const -> void;
 
