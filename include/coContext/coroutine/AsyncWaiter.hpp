@@ -5,9 +5,19 @@
 namespace coContext {
     class AsyncWaiter {
     public:
-        explicit AsyncWaiter(const Submission &submission) noexcept;
+        constexpr AsyncWaiter() noexcept = default;
 
-        [[nodiscard]] constexpr auto await_ready() const noexcept { return false; }
+        AsyncWaiter(const AsyncWaiter &) = delete;
+
+        auto operator=(const AsyncWaiter &) -> AsyncWaiter & = delete;
+
+        AsyncWaiter(AsyncWaiter &&) noexcept = default;
+
+        auto operator=(AsyncWaiter &&) noexcept -> AsyncWaiter & = default;
+
+        ~AsyncWaiter() = default;
+
+        [[nodiscard]] auto await_ready() const noexcept -> bool;
 
         auto await_suspend(std::coroutine_handle<Task::promise_type> handle) -> void;
 
@@ -15,6 +25,5 @@ namespace coContext {
 
     private:
         std::coroutine_handle<Task::promise_type> handle;
-        Submission submission;
     };
 }    // namespace coContext

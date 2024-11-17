@@ -6,13 +6,11 @@ auto coContext::Task::promise_type::get_return_object() -> Task {
     return Task{std::coroutine_handle<promise_type>::from_promise(*this)};
 }
 
+auto coContext::Task::promise_type::initial_suspend() const noexcept -> std::suspend_never { return {}; }
+
+auto coContext::Task::promise_type::final_suspend() const noexcept -> std::suspend_always { return {}; }
+
 auto coContext::Task::promise_type::unhandled_exception() const -> void { throw; }
-
-auto coContext::Task::promise_type::setSubmission(const Submission &submission) noexcept -> void {
-    this->submission = submission;
-}
-
-auto coContext::Task::promise_type::getSubmission() const noexcept -> const Submission & { return this->submission; }
 
 auto coContext::Task::promise_type::setResult(const int result) noexcept -> void { this->result = result; }
 
@@ -33,8 +31,6 @@ auto coContext::Task::operator=(Task &&other) noexcept -> Task & {
 }
 
 coContext::Task::~Task() { this->destroy(); }
-
-auto coContext::Task::getSubmission() const -> const Submission & { return this->handle.promise().getSubmission(); }
 
 auto coContext::Task::operator()(const int result) const -> void {
     this->handle.promise().setResult(result);

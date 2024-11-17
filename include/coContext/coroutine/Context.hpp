@@ -18,15 +18,6 @@ namespace coContext {
 
         ~Context() = default;
 
-        template<typename Function, typename... Args>
-            requires std::is_invocable_r_v<Task, Function, Args...>
-        constexpr auto spawn(Function &&function, Args &&...args) {
-            Task task{std::invoke(std::forward<Function>(function), std::forward<Args>(args)...)};
-
-            task.getSubmission().setSqe(this->ring.getSqe());
-            this->tasks.emplace(task.getSubmission().getUserData(), std::move(task));
-        }
-
     private:
         static auto getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())
             -> unsigned long;
