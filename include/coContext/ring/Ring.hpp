@@ -24,7 +24,7 @@ namespace coContext {
 
         auto registerSelfFileDescriptor(std::source_location sourceLocation = std::source_location::current()) -> void;
 
-        auto registerCpuAffinity(unsigned long cpuSetSize, const cpu_set_t *cpuSet,
+        auto registerCpuAffinity(std::size_t cpuSetSize, const cpu_set_t *cpuSet,
                                  std::source_location sourceLocation = std::source_location::current()) -> void;
 
         auto registerSparseFileDescriptor(unsigned int count,

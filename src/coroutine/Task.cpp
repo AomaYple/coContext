@@ -32,6 +32,10 @@ auto coContext::Task::operator=(Task &&other) noexcept -> Task & {
 
 coContext::Task::~Task() { this->destroy(); }
 
+auto coContext::Task::getHash() const noexcept -> std::size_t {
+    return std::hash<std::coroutine_handle<promise_type>>{}(this->handle);
+}
+
 auto coContext::Task::operator()(const int result) const -> void {
     this->handle.promise().setResult(result);
     this->handle();
