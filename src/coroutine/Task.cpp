@@ -16,8 +16,6 @@ auto coContext::Task::promise_type::setResult(const int result) noexcept -> void
 
 auto coContext::Task::promise_type::getResult() const noexcept -> int { return this->result; }
 
-coContext::Task::Task(const std::coroutine_handle<promise_type> handle) noexcept : handle{handle} {}
-
 coContext::Task::Task(Task &&other) noexcept : handle{std::exchange(other.handle, nullptr)} {}
 
 auto coContext::Task::operator=(Task &&other) noexcept -> Task & {
@@ -42,6 +40,8 @@ auto coContext::Task::operator()(const int result) const -> void {
 }
 
 auto coContext::Task::done() const noexcept -> bool { return this->handle.done(); }
+
+coContext::Task::Task(const std::coroutine_handle<promise_type> handle) noexcept : handle{handle} {}
 
 auto coContext::Task::destroy() const -> void {
     if (static_cast<bool>(this->handle)) this->handle.destroy();

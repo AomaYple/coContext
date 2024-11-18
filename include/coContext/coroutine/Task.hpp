@@ -23,8 +23,6 @@ namespace coContext {
             int result;
         };
 
-        explicit Task(std::coroutine_handle<promise_type> handle) noexcept;
-
         Task(const Task &) = delete;
 
         auto operator=(const Task &) -> Task & = delete;
@@ -42,6 +40,8 @@ namespace coContext {
         [[nodiscard]] auto done() const noexcept -> bool;
 
     private:
+        explicit Task(std::coroutine_handle<promise_type> handle) noexcept;
+
         auto destroy() const -> void;
 
         std::coroutine_handle<promise_type> handle;
