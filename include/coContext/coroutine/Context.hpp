@@ -18,6 +18,12 @@ namespace coContext {
 
         ~Context() = default;
 
+        [[noreturn]] auto run() -> void;
+
+        [[nodiscard]] auto getSubmissionQueueEntry() -> io_uring_sqe *;
+
+        auto submit(Task &&task) -> void;
+
     private:
         static auto getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())
             -> unsigned long;

@@ -35,6 +35,22 @@ coContext::Context::Context() :
     this->ring.registerCpuAffinity(sizeof(cpuSet), &cpuSet);
 }
 
+auto coContext::Context::run() -> void {
+    while (true) {
+        this->ring.submitAndWait(1);
+        this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completionQueueEntry) {
+            const Task &task{this->tasks.at(completionQueueEntry->user_data)};
+            task(completionQueueEntry->res);
+
+            if (task.done()) this->tasks.erase(completionQueueEntry->user_data);
+        }));
+    }
+}
+
+auto coContext::Context::getSubmissionQueueEntry() -> io_uring_sqe * { return this->ring.getSubmissionQueueEntry(); }
+
+auto coContext::Context::submit(Task &&task) -> void { this->tasks.emplace(task.getHash(), std::move(task)); }
+
 auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> unsigned long {
     rlimit limit{};
     if (getrlimit(RLIMIT_NOFILE, &limit) == -1) {
