@@ -26,6 +26,16 @@ namespace coContext {
 
         [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 
+        [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol) -> AsyncWaiter;
+
+        [[nodiscard]] auto accept(std::int32_t socket, sockaddr *address, socklen_t *addressLength) -> AsyncWaiter;
+
+        [[nodiscard]] auto accept4(std::int32_t socket, sockaddr *address, socklen_t *addressLength, std::int32_t flags)
+            -> AsyncWaiter;
+
+        [[nodiscard]] auto connect(std::int32_t socket, const sockaddr *address, socklen_t addressLength)
+            -> AsyncWaiter;
+
     private:
         [[nodiscard]] static auto
             getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())

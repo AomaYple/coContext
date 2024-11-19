@@ -57,6 +57,36 @@ auto coContext::Context::close(const std::int32_t fileDescriptor) -> AsyncWaiter
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::Context::socket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol)
+    -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_socket(submissionQueueEntry, domain, type, protocol, 0);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::Context::accept(const std::int32_t socket, sockaddr *const address, socklen_t *const addressLength)
+    -> AsyncWaiter {
+    return this->accept4(socket, address, addressLength, 0);
+}
+
+auto coContext::Context::accept4(const std::int32_t socket, sockaddr *const address, socklen_t *const addressLength,
+                                 const std::int32_t flags) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_accept(submissionQueueEntry, socket, address, addressLength, flags);
+    submissionQueueEntry->ioprio |= IORING_ACCEPT_POLL_FIRST;
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::Context::connect(const std::int32_t socket, const sockaddr *const address,
+                                 const socklen_t addressLength) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_connect(submissionQueueEntry, socket, address, addressLength);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> std::uint64_t {
     rlimit limit{};
     if (getrlimit(RLIMIT_NOFILE, &limit) == -1) {
