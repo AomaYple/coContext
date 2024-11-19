@@ -109,6 +109,24 @@ auto coContext::Context::shutdown(const std::int32_t fileDescriptor, const std::
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::Context::recv(const std::int32_t fileDescriptor, const std::span<std::byte> buffer,
+                              const std::int32_t flags) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_recv(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), flags);
+    submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::Context::recvmsg(const std::int32_t fileDescriptor, msghdr *const msg, const std::uint32_t flags)
+    -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_recvmsg(submissionQueueEntry, fileDescriptor, msg, flags);
+    submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> std::uint64_t {
     rlimit limit{};
     if (getrlimit(RLIMIT_NOFILE, &limit) == -1) {

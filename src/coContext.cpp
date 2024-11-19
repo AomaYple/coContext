@@ -41,3 +41,13 @@ auto coContext::connect(const std::int32_t fileDescriptor, const sockaddr *const
 auto coContext::shutdown(const std::int32_t fileDescriptor, const std::int32_t how) -> AsyncWaiter {
     return context.shutdown(fileDescriptor, how);
 }
+
+auto coContext::recv(const std::int32_t fileDescriptor, const std::span<std::byte> buffer, const std::int32_t flags)
+    -> AsyncWaiter {
+    return context.recv(fileDescriptor, buffer, flags);
+}
+
+auto coContext::recvmsg(const std::int32_t fileDescriptor, msghdr *const msg, const std::uint32_t flags)
+    -> AsyncWaiter {
+    return context.recvmsg(fileDescriptor, msg, flags);
+}

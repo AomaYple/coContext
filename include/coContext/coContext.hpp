@@ -2,6 +2,7 @@
 
 #include "coroutine/AsyncWaiter.hpp"
 
+#include <span>
 #include <sys/socket.h>
 
 namespace coContext {
@@ -27,4 +28,9 @@ namespace coContext {
         -> AsyncWaiter;
 
     [[nodiscard]] auto shutdown(std::int32_t fileDescriptor, std::int32_t how) -> AsyncWaiter;
+
+    [[nodiscard]] auto recv(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::int32_t flags)
+        -> AsyncWaiter;
+
+    [[nodiscard]] auto recvmsg(std::int32_t fileDescriptor, msghdr *msg, std::uint32_t flags) -> AsyncWaiter;
 }    // namespace coContext

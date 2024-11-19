@@ -44,6 +44,11 @@ namespace coContext {
 
         [[nodiscard]] auto shutdown(std::int32_t fileDescriptor, std::int32_t how) -> AsyncWaiter;
 
+        [[nodiscard]] auto recv(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::int32_t flags)
+            -> AsyncWaiter;
+
+        [[nodiscard]] auto recvmsg(std::int32_t fileDescriptor, msghdr *msg, std::uint32_t flags) -> AsyncWaiter;
+
     private:
         [[nodiscard]] static auto
             getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())
