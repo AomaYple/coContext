@@ -24,7 +24,7 @@ namespace coContext {
 
         auto submit(Task &&task) -> void;
 
-        [[nodiscard]] auto close(int fileDescriptor) -> AsyncWaiter;
+        [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 
     private:
         [[nodiscard]] static auto

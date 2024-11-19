@@ -50,7 +50,7 @@ auto coContext::Context::run() -> void {
 
 auto coContext::Context::submit(Task &&task) -> void { this->tasks.emplace(task.getHash(), std::move(task)); }
 
-auto coContext::Context::close(const int fileDescriptor) -> AsyncWaiter {
+auto coContext::Context::close(const std::int32_t fileDescriptor) -> AsyncWaiter {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
     io_uring_prep_close(submissionQueueEntry, fileDescriptor);
 

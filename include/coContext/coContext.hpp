@@ -7,5 +7,5 @@ namespace coContext {
 
     auto spawn(Task &&task) -> void;
 
-    [[nodiscard]] auto close(int fileDescriptor) -> AsyncWaiter;
+    [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 }    // namespace coContext

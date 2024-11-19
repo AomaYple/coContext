@@ -8,4 +8,4 @@ auto coContext::run() -> void { context.run(); }
 
 auto coContext::spawn(Task &&task) -> void { context.submit(std::move(task)); }
 
-auto coContext::close(const int fileDescriptor) -> AsyncWaiter { return context.close(fileDescriptor); }
+auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter { return context.close(fileDescriptor); }
