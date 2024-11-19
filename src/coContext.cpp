@@ -14,6 +14,15 @@ auto coContext::socket(const std::int32_t domain, const std::int32_t type, const
     return context.socket(domain, type, protocol);
 }
 
+auto coContext::bind(const std::int32_t socket, sockaddr *const address, const std::uint32_t addressLength)
+    -> AsyncWaiter {
+    return context.bind(socket, address, addressLength);
+}
+
+auto coContext::listen(const std::int32_t socket, const std::int32_t backlog) -> AsyncWaiter {
+    return context.listen(socket, backlog);
+}
+
 auto coContext::accept(const std::int32_t socket, sockaddr *const address, std::uint32_t *const addressLength)
     -> AsyncWaiter {
     return context.accept(socket, address, addressLength);

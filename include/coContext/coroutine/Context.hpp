@@ -28,6 +28,10 @@ namespace coContext {
 
         [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol) -> AsyncWaiter;
 
+        [[nodiscard]] auto bind(std::int32_t socket, sockaddr *address, std::uint32_t addressLength) -> AsyncWaiter;
+
+        [[nodiscard]] auto listen(std::int32_t socket, std::int32_t backlog) -> AsyncWaiter;
+
         [[nodiscard]] auto accept(std::int32_t socket, sockaddr *address, std::uint32_t *addressLength) -> AsyncWaiter;
 
         [[nodiscard]] auto accept4(std::int32_t socket, sockaddr *address, std::uint32_t *addressLength,

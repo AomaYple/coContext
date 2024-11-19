@@ -65,6 +65,21 @@ auto coContext::Context::socket(const std::int32_t domain, const std::int32_t ty
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::Context::bind(const std::int32_t socket, sockaddr *const address, const std::uint32_t addressLength)
+    -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_bind(submissionQueueEntry, socket, address, addressLength);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::Context::listen(const std::int32_t socket, const std::int32_t backlog) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_listen(submissionQueueEntry, socket, backlog);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::Context::accept(const std::int32_t socket, sockaddr *const address, std::uint32_t *const addressLength)
     -> AsyncWaiter {
     return this->accept4(socket, address, addressLength, 0);
