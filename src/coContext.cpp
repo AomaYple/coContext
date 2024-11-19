@@ -14,26 +14,30 @@ auto coContext::socket(const std::int32_t domain, const std::int32_t type, const
     return context.socket(domain, type, protocol);
 }
 
-auto coContext::bind(const std::int32_t socket, sockaddr *const address, const std::uint32_t addressLength)
+auto coContext::bind(const std::int32_t fileDescriptor, sockaddr *const address, const std::uint32_t addressLength)
     -> AsyncWaiter {
-    return context.bind(socket, address, addressLength);
+    return context.bind(fileDescriptor, address, addressLength);
 }
 
-auto coContext::listen(const std::int32_t socket, const std::int32_t backlog) -> AsyncWaiter {
-    return context.listen(socket, backlog);
+auto coContext::listen(const std::int32_t fileDescriptor, const std::int32_t backlog) -> AsyncWaiter {
+    return context.listen(fileDescriptor, backlog);
 }
 
-auto coContext::accept(const std::int32_t socket, sockaddr *const address, std::uint32_t *const addressLength)
+auto coContext::accept(const std::int32_t fileDescriptor, sockaddr *const address, std::uint32_t *const addressLength)
     -> AsyncWaiter {
-    return context.accept(socket, address, addressLength);
+    return context.accept(fileDescriptor, address, addressLength);
 }
 
-auto coContext::accept4(const std::int32_t socket, sockaddr *const address, std::uint32_t *const addressLength,
+auto coContext::accept4(const std::int32_t fileDescriptor, sockaddr *const address, std::uint32_t *const addressLength,
                         const std::int32_t flags) -> AsyncWaiter {
-    return context.accept4(socket, address, addressLength, flags);
+    return context.accept4(fileDescriptor, address, addressLength, flags);
 }
 
-auto coContext::connect(const std::int32_t socket, const sockaddr *const address, const std::uint32_t addressLength)
-    -> AsyncWaiter {
-    return context.connect(socket, address, addressLength);
+auto coContext::connect(const std::int32_t fileDescriptor, const sockaddr *const address,
+                        const std::uint32_t addressLength) -> AsyncWaiter {
+    return context.connect(fileDescriptor, address, addressLength);
+}
+
+auto coContext::shutdown(const std::int32_t fileDescriptor, const std::int32_t how) -> AsyncWaiter {
+    return context.shutdown(fileDescriptor, how);
 }
