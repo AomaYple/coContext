@@ -14,14 +14,6 @@ auto coContext::Task::promise_type::unhandled_exception() const -> void { throw;
 
 auto coContext::Task::promise_type::return_void() const noexcept -> void {}
 
-auto coContext::Task::promise_type::setSubmissionQueueEntry(io_uring_sqe *const submissionQueueEntry) noexcept -> void {
-    this->submissionQueueEntry = submissionQueueEntry;
-}
-
-auto coContext::Task::promise_type::getSubmissionQueueEntry() const noexcept -> io_uring_sqe * {
-    return this->submissionQueueEntry;
-}
-
 auto coContext::Task::promise_type::setResult(const std::int32_t result) noexcept -> void { this->result = result; }
 
 auto coContext::Task::promise_type::getResult() const noexcept -> std::int32_t { return this->result; }
@@ -39,10 +31,6 @@ auto coContext::Task::operator=(Task &&other) noexcept -> Task & {
 }
 
 coContext::Task::~Task() { this->destroy(); }
-
-auto coContext::Task::getSubmissionQueueEntry() const -> io_uring_sqe * {
-    return this->handle.promise().getSubmissionQueueEntry();
-}
 
 auto coContext::Task::getHash() const noexcept -> std::uint64_t {
     return std::hash<std::coroutine_handle<promise_type>>{}(this->handle);

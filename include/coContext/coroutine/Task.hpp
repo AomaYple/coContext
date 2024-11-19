@@ -1,7 +1,7 @@
 #pragma once
 
 #include <coroutine>
-#include <liburing.h>
+#include <cstdint>
 
 namespace coContext {
     class Task {
@@ -18,16 +18,11 @@ namespace coContext {
 
             auto return_void() const noexcept -> void;
 
-            auto setSubmissionQueueEntry(io_uring_sqe *submissionQueueEntry) noexcept -> void;
-
-            [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> io_uring_sqe *;
-
             auto setResult(std::int32_t result) noexcept -> void;
 
             [[nodiscard]] auto getResult() const noexcept -> std::int32_t;
 
         private:
-            io_uring_sqe *submissionQueueEntry;
             std::int32_t result;
         };
 
@@ -40,8 +35,6 @@ namespace coContext {
         auto operator=(Task &&) noexcept -> Task &;
 
         ~Task();
-
-        [[nodiscard]] auto getSubmissionQueueEntry() const -> io_uring_sqe *;
 
         [[nodiscard]] auto getHash() const noexcept -> std::uint64_t;
 

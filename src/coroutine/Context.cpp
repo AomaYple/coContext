@@ -48,12 +48,7 @@ auto coContext::Context::run() -> void {
     }
 }
 
-auto coContext::Context::submit(Task &&task) -> void {
-    const std::uint64_t hashValue{task.getHash()};
-
-    io_uring_sqe_set_data64(task.getSubmissionQueueEntry(), hashValue);
-    this->tasks.emplace(hashValue, std::move(task));
-}
+auto coContext::Context::submit(Task &&task) -> void { this->tasks.emplace(task.getHash(), std::move(task)); }
 
 auto coContext::Context::close(const int fileDescriptor) -> AsyncWaiter {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
