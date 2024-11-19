@@ -16,6 +16,8 @@ namespace coContext {
 
             auto unhandled_exception() const -> void;
 
+            auto return_void() const noexcept -> void;
+
             auto setSubmissionQueueEntry(io_uring_sqe *submissionQueueEntry) noexcept -> void;
 
             [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> io_uring_sqe *;

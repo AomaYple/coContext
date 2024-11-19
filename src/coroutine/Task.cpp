@@ -12,6 +12,8 @@ auto coContext::Task::promise_type::final_suspend() const noexcept -> std::suspe
 
 auto coContext::Task::promise_type::unhandled_exception() const -> void { throw; }
 
+auto coContext::Task::promise_type::return_void() const noexcept -> void {}
+
 auto coContext::Task::promise_type::setSubmissionQueueEntry(io_uring_sqe *const submissionQueueEntry) noexcept -> void {
     this->submissionQueueEntry = submissionQueueEntry;
 }

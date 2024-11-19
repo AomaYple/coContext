@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Task.hpp"
 #include "coContext/ring/Ring.hpp"
 
 namespace coContext {
+    class AsyncWaiter;
+    class Task;
+
     class Context {
     public:
         Context();
@@ -20,9 +22,9 @@ namespace coContext {
 
         [[noreturn]] auto run() -> void;
 
-        [[nodiscard]] auto getSubmissionQueueEntry() -> io_uring_sqe *;
-
         auto submit(Task &&task) -> void;
+
+        [[nodiscard]] auto close(int fileDescriptor) -> AsyncWaiter;
 
     private:
         [[nodiscard]] static auto

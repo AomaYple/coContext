@@ -1,6 +1,7 @@
 #include "coContext/coroutine/Context.hpp"
 
 #include "../log/Exception.hpp"
+#include "coContext/coroutine/AsyncWaiter.hpp"
 
 #include <sys/resource.h>
 
@@ -47,13 +48,18 @@ auto coContext::Context::run() -> void {
     }
 }
 
-auto coContext::Context::getSubmissionQueueEntry() -> io_uring_sqe * { return this->ring.getSubmissionQueueEntry(); }
-
 auto coContext::Context::submit(Task &&task) -> void {
     const std::uint64_t hashValue{task.getHash()};
 
     io_uring_sqe_set_data64(task.getSubmissionQueueEntry(), hashValue);
     this->tasks.emplace(hashValue, std::move(task));
+}
+
+auto coContext::Context::close(const int fileDescriptor) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_close(submissionQueueEntry, fileDescriptor);
+
+    return AsyncWaiter{submissionQueueEntry};
 }
 
 auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> std::uint64_t {
