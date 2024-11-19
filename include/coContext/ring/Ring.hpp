@@ -8,7 +8,7 @@
 namespace coContext {
     class Ring {
     public:
-        Ring(unsigned int entries, io_uring_params &params);
+        Ring(std::uint32_t entries, io_uring_params &params);
 
         Ring(const Ring &) = delete;
 
@@ -20,42 +20,43 @@ namespace coContext {
 
         ~Ring();
 
-        [[nodiscard]] auto getFileDescriptor() const noexcept -> int;
+        [[nodiscard]] auto getFileDescriptor() const noexcept -> std::int32_t;
 
         auto registerSelfFileDescriptor(std::source_location sourceLocation = std::source_location::current()) -> void;
 
-        auto registerCpuAffinity(unsigned long cpuSetSize, const cpu_set_t *cpuSet,
+        auto registerCpuAffinity(std::uint64_t cpuSetSize, const cpu_set_t *cpuSet,
                                  std::source_location sourceLocation = std::source_location::current()) -> void;
 
-        auto registerSparseFileDescriptor(unsigned int count,
+        auto registerSparseFileDescriptor(std::uint32_t count,
                                           std::source_location sourceLocation = std::source_location::current())
             -> void;
 
-        auto allocateFileDescriptorRange(unsigned int offset, unsigned int length,
+        auto allocateFileDescriptorRange(std::uint32_t offset, std::uint32_t length,
                                          std::source_location sourceLocation = std::source_location::current()) -> void;
 
-        auto updateFileDescriptors(unsigned int offset, std::span<const int> fileDescriptors,
+        auto updateFileDescriptors(std::uint32_t offset, std::span<const std::int32_t> fileDescriptors,
                                    std::source_location sourceLocation = std::source_location::current()) -> void;
 
-        [[nodiscard]] auto setupRingBuffer(unsigned int entries, int id, unsigned int flags,
+        [[nodiscard]] auto setupRingBuffer(std::uint32_t entries, std::int32_t id, std::uint32_t flags,
                                            std::source_location sourceLocation = std::source_location::current())
             -> io_uring_buf_ring *;
 
-        auto freeRingBuffer(io_uring_buf_ring *ringBuffer, unsigned int entries, int id,
+        auto freeRingBuffer(io_uring_buf_ring *ringBuffer, std::uint32_t entries, std::int32_t id,
                             std::source_location sourceLocation = std::source_location::current()) -> void;
 
         [[nodiscard]] auto
             getSubmissionQueueEntry(std::source_location sourceLocation = std::source_location::current())
                 -> io_uring_sqe *;
 
-        auto submitAndWait(unsigned int count, std::source_location sourceLocation = std::source_location::current())
+        auto submitAndWait(std::uint32_t count, std::source_location sourceLocation = std::source_location::current())
             -> void;
 
-        auto poll(std::move_only_function<auto(const io_uring_cqe *)->void> &&action) const -> int;
+        [[nodiscard]] auto poll(std::move_only_function<auto(const io_uring_cqe *)->void> &&action) const
+            -> std::int32_t;
 
-        auto advance(unsigned int count) noexcept -> void;
+        auto advance(std::uint32_t count) noexcept -> void;
 
-        auto advance(io_uring_buf_ring *ringBuffer, int cqeCount, int bufferCount) noexcept -> void;
+        auto advance(io_uring_buf_ring *ringBuffer, std::int32_t cqeCount, std::int32_t bufferCount) noexcept -> void;
 
     private:
         auto destroy() noexcept -> void;

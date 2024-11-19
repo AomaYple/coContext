@@ -4,7 +4,8 @@
 #include <utility>
 
 coContext::Log::Log(const Level level, std::string &&message, const std::source_location sourceLocation,
-         const std::chrono::system_clock::time_point timestamp, const std::jthread::id joinThreadId) noexcept :
+                    const std::chrono::system_clock::time_point timestamp, const std::jthread::id joinThreadId) noexcept
+    :
     level{level}, message{std::move(message)}, sourceLocation{sourceLocation}, timestamp{timestamp},
     joinThreadId{joinThreadId} {}
 

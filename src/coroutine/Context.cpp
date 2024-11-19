@@ -17,7 +17,7 @@ coContext::Context::Context() :
             params.wq_fd = sharedRingFileDescriptor;
         }
 
-        Ring ring{static_cast<unsigned int>(getFileDescriptorLimit()) * 2, params};
+        Ring ring{static_cast<std::uint32_t>(getFileDescriptorLimit()) * 2, params};
 
         if (sharedRingFileDescriptor == -1) sharedRingFileDescriptor = ring.getFileDescriptor();
 
@@ -49,9 +49,14 @@ auto coContext::Context::run() -> void {
 
 auto coContext::Context::getSubmissionQueueEntry() -> io_uring_sqe * { return this->ring.getSubmissionQueueEntry(); }
 
-auto coContext::Context::submit(Task &&task) -> void { this->tasks.emplace(task.getHash(), std::move(task)); }
+auto coContext::Context::submit(Task &&task) -> void {
+    const std::uint64_t hashValue{task.getHash()};
 
-auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> unsigned long {
+    io_uring_sqe_set_data64(task.getSubmissionQueueEntry(), hashValue);
+    this->tasks.emplace(hashValue, std::move(task));
+}
+
+auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> std::uint64_t {
     rlimit limit{};
     if (getrlimit(RLIMIT_NOFILE, &limit) == -1) {
         throw Exception{
@@ -63,5 +68,5 @@ auto coContext::Context::getFileDescriptorLimit(const std::source_location sourc
 }
 
 std::mutex coContext::Context::mutex;
-int coContext::Context::sharedRingFileDescriptor{-1};
-unsigned int coContext::Context::cpuCode;
+std::int32_t coContext::Context::sharedRingFileDescriptor{-1};
+std::uint32_t coContext::Context::cpuCode;

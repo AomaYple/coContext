@@ -25,14 +25,15 @@ namespace coContext {
         auto submit(Task &&task) -> void;
 
     private:
-        static auto getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())
-            -> unsigned long;
+        [[nodiscard]] static auto
+            getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())
+                -> std::uint64_t;
 
         static std::mutex mutex;
-        static int sharedRingFileDescriptor;
-        static unsigned int cpuCode;
+        static std::int32_t sharedRingFileDescriptor;
+        static std::uint32_t cpuCode;
 
         Ring ring;
-        std::unordered_map<unsigned long, Task> tasks;
+        std::unordered_map<std::uint64_t, Task> tasks;
     };
 }    // namespace coContext

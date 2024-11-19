@@ -5,7 +5,7 @@
 namespace coContext {
     class AsyncWaiter {
     public:
-        constexpr AsyncWaiter() noexcept = default;
+        explicit AsyncWaiter(io_uring_sqe *submissionQueueEntry) noexcept;
 
         AsyncWaiter(const AsyncWaiter &) = delete;
 
@@ -21,9 +21,10 @@ namespace coContext {
 
         auto await_suspend(std::coroutine_handle<Task::promise_type> handle) -> void;
 
-        [[nodiscard]] auto await_resume() const -> int;
+        [[nodiscard]] auto await_resume() const -> std::int32_t;
 
     private:
+        io_uring_sqe *submissionQueueEntry;
         std::coroutine_handle<Task::promise_type> handle;
     };
 }    // namespace coContext
