@@ -1,5 +1,7 @@
 #include "coContext/coroutine/AsyncWaiter.hpp"
 
+#include <liburing.h>
+
 coContext::AsyncWaiter::AsyncWaiter(io_uring_sqe *const submissionQueueEntry) noexcept :
     submissionQueueEntry{submissionQueueEntry} {}
 
