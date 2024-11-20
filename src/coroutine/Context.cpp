@@ -166,6 +166,14 @@ auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const 
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
+                              open_how *const how) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_openat2(submissionQueueEntry, directoryFileDescriptor, pathname.data(), how);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> std::uint64_t {
     rlimit limit{};
     if (getrlimit(RLIMIT_NOFILE, &limit) == -1) {

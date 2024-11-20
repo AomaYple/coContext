@@ -2,6 +2,7 @@
 
 #include "coroutine/AsyncWaiter.hpp"
 
+#include <linux/openat2.h>
 #include <span>
 #include <string_view>
 #include <sys/socket.h>
@@ -47,4 +48,7 @@ namespace coContext {
 
     [[nodiscard]] auto openat(std::int32_t directoryFileDescriptor, std::string_view pathname, std::int32_t flags,
                               std::uint32_t mode) -> AsyncWaiter;
+
+    [[nodiscard]] auto openat2(std::int32_t directoryFileDescriptor, std::string_view pathname, open_how *how)
+        -> AsyncWaiter;
 }    // namespace coContext

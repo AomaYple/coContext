@@ -64,6 +64,9 @@ namespace coContext {
         [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, std::int32_t flags,
                                 std::uint32_t mode) -> AsyncWaiter;
 
+        [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, open_how *how)
+            -> AsyncWaiter;
+
     private:
         [[nodiscard]] static auto
             getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())
