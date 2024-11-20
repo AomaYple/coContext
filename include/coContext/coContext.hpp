@@ -51,4 +51,8 @@ namespace coContext {
 
     [[nodiscard]] auto openat2(std::int32_t directoryFileDescriptor, std::string_view pathname, open_how *how)
         -> AsyncWaiter;
+
+    [[nodiscard]] auto read(std::int32_t fileDescriptor, std::span<std::byte> buffer) -> AsyncWaiter;
+
+    [[nodiscard]] auto readv(std::int32_t fileDescriptor, std::span<const iovec> buffer) -> AsyncWaiter;
 }    // namespace coContext

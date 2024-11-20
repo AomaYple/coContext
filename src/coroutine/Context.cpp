@@ -57,10 +57,10 @@ auto coContext::Context::close(const std::int32_t fileDescriptor) -> AsyncWaiter
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::Context::socket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol)
-    -> AsyncWaiter {
+auto coContext::Context::socket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol,
+                                const std::uint32_t flags) -> AsyncWaiter {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_socket(submissionQueueEntry, domain, type, protocol, 0);
+    io_uring_prep_socket(submissionQueueEntry, domain, type, protocol, flags);
 
     return AsyncWaiter{submissionQueueEntry};
 }
@@ -170,6 +170,22 @@ auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const 
                               open_how *const how) -> AsyncWaiter {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
     io_uring_prep_openat2(submissionQueueEntry, directoryFileDescriptor, pathname.data(), how);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer,
+                              const std::uint64_t offset) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_read(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), offset);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
+                              const std::uint64_t offset) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_readv(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), offset);
 
     return AsyncWaiter{submissionQueueEntry};
 }

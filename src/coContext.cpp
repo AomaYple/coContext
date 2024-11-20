@@ -11,7 +11,7 @@ auto coContext::spawn(Task &&task) -> void { context.submit(std::move(task)); }
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter { return context.close(fileDescriptor); }
 
 auto coContext::socket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol) -> AsyncWaiter {
-    return context.socket(domain, type, protocol);
+    return context.socket(domain, type, protocol, 0);
 }
 
 auto coContext::bind(const std::int32_t fileDescriptor, sockaddr *const address, const std::uint32_t addressLength)
@@ -81,4 +81,12 @@ auto coContext::openat(const std::int32_t directoryFileDescriptor, const std::st
 auto coContext::openat2(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
                         open_how *const how) -> AsyncWaiter {
     return context.open(directoryFileDescriptor, pathname, how);
+}
+
+auto coContext::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer) -> AsyncWaiter {
+    return context.read(fileDescriptor, buffer, -1);
+}
+
+auto coContext::readv(const std::int32_t fileDescriptor, const std::span<const iovec> buffer) -> AsyncWaiter {
+    return context.read(fileDescriptor, buffer, -1);
 }
