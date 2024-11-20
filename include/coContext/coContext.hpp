@@ -55,4 +55,10 @@ namespace coContext {
     [[nodiscard]] auto read(std::int32_t fileDescriptor, std::span<std::byte> buffer) -> AsyncWaiter;
 
     [[nodiscard]] auto readv(std::int32_t fileDescriptor, std::span<const iovec> buffer) -> AsyncWaiter;
+
+    [[nodiscard]] auto pread(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::uint64_t offset)
+        -> AsyncWaiter;
+
+    [[nodiscard]] auto preadv(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset)
+        -> AsyncWaiter;
 }    // namespace coContext

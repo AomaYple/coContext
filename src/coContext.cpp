@@ -84,9 +84,19 @@ auto coContext::openat2(const std::int32_t directoryFileDescriptor, const std::s
 }
 
 auto coContext::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer) -> AsyncWaiter {
-    return context.read(fileDescriptor, buffer, -1);
+    return pread(fileDescriptor, buffer, -1);
 }
 
 auto coContext::readv(const std::int32_t fileDescriptor, const std::span<const iovec> buffer) -> AsyncWaiter {
-    return context.read(fileDescriptor, buffer, -1);
+    return preadv(fileDescriptor, buffer, -1);
+}
+
+auto coContext::pread(const std::int32_t fileDescriptor, const std::span<std::byte> buffer, const std::uint64_t offset)
+    -> AsyncWaiter {
+    return context.read(fileDescriptor, buffer, offset);
+}
+
+auto coContext::preadv(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
+                       const std::uint64_t offset) -> AsyncWaiter {
+    return context.read(fileDescriptor, buffer, offset);
 }
