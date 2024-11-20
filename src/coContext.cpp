@@ -11,7 +11,7 @@ auto coContext::spawn(Task &&task) -> void { context.submit(std::move(task)); }
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter { return context.close(fileDescriptor); }
 
 auto coContext::socket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol) -> AsyncWaiter {
-    return context.socket(domain, type, protocol, 0);
+    return context.socket(domain, type, protocol);
 }
 
 auto coContext::bind(const std::int32_t fileDescriptor, sockaddr *const address, const std::uint32_t addressLength)
@@ -25,7 +25,7 @@ auto coContext::listen(const std::int32_t fileDescriptor, const std::int32_t bac
 
 auto coContext::accept(const std::int32_t fileDescriptor, sockaddr *const address, std::uint32_t *const addressLength)
     -> AsyncWaiter {
-    return context.accept(fileDescriptor, address, addressLength, 0);
+    return context.accept(fileDescriptor, address, addressLength);
 }
 
 auto coContext::accept4(const std::int32_t fileDescriptor, sockaddr *const address, std::uint32_t *const addressLength,
@@ -75,7 +75,7 @@ auto coContext::open(const std::string_view pathname, const std::int32_t flags, 
 
 auto coContext::openat(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
                        const std::int32_t flags, const std::uint32_t mode) -> AsyncWaiter {
-    return context.open(directoryFileDescriptor, pathname, flags, mode);
+    return context.open(pathname, flags, mode, directoryFileDescriptor);
 }
 
 auto coContext::openat2(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
@@ -84,11 +84,7 @@ auto coContext::openat2(const std::int32_t directoryFileDescriptor, const std::s
 }
 
 auto coContext::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer) -> AsyncWaiter {
-    return pread(fileDescriptor, buffer, -1);
-}
-
-auto coContext::readv(const std::int32_t fileDescriptor, const std::span<const iovec> buffer) -> AsyncWaiter {
-    return preadv(fileDescriptor, buffer, -1);
+    return context.read(fileDescriptor, buffer);
 }
 
 auto coContext::pread(const std::int32_t fileDescriptor, const std::span<std::byte> buffer, const std::uint64_t offset)
@@ -96,7 +92,16 @@ auto coContext::pread(const std::int32_t fileDescriptor, const std::span<std::by
     return context.read(fileDescriptor, buffer, offset);
 }
 
+auto coContext::readv(const std::int32_t fileDescriptor, const std::span<const iovec> buffer) -> AsyncWaiter {
+    return context.read(fileDescriptor, buffer);
+}
+
 auto coContext::preadv(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
                        const std::uint64_t offset) -> AsyncWaiter {
     return context.read(fileDescriptor, buffer, offset);
+}
+
+auto coContext::preadv2(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
+                        const std::uint64_t offset, const std::int32_t flags) -> AsyncWaiter {
+    return context.read(fileDescriptor, buffer, offset, flags);
 }
