@@ -32,5 +32,13 @@ namespace coContext {
     [[nodiscard]] auto recv(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::int32_t flags)
         -> AsyncWaiter;
 
-    [[nodiscard]] auto recvmsg(std::int32_t fileDescriptor, msghdr *msg, std::uint32_t flags) -> AsyncWaiter;
+    [[nodiscard]] auto recvmsg(std::int32_t fileDescriptor, msghdr *message, std::uint32_t flags) -> AsyncWaiter;
+
+    [[nodiscard]] auto send(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::int32_t flags)
+        -> AsyncWaiter;
+
+    [[nodiscard]] auto sendto(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
+                              const sockaddr *address, std::uint32_t addressLength) -> AsyncWaiter;
+
+    [[nodiscard]] auto sendmsg(std::int32_t fileDescriptor, const msghdr *message, std::uint32_t flags) -> AsyncWaiter;
 }    // namespace coContext

@@ -113,10 +113,38 @@ auto coContext::Context::recv(const std::int32_t fileDescriptor, const std::span
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::Context::recvmsg(const std::int32_t fileDescriptor, msghdr *const msg, const std::uint32_t flags)
+auto coContext::Context::recvmsg(const std::int32_t fileDescriptor, msghdr *const message, const std::uint32_t flags)
     -> AsyncWaiter {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_recvmsg(submissionQueueEntry, fileDescriptor, msg, flags);
+    io_uring_prep_recvmsg(submissionQueueEntry, fileDescriptor, message, flags);
+    submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::Context::send(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
+                              const std::int32_t flags) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_send(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), flags);
+    submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::Context::sendto(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
+                                const std::int32_t flags, const sockaddr *const address,
+                                const std::uint32_t addressLength) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_sendto(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), flags, address,
+                         addressLength);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::Context::sendmsg(const std::int32_t fileDescriptor, const msghdr *const message,
+                                 const std::uint32_t flags) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_sendmsg(submissionQueueEntry, fileDescriptor, message, flags);
     submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
 
     return AsyncWaiter{submissionQueueEntry};

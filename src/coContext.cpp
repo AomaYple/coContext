@@ -47,7 +47,23 @@ auto coContext::recv(const std::int32_t fileDescriptor, const std::span<std::byt
     return context.recv(fileDescriptor, buffer, flags);
 }
 
-auto coContext::recvmsg(const std::int32_t fileDescriptor, msghdr *const msg, const std::uint32_t flags)
+auto coContext::recvmsg(const std::int32_t fileDescriptor, msghdr *const message, const std::uint32_t flags)
     -> AsyncWaiter {
-    return context.recvmsg(fileDescriptor, msg, flags);
+    return context.recvmsg(fileDescriptor, message, flags);
+}
+
+auto coContext::send(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
+                     const std::int32_t flags) -> AsyncWaiter {
+    return context.send(fileDescriptor, buffer, flags);
+}
+
+auto coContext::sendto(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
+                       const std::int32_t flags, const sockaddr *const address, const std::uint32_t addressLength)
+    -> AsyncWaiter {
+    return context.sendto(fileDescriptor, buffer, flags, address, addressLength);
+}
+
+auto coContext::sendmsg(const std::int32_t fileDescriptor, const msghdr *const message, const std::uint32_t flags)
+    -> AsyncWaiter {
+    return context.sendmsg(fileDescriptor, message, flags);
 }
