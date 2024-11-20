@@ -25,12 +25,12 @@ auto coContext::listen(const std::int32_t fileDescriptor, const std::int32_t bac
 
 auto coContext::accept(const std::int32_t fileDescriptor, sockaddr *const address, std::uint32_t *const addressLength)
     -> AsyncWaiter {
-    return context.accept(fileDescriptor, address, addressLength);
+    return context.accept(fileDescriptor, address, addressLength, 0);
 }
 
 auto coContext::accept4(const std::int32_t fileDescriptor, sockaddr *const address, std::uint32_t *const addressLength,
                         const std::int32_t flags) -> AsyncWaiter {
-    return context.accept4(fileDescriptor, address, addressLength, flags);
+    return context.accept(fileDescriptor, address, addressLength, flags);
 }
 
 auto coContext::connect(const std::int32_t fileDescriptor, const sockaddr *const address,

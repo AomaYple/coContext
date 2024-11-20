@@ -33,11 +33,8 @@ namespace coContext {
 
         [[nodiscard]] auto listen(std::int32_t fileDescriptor, std::int32_t backlog) -> AsyncWaiter;
 
-        [[nodiscard]] auto accept(std::int32_t fileDescriptor, sockaddr *address, std::uint32_t *addressLength)
-            -> AsyncWaiter;
-
-        [[nodiscard]] auto accept4(std::int32_t fileDescriptor, sockaddr *address, std::uint32_t *addressLength,
-                                   std::int32_t flags) -> AsyncWaiter;
+        [[nodiscard]] auto accept(std::int32_t fileDescriptor, sockaddr *address, std::uint32_t *addressLength,
+                                  std::int32_t flags) -> AsyncWaiter;
 
         [[nodiscard]] auto connect(std::int32_t fileDescriptor, const sockaddr *address, std::uint32_t addressLength)
             -> AsyncWaiter;

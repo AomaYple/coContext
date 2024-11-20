@@ -81,12 +81,7 @@ auto coContext::Context::listen(const std::int32_t fileDescriptor, const std::in
 }
 
 auto coContext::Context::accept(const std::int32_t fileDescriptor, sockaddr *const address,
-                                std::uint32_t *const addressLength) -> AsyncWaiter {
-    return this->accept4(fileDescriptor, address, addressLength, 0);
-}
-
-auto coContext::Context::accept4(const std::int32_t fileDescriptor, sockaddr *const address,
-                                 std::uint32_t *const addressLength, const std::int32_t flags) -> AsyncWaiter {
+                                std::uint32_t *const addressLength, const std::int32_t flags) -> AsyncWaiter {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
     io_uring_prep_accept(submissionQueueEntry, fileDescriptor, address, addressLength, flags);
     submissionQueueEntry->ioprio |= IORING_ACCEPT_POLL_FIRST;
