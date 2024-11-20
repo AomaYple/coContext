@@ -44,12 +44,12 @@ auto coContext::shutdown(const std::int32_t fileDescriptor, const std::int32_t h
 
 auto coContext::recv(const std::int32_t fileDescriptor, const std::span<std::byte> buffer, const std::int32_t flags)
     -> AsyncWaiter {
-    return context.recv(fileDescriptor, buffer, flags);
+    return context.receive(fileDescriptor, buffer, flags);
 }
 
 auto coContext::recvmsg(const std::int32_t fileDescriptor, msghdr *const message, const std::uint32_t flags)
     -> AsyncWaiter {
-    return context.recvmsg(fileDescriptor, message, flags);
+    return context.receive(fileDescriptor, message, flags);
 }
 
 auto coContext::send(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
@@ -60,10 +60,20 @@ auto coContext::send(const std::int32_t fileDescriptor, const std::span<const st
 auto coContext::sendto(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
                        const std::int32_t flags, const sockaddr *const address, const std::uint32_t addressLength)
     -> AsyncWaiter {
-    return context.sendto(fileDescriptor, buffer, flags, address, addressLength);
+    return context.send(fileDescriptor, buffer, flags, address, addressLength);
 }
 
 auto coContext::sendmsg(const std::int32_t fileDescriptor, const msghdr *const message, const std::uint32_t flags)
     -> AsyncWaiter {
-    return context.sendmsg(fileDescriptor, message, flags);
+    return context.send(fileDescriptor, message, flags);
+}
+
+auto coContext::open(const std::string_view pathname, const std::int32_t flags, const std::uint32_t mode)
+    -> AsyncWaiter {
+    return context.open(pathname, flags, mode);
+}
+
+auto coContext::openat(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
+                       const std::int32_t flags, const std::uint32_t mode) -> AsyncWaiter {
+    return context.open(directoryFileDescriptor, pathname, flags, mode);
 }

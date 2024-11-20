@@ -2,6 +2,8 @@
 
 #include "coContext/ring/Ring.hpp"
 
+#include <string_view>
+
 namespace coContext {
     class AsyncWaiter;
     class Task;
@@ -28,32 +30,39 @@ namespace coContext {
 
         [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol) -> AsyncWaiter;
 
-        [[nodiscard]] auto bind(std::int32_t fileDescriptor, sockaddr *address, std::uint32_t addressLength)
+        [[nodiscard]] auto bind(std::int32_t socketFileDescriptor, sockaddr *address, std::uint32_t addressLength)
             -> AsyncWaiter;
 
-        [[nodiscard]] auto listen(std::int32_t fileDescriptor, std::int32_t backlog) -> AsyncWaiter;
+        [[nodiscard]] auto listen(std::int32_t socketFileDescriptor, std::int32_t backlog) -> AsyncWaiter;
 
-        [[nodiscard]] auto accept(std::int32_t fileDescriptor, sockaddr *address, std::uint32_t *addressLength,
+        [[nodiscard]] auto accept(std::int32_t socketFileDescriptor, sockaddr *address, std::uint32_t *addressLength,
                                   std::int32_t flags) -> AsyncWaiter;
 
-        [[nodiscard]] auto connect(std::int32_t fileDescriptor, const sockaddr *address, std::uint32_t addressLength)
+        [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr *address,
+                                   std::uint32_t addressLength) -> AsyncWaiter;
+
+        [[nodiscard]] auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) -> AsyncWaiter;
+
+        [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, std::span<std::byte> buffer, std::int32_t flags)
             -> AsyncWaiter;
 
-        [[nodiscard]] auto shutdown(std::int32_t fileDescriptor, std::int32_t how) -> AsyncWaiter;
-
-        [[nodiscard]] auto recv(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::int32_t flags)
+        [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, msghdr *message, std::uint32_t flags)
             -> AsyncWaiter;
 
-        [[nodiscard]] auto recvmsg(std::int32_t fileDescriptor, msghdr *message, std::uint32_t flags) -> AsyncWaiter;
+        [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer,
+                                std::int32_t flags) -> AsyncWaiter;
 
-        [[nodiscard]] auto send(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::int32_t flags)
+        [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer,
+                                std::int32_t flags, const sockaddr *address, std::uint32_t addressLength)
             -> AsyncWaiter;
 
-        [[nodiscard]] auto sendto(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
-                                  const sockaddr *address, std::uint32_t addressLength) -> AsyncWaiter;
-
-        [[nodiscard]] auto sendmsg(std::int32_t fileDescriptor, const msghdr *message, std::uint32_t flags)
+        [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr *message, std::uint32_t flags)
             -> AsyncWaiter;
+
+        [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode) -> AsyncWaiter;
+
+        [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, std::int32_t flags,
+                                std::uint32_t mode) -> AsyncWaiter;
 
     private:
         [[nodiscard]] static auto

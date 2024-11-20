@@ -3,6 +3,7 @@
 #include "coroutine/AsyncWaiter.hpp"
 
 #include <span>
+#include <string_view>
 #include <sys/socket.h>
 
 namespace coContext {
@@ -41,4 +42,9 @@ namespace coContext {
                               const sockaddr *address, std::uint32_t addressLength) -> AsyncWaiter;
 
     [[nodiscard]] auto sendmsg(std::int32_t fileDescriptor, const msghdr *message, std::uint32_t flags) -> AsyncWaiter;
+
+    [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode) -> AsyncWaiter;
+
+    [[nodiscard]] auto openat(std::int32_t directoryFileDescriptor, std::string_view pathname, std::int32_t flags,
+                              std::uint32_t mode) -> AsyncWaiter;
 }    // namespace coContext
