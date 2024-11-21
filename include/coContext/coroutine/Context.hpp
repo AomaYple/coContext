@@ -76,6 +76,15 @@ namespace coContext {
         [[nodiscard]] auto read(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
                                 std::int32_t flags) -> io_uring_sqe *;
 
+        [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::uint64_t offset)
+            -> io_uring_sqe *;
+
+        [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset)
+            -> io_uring_sqe *;
+
+        [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
+                                 std::int32_t flags) -> io_uring_sqe *;
+
     private:
         [[nodiscard]] static auto
             getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())

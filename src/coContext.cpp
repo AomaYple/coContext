@@ -94,3 +94,18 @@ auto coContext::read(const std::int32_t fileDescriptor, const std::span<const io
                      const std::int32_t flags) -> AsyncWaiter {
     return AsyncWaiter{context.read(fileDescriptor, buffer, offset, flags)};
 }
+
+auto coContext::write(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
+                      const std::uint64_t offset) -> AsyncWaiter {
+    return AsyncWaiter{context.write(fileDescriptor, buffer, offset)};
+}
+
+auto coContext::write(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
+                      const std::uint64_t offset) -> AsyncWaiter {
+    return AsyncWaiter{context.write(fileDescriptor, buffer, offset)};
+}
+
+auto coContext::write(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
+                      const std::uint64_t offset, const std::int32_t flags) -> AsyncWaiter {
+    return AsyncWaiter{context.write(fileDescriptor, buffer, offset, flags)};
+}
