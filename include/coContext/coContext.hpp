@@ -43,10 +43,10 @@ namespace coContext {
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr *message, std::uint32_t flags)
         -> AsyncWaiter;
 
-    [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode) -> AsyncWaiter;
+    [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode = 0) -> AsyncWaiter;
 
     [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, std::int32_t flags,
-                            std::uint32_t mode) -> AsyncWaiter;
+                            std::uint32_t mode = 0) -> AsyncWaiter;
 
     [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, open_how *how)
         -> AsyncWaiter;
