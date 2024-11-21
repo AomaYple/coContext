@@ -4,7 +4,8 @@
 
 ## 依赖
 
-Linux内核6.12及以上，GCC 14及以上，CMake 3.30及以上，Ninja 1.8.2及以上，liburing 2.8及以上
+[Linux内核](https://www.kernel.org) 6.12及以上，[GCC](https://gcc.gnu.org) 14及以上，[CMake](https://cmake.org)
+3.30及以上，[Ninja](https://ninja-build.org/) 1.8.2及以上，[liburing](https://github.com/axboe/liburing) 2.8及以上
 
 ## 构建
 
