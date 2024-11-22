@@ -1,4 +1,4 @@
-#include "coContext/ring/Ring.hpp"
+#include "Ring.hpp"
 
 #include "../log/Exception.hpp"
 

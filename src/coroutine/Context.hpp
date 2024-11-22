@@ -1,6 +1,6 @@
 #pragma once
 
-#include "coContext/ring/Ring.hpp"
+#include "../ring/Ring.hpp"
 
 #include <string_view>
 
