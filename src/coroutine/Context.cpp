@@ -63,7 +63,7 @@ auto coContext::Context::cancel(const std::variant<std::uint64_t, std::int32_t> 
     parameters.flags |= flags;
     parameters.timeout = timeout;
 
-    return this->ring.registerSyncCancel(parameters);
+    return this->ring.syncCancel(parameters);
 }
 
 auto coContext::Context::cancel(const std::uint64_t userData, const std::int32_t flags) -> io_uring_sqe * {
