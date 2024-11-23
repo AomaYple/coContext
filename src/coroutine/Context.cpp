@@ -50,6 +50,22 @@ auto coContext::Context::run() -> void {
 
 auto coContext::Context::submit(Task &&task) -> void { this->tasks.emplace(task.getHash(), std::move(task)); }
 
+auto coContext::Context::cancel(const std::variant<std::uint64_t, std::int32_t> identify, const std::int32_t flags,
+                                const __kernel_timespec timeout) -> std::int32_t {
+    io_uring_sync_cancel_reg parameters{};
+
+    if (std::holds_alternative<std::uint64_t>(identify)) parameters.addr = std::get<std::uint64_t>(identify);
+    else {
+        parameters.fd = std::get<std::int32_t>(identify);
+        parameters.flags = IORING_ASYNC_CANCEL_FD;
+    }
+
+    parameters.flags |= flags;
+    parameters.timeout = timeout;
+
+    return this->ring.registerSyncCancel(parameters);
+}
+
 auto coContext::Context::cancel(const std::uint64_t userData, const std::int32_t flags) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
     io_uring_prep_cancel64(submissionQueueEntry, userData, flags);

@@ -3,6 +3,7 @@
 #include "../ring/Ring.hpp"
 
 #include <string_view>
+#include <variant>
 
 namespace coContext {
     class Task;
@@ -24,6 +25,9 @@ namespace coContext {
         [[noreturn]] auto run() -> void;
 
         auto submit(Task &&task) -> void;
+
+        [[nodiscard]] auto cancel(std::variant<std::uint64_t, std::int32_t> identify, std::int32_t flags,
+                                  __kernel_timespec timeout) -> std::int32_t;
 
         [[nodiscard]] auto cancel(std::uint64_t userData, std::int32_t flags) -> io_uring_sqe *;
 

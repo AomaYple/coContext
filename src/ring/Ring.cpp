@@ -108,6 +108,19 @@ auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const 
     }
 }
 
+auto coContext::Ring::registerSyncCancel(io_uring_sync_cancel_reg &parameters,
+                                         const std::source_location sourceLocation) -> std::int32_t {
+    const std::int32_t result{io_uring_register_sync_cancel(&this->handle, &parameters)};
+    if (result < 0) {
+        throw Exception{
+            Log{Log::Level::warn, std::error_code{std::abs(result), std::generic_category()}.message(),
+                sourceLocation}
+        };
+    }
+
+    return result;
+}
+
 auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceLocation) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{io_uring_get_sqe(&this->handle)};
     if (submissionQueueEntry == nullptr) {
