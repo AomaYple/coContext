@@ -8,17 +8,17 @@ auto coContext::run() -> void { context.run(); }
 
 auto coContext::spawn(Task &&task) -> void { context.submit(std::move(task)); }
 
-auto coContext::cancel(const std::uint64_t userData, const bool matchAll, const __kernel_timespec timeout)
+auto coContext::syncCancel(const std::uint64_t userData, const bool matchAll, const __kernel_timespec timeout)
     -> std::int32_t {
     return context.cancel(userData, matchAll ? IORING_ASYNC_CANCEL_ALL : 0, timeout);
 }
 
-auto coContext::cancel(const std::int32_t fileDescriptor, const bool matchAll, const __kernel_timespec timeout)
+auto coContext::syncCancel(const std::int32_t fileDescriptor, const bool matchAll, const __kernel_timespec timeout)
     -> std::int32_t {
     return context.cancel(fileDescriptor, matchAll ? IORING_ASYNC_CANCEL_ALL : 0, timeout);
 }
 
-auto coContext::cancelAny(const __kernel_timespec timeout) -> std::int32_t {
+auto coContext::syncCancelAny(const __kernel_timespec timeout) -> std::int32_t {
     return context.cancel(std::uint64_t{}, IORING_ASYNC_CANCEL_ANY, timeout);
 }
 

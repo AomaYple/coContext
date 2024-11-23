@@ -12,13 +12,13 @@ namespace coContext {
 
     auto spawn(Task &&task) -> void;
 
-    [[nodiscard]] auto cancel(std::uint64_t userData, bool matchAll = {}, __kernel_timespec timeout = {})
+    [[nodiscard]] auto syncCancel(std::uint64_t userData, bool matchAll = {}, __kernel_timespec timeout = {})
         -> std::int32_t;
 
-    [[nodiscard]] auto cancel(std::int32_t fileDescriptor, bool matchAll = {}, __kernel_timespec timeout = {})
+    [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool matchAll = {}, __kernel_timespec timeout = {})
         -> std::int32_t;
 
-    [[nodiscard]] auto cancelAny(__kernel_timespec timeout = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancelAny(__kernel_timespec timeout = {}) -> std::int32_t;
 
     [[nodiscard]] auto cancel(std::uint64_t taskHash, bool matchAll = {}) -> AsyncWaiter;
 
