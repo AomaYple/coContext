@@ -44,10 +44,6 @@ namespace coContext {
         auto freeRingBuffer(io_uring_buf_ring *ringBuffer, std::uint32_t entries, std::int32_t id,
                             std::source_location sourceLocation = std::source_location::current()) -> void;
 
-        [[nodiscard]] auto syncCancel(io_uring_sync_cancel_reg &parameters,
-                                      std::source_location sourceLocation = std::source_location::current())
-            -> std::int32_t;
-
         [[nodiscard]] auto
             getSubmissionQueueEntry(std::source_location sourceLocation = std::source_location::current())
                 -> io_uring_sqe *;
@@ -62,6 +58,10 @@ namespace coContext {
 
         auto advance(io_uring_buf_ring *ringBuffer, std::int32_t completionQueueEntry,
                      std::int32_t bufferCount) noexcept -> void;
+
+        [[nodiscard]] auto syncCancel(io_uring_sync_cancel_reg &parameters,
+                                      std::source_location sourceLocation = std::source_location::current())
+            -> std::int32_t;
 
     private:
         auto destroy() noexcept -> void;
