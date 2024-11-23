@@ -50,6 +50,20 @@ auto coContext::Context::run() -> void {
 
 auto coContext::Context::submit(Task &&task) -> void { this->tasks.emplace(task.getHash(), std::move(task)); }
 
+auto coContext::Context::cancel(const std::uint64_t userData, const std::int32_t flags) -> io_uring_sqe * {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_cancel64(submissionQueueEntry, userData, flags);
+
+    return submissionQueueEntry;
+}
+
+auto coContext::Context::cancel(const std::int32_t fileDescriptor, const std::int32_t flags) -> io_uring_sqe * {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_cancel_fd(submissionQueueEntry, fileDescriptor, flags);
+
+    return submissionQueueEntry;
+}
+
 auto coContext::Context::close(const std::int32_t fileDescriptor) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
     io_uring_prep_close(submissionQueueEntry, fileDescriptor);

@@ -132,9 +132,9 @@ auto coContext::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->v
     std::int32_t count{};
 
     std::uint32_t head;
-    const io_uring_cqe *cqe;
-    io_uring_for_each_cqe(&this->handle, head, cqe) {
-        action(cqe);
+    const io_uring_cqe *completionQueueEntry;
+    io_uring_for_each_cqe(&this->handle, head, completionQueueEntry) {
+        action(completionQueueEntry);
         ++count;
     }
 
@@ -143,9 +143,9 @@ auto coContext::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->v
 
 auto coContext::Ring::advance(const std::uint32_t count) noexcept -> void { io_uring_cq_advance(&this->handle, count); }
 
-auto coContext::Ring::advance(io_uring_buf_ring *const ringBuffer, const std::int32_t cqeCount,
+auto coContext::Ring::advance(io_uring_buf_ring *const ringBuffer, const std::int32_t completionQueueEntry,
                               const std::int32_t bufferCount) noexcept -> void {
-    __io_uring_buf_ring_cq_advance(&this->handle, ringBuffer, cqeCount, bufferCount);
+    __io_uring_buf_ring_cq_advance(&this->handle, ringBuffer, completionQueueEntry, bufferCount);
 }
 
 auto coContext::Ring::destroy() noexcept -> void {

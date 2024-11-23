@@ -8,6 +8,22 @@ auto coContext::run() -> void { context.run(); }
 
 auto coContext::spawn(Task &&task) -> void { context.submit(std::move(task)); }
 
+auto coContext::cancel(const std::uint64_t taskHash, const bool matchAll) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{context.cancel(taskHash, matchAll ? IORING_ASYNC_CANCEL_ALL : 0)};
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::cancel(const std::int32_t fileDescriptor, const bool matchAll) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{context.cancel(fileDescriptor, matchAll ? IORING_ASYNC_CANCEL_ALL : 0)};
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::cancelAll() -> AsyncWaiter {
+    return AsyncWaiter{context.cancel(std::uint64_t{}, IORING_ASYNC_CANCEL_ANY)};
+}
+
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter {
     return AsyncWaiter{context.close(fileDescriptor)};
 }

@@ -56,7 +56,8 @@ namespace coContext {
 
         auto advance(std::uint32_t count) noexcept -> void;
 
-        auto advance(io_uring_buf_ring *ringBuffer, std::int32_t cqeCount, std::int32_t bufferCount) noexcept -> void;
+        auto advance(io_uring_buf_ring *ringBuffer, std::int32_t completionQueueEntry,
+                     std::int32_t bufferCount) noexcept -> void;
 
     private:
         auto destroy() noexcept -> void;

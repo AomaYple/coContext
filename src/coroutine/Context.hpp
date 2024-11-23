@@ -25,10 +25,14 @@ namespace coContext {
 
         auto submit(Task &&task) -> void;
 
+        [[nodiscard]] auto cancel(std::uint64_t userData, std::int32_t flags) -> io_uring_sqe *;
+
+        [[nodiscard]] auto cancel(std::int32_t fileDescriptor, std::int32_t flags) -> io_uring_sqe *;
+
         [[nodiscard]] auto close(std::int32_t fileDescriptor) -> io_uring_sqe *;
 
         [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol,
-                                  std::uint32_t flags = 0) -> io_uring_sqe *;
+                                  std::uint32_t flags = {}) -> io_uring_sqe *;
 
         [[nodiscard]] auto bind(std::int32_t socketFileDescriptor, sockaddr *address, std::uint32_t addressLength)
             -> io_uring_sqe *;

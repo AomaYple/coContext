@@ -12,6 +12,12 @@ namespace coContext {
 
     auto spawn(Task &&task) -> void;
 
+    [[nodiscard]] auto cancel(std::uint64_t taskHash, bool matchAll = {}) -> AsyncWaiter;
+
+    [[nodiscard]] auto cancel(std::int32_t fileDescriptor, bool matchAll = {}) -> AsyncWaiter;
+
+    [[nodiscard]] auto cancelAll() -> AsyncWaiter;
+
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 
     [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol) -> AsyncWaiter;
@@ -22,7 +28,7 @@ namespace coContext {
     [[nodiscard]] auto listen(std::int32_t socketFileDescriptor, std::int32_t backlog) -> AsyncWaiter;
 
     [[nodiscard]] auto accept(std::int32_t socketFileDescriptor, sockaddr *address, std::uint32_t *addressLength,
-                              std::int32_t flags = 0) -> AsyncWaiter;
+                              std::int32_t flags = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr *address, std::uint32_t addressLength)
         -> AsyncWaiter;
@@ -43,10 +49,10 @@ namespace coContext {
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr *message, std::uint32_t flags)
         -> AsyncWaiter;
 
-    [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode = 0) -> AsyncWaiter;
+    [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, std::int32_t flags,
-                            std::uint32_t mode = 0) -> AsyncWaiter;
+                            std::uint32_t mode = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, open_how *how)
         -> AsyncWaiter;
