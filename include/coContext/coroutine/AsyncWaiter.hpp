@@ -21,7 +21,7 @@ namespace coContext {
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
-        auto await_suspend(std::coroutine_handle<Task::promise_type> handle) -> void;
+        auto await_suspend(std::coroutine_handle<Task::promise_type> handle) noexcept -> void;
 
         [[nodiscard]] auto await_resume() const -> std::int32_t;
 

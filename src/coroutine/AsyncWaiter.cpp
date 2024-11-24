@@ -7,7 +7,7 @@ coContext::AsyncWaiter::AsyncWaiter(io_uring_sqe *const submissionQueueEntry) no
 
 auto coContext::AsyncWaiter::await_ready() const noexcept -> bool { return false; }
 
-auto coContext::AsyncWaiter::await_suspend(const std::coroutine_handle<Task::promise_type> handle) -> void {
+auto coContext::AsyncWaiter::await_suspend(const std::coroutine_handle<Task::promise_type> handle) noexcept -> void {
     this->handle = handle;
     io_uring_sqe_set_data64(this->submissionQueueEntry,
                             std::hash<std::coroutine_handle<Task::promise_type>>{}(this->handle));
