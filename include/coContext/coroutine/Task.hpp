@@ -36,6 +36,8 @@ namespace coContext {
 
         ~Task();
 
+        auto swap(Task &other) noexcept -> void;
+
         [[nodiscard]] auto getHash() const noexcept -> std::size_t;
 
         auto operator()(std::int32_t result) const -> void;
@@ -50,5 +52,10 @@ namespace coContext {
         std::coroutine_handle<promise_type> handle;
     };
 
-    auto operator==(const Task::promise_type &lhs, const Task::promise_type &rhs) noexcept -> bool;
+    [[nodiscard]] auto operator==(const Task::promise_type &lhs, const Task::promise_type &rhs) noexcept -> bool;
 }    // namespace coContext
+
+template<>
+constexpr auto std::swap(coContext::Task &lhs, coContext::Task &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}
