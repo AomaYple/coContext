@@ -253,7 +253,7 @@ auto coContext::Context::write(const std::int32_t fileDescriptor, const std::spa
     return submissionQueueEntry;
 }
 
-auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> std::uint64_t {
+auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> std::size_t {
     rlimit limit{};
     if (getrlimit(RLIMIT_NOFILE, &limit) == -1) {
         throw Exception{

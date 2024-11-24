@@ -20,7 +20,7 @@ namespace coContext {
 
     [[nodiscard]] auto syncCancelAny(__kernel_timespec timeout = {}) -> std::int32_t;
 
-    [[nodiscard]] auto cancel(std::uint64_t taskHash, bool matchAll = {}) -> AsyncWaiter;
+    [[nodiscard]] auto cancel(std::uint64_t userData, bool matchAll = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto cancel(std::int32_t fileDescriptor, bool matchAll = {}) -> AsyncWaiter;
 

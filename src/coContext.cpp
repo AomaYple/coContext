@@ -22,8 +22,8 @@ auto coContext::syncCancelAny(const __kernel_timespec timeout) -> std::int32_t {
     return context.cancel(std::uint64_t{}, IORING_ASYNC_CANCEL_ANY, timeout);
 }
 
-auto coContext::cancel(const std::uint64_t taskHash, const bool matchAll) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{context.cancel(taskHash, matchAll ? IORING_ASYNC_CANCEL_ALL : 0)};
+auto coContext::cancel(const std::uint64_t userData, const bool matchAll) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{context.cancel(userData, matchAll ? IORING_ASYNC_CANCEL_ALL : 0)};
 
     return AsyncWaiter{submissionQueueEntry};
 }

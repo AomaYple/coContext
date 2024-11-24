@@ -96,13 +96,13 @@ namespace coContext {
     private:
         [[nodiscard]] static auto
             getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())
-                -> std::uint64_t;
+                -> std::size_t;
 
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
         static constinit std::uint32_t cpuCode;
 
         Ring ring;
-        std::unordered_map<std::uint64_t, Task> tasks;
+        std::unordered_map<std::size_t, Task> tasks;
     };
 }    // namespace coContext

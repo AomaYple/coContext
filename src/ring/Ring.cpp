@@ -43,7 +43,7 @@ auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sour
     }
 }
 
-auto coContext::Ring::registerCpuAffinity(const std::uint64_t cpuSetSize, const cpu_set_t *const cpuSet,
+auto coContext::Ring::registerCpuAffinity(const std::size_t cpuSetSize, const cpu_set_t *const cpuSet,
                                           const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_iowq_aff(&this->handle, cpuSetSize, cpuSet)}; result != 0) {
         throw Exception{
