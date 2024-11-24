@@ -20,6 +20,8 @@ namespace coContext {
 
         ~Ring();
 
+        auto swap(Ring &other) noexcept -> void;
+
         [[nodiscard]] auto getFileDescriptor() const noexcept -> std::int32_t;
 
         auto registerSelfFileDescriptor(std::source_location sourceLocation = std::source_location::current()) -> void;
@@ -69,3 +71,8 @@ namespace coContext {
         io_uring handle;
     };
 }    // namespace coContext
+
+template<>
+constexpr auto std::swap(coContext::Ring &lhs, coContext::Ring &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}

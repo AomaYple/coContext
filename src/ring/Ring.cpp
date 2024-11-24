@@ -32,6 +32,8 @@ auto coContext::Ring::operator=(Ring &&other) noexcept -> Ring & {
 
 coContext::Ring::~Ring() { this->destroy(); }
 
+auto coContext::Ring::swap(Ring &other) noexcept -> void { std::swap(this->handle, other.handle); }
+
 auto coContext::Ring::getFileDescriptor() const noexcept -> std::int32_t { return this->handle.ring_fd; }
 
 auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sourceLocation) -> void {
