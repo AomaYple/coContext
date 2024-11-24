@@ -22,6 +22,8 @@ namespace coContext {
 
         ~Context() = default;
 
+        auto swap(Context &other) noexcept -> void;
+
         [[noreturn]] auto run() -> void;
 
         auto submit(Task &&task) -> void;
@@ -106,3 +108,8 @@ namespace coContext {
         std::unordered_map<std::size_t, Task> tasks;
     };
 }    // namespace coContext
+
+template<>
+constexpr auto std::swap(coContext::Context &lhs, coContext::Context &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}

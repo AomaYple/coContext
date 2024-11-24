@@ -37,6 +37,11 @@ coContext::Context::Context() :
     this->ring.registerCpuAffinity(sizeof(cpuSet), &cpuSet);
 }
 
+auto coContext::Context::swap(Context &other) noexcept -> void {
+    std::swap(this->ring, other.ring);
+    std::swap(this->tasks, other.tasks);
+}
+
 auto coContext::Context::run() -> void {
     while (true) {
         this->ring.submitAndWait(1);
