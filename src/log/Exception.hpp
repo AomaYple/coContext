@@ -11,6 +11,8 @@ namespace coContext {
 
         [[nodiscard]] auto what() const noexcept -> const char * override;
 
+        [[nodiscard]] auto getMessage() const noexcept -> std::string_view;
+
     private:
         std::string message;
     };
