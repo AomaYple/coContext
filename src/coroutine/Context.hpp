@@ -98,9 +98,9 @@ namespace coContext {
             getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())
                 -> std::uint64_t;
 
-        static std::mutex mutex;
-        static std::int32_t sharedRingFileDescriptor;
-        static std::uint32_t cpuCode;
+        static constinit std::mutex mutex;
+        static constinit std::int32_t sharedRingFileDescriptor;
+        static constinit std::uint32_t cpuCode;
 
         Ring ring;
         std::unordered_map<std::uint64_t, Task> tasks;
