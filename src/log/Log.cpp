@@ -9,6 +9,14 @@ coContext::Log::Log(const Level level, std::string &&message, const std::source_
     level{level}, message{std::move(message)}, sourceLocation{sourceLocation}, timestamp{timestamp},
     joinThreadId{joinThreadId} {}
 
+auto coContext::Log::swap(Log &other) noexcept -> void {
+    std::swap(this->level, other.level);
+    std::swap(this->message, other.message);
+    std::swap(this->sourceLocation, other.sourceLocation);
+    std::swap(this->timestamp, other.timestamp);
+    std::swap(this->joinThreadId, other.joinThreadId);
+}
+
 auto coContext::Log::toString() const -> std::string {
     static constexpr std::array<const std::string_view, 4> levels{"info", "warn", "error", "fatal"};
 

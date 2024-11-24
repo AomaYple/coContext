@@ -9,10 +9,12 @@ namespace coContext {
     public:
         enum class Level : std::uint8_t { info, warn, error, fatal };
 
-        explicit Log(Level level, std::string &&message,
+        explicit Log(Level level = {}, std::string &&message = {},
                      std::source_location sourceLocation = std::source_location::current(),
                      std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now(),
                      std::jthread::id joinThreadId = std::this_thread::get_id()) noexcept;
+
+        auto swap(Log &other) noexcept -> void;
 
         [[nodiscard]] auto toString() const -> std::string;
 
@@ -27,3 +29,8 @@ namespace coContext {
     };
 
 }    // namespace coContext
+
+template<>
+constexpr auto std::swap(coContext::Log &lhs, coContext::Log &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}
