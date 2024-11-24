@@ -48,3 +48,7 @@ coContext::Task::Task(const std::coroutine_handle<promise_type> handle) noexcept
 auto coContext::Task::destroy() const -> void {
     if (static_cast<bool>(this->handle)) this->handle.destroy();
 }
+
+auto coContext::operator==(const Task::promise_type &lhs, const Task::promise_type &rhs) noexcept -> bool {
+    return lhs.getResult() == rhs.getResult();
+}

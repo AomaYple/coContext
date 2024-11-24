@@ -49,4 +49,6 @@ namespace coContext {
 
         std::coroutine_handle<promise_type> handle;
     };
+
+    auto operator==(const Task::promise_type &lhs, const Task::promise_type &rhs) noexcept -> bool;
 }    // namespace coContext
