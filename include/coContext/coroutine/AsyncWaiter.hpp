@@ -19,6 +19,8 @@ namespace coContext {
 
         ~AsyncWaiter() = default;
 
+        auto swap(AsyncWaiter &other) noexcept -> void;
+
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
         auto await_suspend(std::coroutine_handle<Task::promise_type> handle) noexcept -> void;
@@ -30,3 +32,8 @@ namespace coContext {
         std::coroutine_handle<Task::promise_type> handle;
     };
 }    // namespace coContext
+
+template<>
+constexpr auto std::swap(coContext::AsyncWaiter &lhs, coContext::AsyncWaiter &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}
