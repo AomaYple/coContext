@@ -1,6 +1,7 @@
 #include "Ring.hpp"
 
 #include "../log/Exception.hpp"
+#include "../log/Log.hpp"
 
 coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &params) :
     handle{[entries, &params](const std::source_location sourceLocation = std::source_location::current()) {
@@ -9,6 +10,7 @@ coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &params) :
             throw Exception{
                 Log{Log::Level::fatal, std::error_code{std::abs(result), std::generic_category()}.message(),
                     sourceLocation}
+                    .toString()
             };
         }
 
@@ -35,8 +37,8 @@ auto coContext::Ring::getFileDescriptor() const noexcept -> std::int32_t { retur
 auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_ring_fd(&this->handle)}; result != 1) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
-                sourceLocation}
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
+                .toString()
         };
     }
 }
@@ -45,8 +47,8 @@ auto coContext::Ring::registerCpuAffinity(const std::uint64_t cpuSetSize, const 
                                           const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_iowq_aff(&this->handle, cpuSetSize, cpuSet)}; result != 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
-                sourceLocation}
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
+                .toString()
         };
     }
 }
@@ -55,8 +57,8 @@ auto coContext::Ring::registerSparseFileDescriptor(const std::uint32_t count, co
     -> void {
     if (const std::int32_t result{io_uring_register_files_sparse(&this->handle, count)}; result != 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
-                sourceLocation}
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
+                .toString()
         };
     }
 }
@@ -65,8 +67,8 @@ auto coContext::Ring::allocateFileDescriptorRange(const std::uint32_t offset, co
                                                   const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_file_alloc_range(&this->handle, offset, length)}; result != 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
-                sourceLocation}
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
+                .toString()
         };
     }
 }
@@ -78,8 +80,8 @@ auto coContext::Ring::updateFileDescriptors(const std::uint32_t offset,
             io_uring_register_files_update(&this->handle, offset, fileDescriptors.data(), fileDescriptors.size())};
         result < 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
-                sourceLocation}
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
+                .toString()
         };
     }
 }
@@ -90,8 +92,8 @@ auto coContext::Ring::setupRingBuffer(const std::uint32_t entries, const std::in
     io_uring_buf_ring *const handle{io_uring_setup_buf_ring(&this->handle, entries, id, flags, &error)};
     if (handle == nullptr) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(error), std::generic_category()}.message(),
-                sourceLocation}
+            Log{Log::Level::error, std::error_code{std::abs(error), std::generic_category()}.message(), sourceLocation}
+                .toString()
         };
     }
 
@@ -102,8 +104,8 @@ auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const 
                                      const std::int32_t id, const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_free_buf_ring(&this->handle, ringBuffer, entries, id)}; result != 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
-                sourceLocation}
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
+                .toString()
         };
     }
 }
@@ -113,8 +115,8 @@ auto coContext::Ring::syncCancel(io_uring_sync_cancel_reg &parameters, const std
     const std::int32_t result{io_uring_register_sync_cancel(&this->handle, &parameters)};
     if (result < 0) {
         throw Exception{
-            Log{Log::Level::warn, std::error_code{std::abs(result), std::generic_category()}.message(),
-                sourceLocation}
+            Log{Log::Level::warn, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
+                .toString()
         };
     }
 
@@ -126,6 +128,7 @@ auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceL
     if (submissionQueueEntry == nullptr) {
         throw Exception{
             Log{Log::Level::error, "no submission queue entry available", sourceLocation}
+            .toString()
         };
     }
 
@@ -135,8 +138,8 @@ auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceL
 auto coContext::Ring::submitAndWait(const std::uint32_t count, const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_submit_and_wait(&this->handle, count)}; result < 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
-                sourceLocation}
+            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
+                .toString()
         };
     }
 }

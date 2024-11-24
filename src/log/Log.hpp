@@ -12,7 +12,7 @@ namespace coContext {
         explicit Log(Level level = {}, std::string &&message = {},
                      std::source_location sourceLocation = std::source_location::current(),
                      std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now(),
-                     std::jthread::id joinThreadId = std::this_thread::get_id()) noexcept;
+                     std::thread::id threadId = std::this_thread::get_id()) noexcept;
 
         auto swap(Log &other) noexcept -> void;
 
@@ -25,7 +25,7 @@ namespace coContext {
         std::string message;
         std::source_location sourceLocation;
         std::chrono::system_clock::time_point timestamp;
-        std::jthread::id joinThreadId;
+        std::thread::id threadId;
     };
 
 }    // namespace coContext

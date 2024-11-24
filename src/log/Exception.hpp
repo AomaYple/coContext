@@ -1,18 +1,24 @@
 #pragma once
 
-#include "Log.hpp"
+#include <string>
 
 namespace coContext {
     class Exception final : public std::exception {
     public:
-        explicit Exception(Log &&log);
+        explicit Exception(std::string &&message = {});
+
+        auto swap(Exception &other) noexcept -> void;
 
         [[nodiscard]] auto what() const noexcept -> const char * override;
 
-        [[nodiscard]] auto getLog() noexcept -> Log &;
-
     private:
         std::string message;
-        Log log;
     };
+
+    [[nodiscard]] auto operator==(const Exception &lhs, const Exception &rhs) noexcept -> bool;
 }    // namespace coContext
+
+template<>
+constexpr auto std::swap(coContext::Exception &lhs, coContext::Exception &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}

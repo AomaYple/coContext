@@ -1,6 +1,7 @@
 #include "Context.hpp"
 
 #include "../log/Exception.hpp"
+#include "../log/Log.hpp"
 #include "coContext/coroutine/Task.hpp"
 
 #include <sys/resource.h>
@@ -31,7 +32,7 @@ coContext::Context::Context() :
         const std::lock_guard lock{mutex};
 
         CPU_SET(cpuCode++, &cpuSet);
-        cpuCode %= std::jthread::hardware_concurrency();
+        cpuCode %= std::thread::hardware_concurrency();
     }
     this->ring.registerCpuAffinity(sizeof(cpuSet), &cpuSet);
 }
@@ -257,6 +258,7 @@ auto coContext::Context::getFileDescriptorLimit(const std::source_location sourc
     if (getrlimit(RLIMIT_NOFILE, &limit) == -1) {
         throw Exception{
             Log{Log::Level::fatal, std::error_code{errno, std::generic_category()}.message(), sourceLocation}
+                .toString()
         };
     }
 
