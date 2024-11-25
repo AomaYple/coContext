@@ -2,7 +2,9 @@
 
 #include "coroutine/Context.hpp"
 
-static thread_local coContext::Context context;
+namespace {
+    thread_local coContext::Context context;
+}
 
 auto coContext::run() -> void { context.run(); }
 
