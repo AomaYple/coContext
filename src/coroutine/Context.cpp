@@ -260,7 +260,7 @@ auto coContext::Context::write(const std::int32_t fileDescriptor, const std::spa
 
 auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> std::size_t {
     rlimit limit{};
-    if (getrlimit(RLIMIT_NOFILE, &limit) == -1) {
+    if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
         throw Exception{
             Log{Log::Level::fatal, std::error_code{errno, std::generic_category()}.message(), sourceLocation}
                 .toString()
