@@ -34,7 +34,7 @@ coContext::Context::Context() :
         CPU_SET(cpuCode++, &cpuSet);
         cpuCode %= std::thread::hardware_concurrency();
     }
-    this->ring.registerCpuAffinity(sizeof(cpuSet), &cpuSet);
+    this->ring.registerCpuAffinity(cpuSet);
 }
 
 auto coContext::Context::swap(Context &other) noexcept -> void {

@@ -6,7 +6,9 @@
 coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &params) :
     handle{[entries, &params](const std::source_location sourceLocation = std::source_location::current()) {
         io_uring handle{};
-        if (const std::int32_t result{io_uring_queue_init_params(entries, &handle, &params)}; result != 0) {
+        if (const std::int32_t result{
+                io_uring_queue_init_params(entries, std::addressof(handle), std::addressof(params))};
+            result != 0) {
             throw Exception{
                 Log{Log::Level::fatal, std::error_code{std::abs(result), std::generic_category()}.message(),
                     sourceLocation}
@@ -37,7 +39,7 @@ auto coContext::Ring::swap(Ring &other) noexcept -> void { std::swap(this->handl
 auto coContext::Ring::getFileDescriptor() const noexcept -> std::int32_t { return this->handle.ring_fd; }
 
 auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{io_uring_register_ring_fd(&this->handle)}; result != 1) {
+    if (const std::int32_t result{io_uring_register_ring_fd(std::addressof(this->handle))}; result != 1) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
                 .toString()
@@ -45,9 +47,10 @@ auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sour
     }
 }
 
-auto coContext::Ring::registerCpuAffinity(const std::size_t cpuSetSize, const cpu_set_t *const cpuSet,
-                                          const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{io_uring_register_iowq_aff(&this->handle, cpuSetSize, cpuSet)}; result != 0) {
+auto coContext::Ring::registerCpuAffinity(const cpu_set_t &cpuSet, const std::source_location sourceLocation) -> void {
+    if (const std::int32_t result{
+            io_uring_register_iowq_aff(std::addressof(this->handle), sizeof(cpuSet), std::addressof(cpuSet))};
+        result != 0) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
                 .toString()
@@ -57,7 +60,7 @@ auto coContext::Ring::registerCpuAffinity(const std::size_t cpuSetSize, const cp
 
 auto coContext::Ring::registerSparseFileDescriptor(const std::uint32_t count, const std::source_location sourceLocation)
     -> void {
-    if (const std::int32_t result{io_uring_register_files_sparse(&this->handle, count)}; result != 0) {
+    if (const std::int32_t result{io_uring_register_files_sparse(std::addressof(this->handle), count)}; result != 0) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
                 .toString()
@@ -67,7 +70,8 @@ auto coContext::Ring::registerSparseFileDescriptor(const std::uint32_t count, co
 
 auto coContext::Ring::allocateFileDescriptorRange(const std::uint32_t offset, const std::uint32_t length,
                                                   const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{io_uring_register_file_alloc_range(&this->handle, offset, length)}; result != 0) {
+    if (const std::int32_t result{io_uring_register_file_alloc_range(std::addressof(this->handle), offset, length)};
+        result != 0) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
                 .toString()
@@ -78,8 +82,8 @@ auto coContext::Ring::allocateFileDescriptorRange(const std::uint32_t offset, co
 auto coContext::Ring::updateFileDescriptors(const std::uint32_t offset,
                                             const std::span<const std::int32_t> fileDescriptors,
                                             const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{
-            io_uring_register_files_update(&this->handle, offset, fileDescriptors.data(), fileDescriptors.size())};
+    if (const std::int32_t result{io_uring_register_files_update(std::addressof(this->handle), offset,
+                                                                 fileDescriptors.data(), fileDescriptors.size())};
         result < 0) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
@@ -91,7 +95,7 @@ auto coContext::Ring::updateFileDescriptors(const std::uint32_t offset,
 auto coContext::Ring::setupRingBuffer(const std::uint32_t entries, const std::int32_t id, const std::uint32_t flags,
                                       const std::source_location sourceLocation) -> io_uring_buf_ring * {
     std::int32_t error;
-    io_uring_buf_ring *const handle{io_uring_setup_buf_ring(&this->handle, entries, id, flags, &error)};
+    io_uring_buf_ring *const handle{io_uring_setup_buf_ring(std::addressof(this->handle), entries, id, flags, &error)};
     if (handle == nullptr) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(error), std::generic_category()}.message(), sourceLocation}
@@ -104,7 +108,8 @@ auto coContext::Ring::setupRingBuffer(const std::uint32_t entries, const std::in
 
 auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const std::uint32_t entries,
                                      const std::int32_t id, const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{io_uring_free_buf_ring(&this->handle, ringBuffer, entries, id)}; result != 0) {
+    if (const std::int32_t result{io_uring_free_buf_ring(std::addressof(this->handle), ringBuffer, entries, id)};
+        result != 0) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
                 .toString()
@@ -114,7 +119,7 @@ auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const 
 
 auto coContext::Ring::syncCancel(io_uring_sync_cancel_reg &parameters, const std::source_location sourceLocation)
     -> std::int32_t {
-    const std::int32_t result{io_uring_register_sync_cancel(&this->handle, &parameters)};
+    const std::int32_t result{io_uring_register_sync_cancel(std::addressof(this->handle), std::addressof(parameters))};
     if (result < 0) {
         throw Exception{
             Log{Log::Level::warn, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
@@ -126,7 +131,7 @@ auto coContext::Ring::syncCancel(io_uring_sync_cancel_reg &parameters, const std
 }
 
 auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceLocation) -> io_uring_sqe * {
-    io_uring_sqe *const submissionQueueEntry{io_uring_get_sqe(&this->handle)};
+    io_uring_sqe *const submissionQueueEntry{io_uring_get_sqe(std::addressof(this->handle))};
     if (submissionQueueEntry == nullptr) {
         throw Exception{
             Log{Log::Level::error, "no submission queue entry available", sourceLocation}
@@ -138,7 +143,7 @@ auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceL
 }
 
 auto coContext::Ring::submitAndWait(const std::uint32_t count, const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{io_uring_submit_and_wait(&this->handle, count)}; result < 0) {
+    if (const std::int32_t result{io_uring_submit_and_wait(std::addressof(this->handle), count)}; result < 0) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
                 .toString()
@@ -151,7 +156,7 @@ auto coContext::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->v
 
     std::uint32_t head;
     const io_uring_cqe *completionQueueEntry;
-    io_uring_for_each_cqe(&this->handle, head, completionQueueEntry) {
+    io_uring_for_each_cqe(std::addressof(this->handle), head, completionQueueEntry) {
         action(completionQueueEntry);
         ++count;
     }
@@ -159,13 +164,15 @@ auto coContext::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->v
     return count;
 }
 
-auto coContext::Ring::advance(const std::uint32_t count) noexcept -> void { io_uring_cq_advance(&this->handle, count); }
+auto coContext::Ring::advance(const std::uint32_t count) noexcept -> void {
+    io_uring_cq_advance(std::addressof(this->handle), count);
+}
 
 auto coContext::Ring::advance(io_uring_buf_ring *const ringBuffer, const std::int32_t completionQueueEntry,
                               const std::int32_t bufferCount) noexcept -> void {
-    __io_uring_buf_ring_cq_advance(&this->handle, ringBuffer, completionQueueEntry, bufferCount);
+    __io_uring_buf_ring_cq_advance(std::addressof(this->handle), ringBuffer, completionQueueEntry, bufferCount);
 }
 
 auto coContext::Ring::destroy() noexcept -> void {
-    if (this->handle.ring_fd != -1) io_uring_queue_exit(&this->handle);
+    if (this->handle.ring_fd != -1) io_uring_queue_exit(std::addressof(this->handle));
 }
