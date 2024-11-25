@@ -42,8 +42,12 @@ auto coContext::Context::swap(Context &other) noexcept -> void {
     std::swap(this->schedulingTasks, other.schedulingTasks);
 }
 
+auto coContext::Context::spawn(Task &&task) -> void { this->unscheduledTasks.emplace_back(std::move(task)); }
+
 auto coContext::Context::run() -> void {
-    while (true) {
+    this->isRunning = true;
+
+    while (this->isRunning) {
         this->scheduleTasks();
 
         this->ring.submitAndWait(1);
@@ -56,7 +60,7 @@ auto coContext::Context::run() -> void {
     }
 }
 
-auto coContext::Context::spawn(Task &&task) -> void { this->unscheduledTasks.emplace_back(std::move(task)); }
+auto coContext::Context::stop() noexcept -> void { this->isRunning = false; }
 
 auto coContext::Context::cancel(const std::variant<std::uint64_t, std::int32_t> identify, const std::int32_t flags,
                                 const __kernel_timespec timeout) -> std::int32_t {

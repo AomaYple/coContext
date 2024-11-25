@@ -6,9 +6,15 @@ namespace {
     thread_local coContext::Context context;
 }
 
+auto coContext::spawn(Task &&task) -> void { context.spawn(std::move(task)); }
+
 auto coContext::run() -> void { context.run(); }
 
-auto coContext::spawn(Task &&task) -> void { context.spawn(std::move(task)); }
+auto coContext::stop() -> AsyncWaiter {
+    context.stop();
+
+    return cancel(std::uint64_t{}, true);
+}
 
 auto coContext::syncCancel(const std::uint64_t userData, const bool matchAll, const __kernel_timespec timeout)
     -> std::int32_t {

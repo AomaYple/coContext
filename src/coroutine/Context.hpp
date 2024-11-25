@@ -24,9 +24,11 @@ namespace coContext {
 
         auto swap(Context &other) noexcept -> void;
 
-        [[noreturn]] auto run() -> void;
-
         auto spawn(Task &&task) -> void;
+
+        auto run() -> void;
+
+        auto stop() noexcept -> void;
 
         [[nodiscard]] auto cancel(std::variant<std::uint64_t, std::int32_t> identify, std::int32_t flags,
                                   __kernel_timespec timeout) -> std::int32_t;
@@ -107,6 +109,7 @@ namespace coContext {
         static constinit std::uint32_t cpuCode;
 
         Ring ring;
+        bool isRunning{};
         std::vector<Task> unscheduledTasks;
         std::unordered_map<std::size_t, Task> schedulingTasks;
     };

@@ -8,9 +8,11 @@
 #include <sys/socket.h>
 
 namespace coContext {
-    [[noreturn]] auto run() -> void;
-
     auto spawn(Task &&task) -> void;
+
+    auto run() -> void;
+
+    [[nodiscard]] auto stop() -> AsyncWaiter;
 
     [[nodiscard]] auto syncCancel(std::uint64_t userData, bool matchAll = {}, __kernel_timespec timeout = {})
         -> std::int32_t;
