@@ -5,7 +5,7 @@
 namespace coContext {
     class Exception final : public std::exception {
     public:
-        explicit Exception(std::string &&message = {});
+        explicit Exception(std::string &&message = {}) noexcept;
 
         auto swap(Exception &other) noexcept -> void;
 

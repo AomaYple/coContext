@@ -1,6 +1,6 @@
 #include "Exception.hpp"
 
-coContext::Exception::Exception(std::string &&message) : message{std::move(message)} {}
+coContext::Exception::Exception(std::string &&message) noexcept : message{std::move(message)} {}
 
 auto coContext::Exception::swap(Exception &other) noexcept -> void { std::swap(this->message, other.message); }
 
