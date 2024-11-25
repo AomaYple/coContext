@@ -10,7 +10,7 @@ namespace coContext {
         public:
             [[nodiscard]] auto get_return_object() -> Task;
 
-            [[nodiscard]] auto initial_suspend() const noexcept -> std::suspend_never;
+            [[nodiscard]] auto initial_suspend() const noexcept -> std::suspend_always;
 
             [[nodiscard]] auto final_suspend() const noexcept -> std::suspend_always;
 

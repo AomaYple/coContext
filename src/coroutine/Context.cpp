@@ -39,22 +39,24 @@ coContext::Context::Context() :
 
 auto coContext::Context::swap(Context &other) noexcept -> void {
     std::swap(this->ring, other.ring);
-    std::swap(this->tasks, other.tasks);
+    std::swap(this->schedulingTasks, other.schedulingTasks);
 }
 
 auto coContext::Context::run() -> void {
     while (true) {
+        this->scheduleTasks();
+
         this->ring.submitAndWait(1);
         this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completionQueueEntry) {
-            const Task &task{this->tasks.at(completionQueueEntry->user_data)};
+            const Task &task{this->schedulingTasks.at(completionQueueEntry->user_data)};
             task(completionQueueEntry->res);
 
-            if (task.done()) this->tasks.erase(completionQueueEntry->user_data);
+            if (task.done()) this->schedulingTasks.erase(completionQueueEntry->user_data);
         }));
     }
 }
 
-auto coContext::Context::submit(Task &&task) -> void { this->tasks.emplace(task.getHash(), std::move(task)); }
+auto coContext::Context::spawn(Task &&task) -> void { this->unscheduledTasks.emplace_back(std::move(task)); }
 
 auto coContext::Context::cancel(const std::variant<std::uint64_t, std::int32_t> identify, const std::int32_t flags,
                                 const __kernel_timespec timeout) -> std::int32_t {
@@ -268,6 +270,15 @@ auto coContext::Context::getFileDescriptorLimit(const std::source_location sourc
     }
 
     return limit.rlim_cur;
+}
+
+auto coContext::Context::scheduleTasks() -> void {
+    for (auto &task : this->unscheduledTasks) {
+        task(0);
+        this->schedulingTasks.emplace(task.getHash(), std::move(task));
+    }
+
+    this->unscheduledTasks.clear();
 }
 
 std::mutex coContext::Context::mutex;

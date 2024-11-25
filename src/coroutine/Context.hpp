@@ -26,7 +26,7 @@ namespace coContext {
 
         [[noreturn]] auto run() -> void;
 
-        auto submit(Task &&task) -> void;
+        auto spawn(Task &&task) -> void;
 
         [[nodiscard]] auto cancel(std::variant<std::uint64_t, std::int32_t> identify, std::int32_t flags,
                                   __kernel_timespec timeout) -> std::int32_t;
@@ -100,12 +100,15 @@ namespace coContext {
             getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())
                 -> std::size_t;
 
+        auto scheduleTasks() -> void;
+
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
         static constinit std::uint32_t cpuCode;
 
         Ring ring;
-        std::unordered_map<std::size_t, Task> tasks;
+        std::vector<Task> unscheduledTasks;
+        std::unordered_map<std::size_t, Task> schedulingTasks;
     };
 }    // namespace coContext
 

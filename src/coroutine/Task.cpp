@@ -6,7 +6,7 @@ auto coContext::Task::promise_type::get_return_object() -> Task {
     return Task{std::coroutine_handle<promise_type>::from_promise(*this)};
 }
 
-auto coContext::Task::promise_type::initial_suspend() const noexcept -> std::suspend_never { return {}; }
+auto coContext::Task::promise_type::initial_suspend() const noexcept -> std::suspend_always { return {}; }
 
 auto coContext::Task::promise_type::final_suspend() const noexcept -> std::suspend_always { return {}; }
 
