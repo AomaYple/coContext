@@ -50,7 +50,6 @@ install(TARGETS ${PROJECT_NAME}
 
 install(EXPORT ${installTargets}
         FILE ${PROJECT_NAME}Config.cmake
-        NAMESPACE ${PROJECT_NAME}::
         DESTINATION lib/cmake/${PROJECT_NAME}
 )
 

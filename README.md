@@ -27,6 +27,6 @@ ninja install
 find_package(coContext REQUIRED)
 target_link_libraries(your_target
         PRIVATE
-        coContext::coContext
+        coContext
 )
 ```
