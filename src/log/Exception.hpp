@@ -11,11 +11,15 @@ namespace coContext {
 
         [[nodiscard]] auto what() const noexcept -> const char * override;
 
+        [[nodiscard]] auto getMessage() const noexcept -> std::string_view;
+
         [[nodiscard]] auto getMessage() noexcept -> std::string &;
 
     private:
         std::string message;
     };
+
+    [[nodiscard]] auto operator==(const Exception &lhs, const Exception &rhs) noexcept -> bool;
 }    // namespace coContext
 
 template<>
