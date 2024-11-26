@@ -25,8 +25,6 @@ coContext::Context::Context() :
 
         return ring;
     }()} {
-    this->ring.registerSelfFileDescriptor();
-
     constexpr cpu_set_t cpuSet{};
     {
         const std::lock_guard lock{mutex};
@@ -35,6 +33,8 @@ coContext::Context::Context() :
         cpuCode %= std::thread::hardware_concurrency();
     }
     this->ring.registerCpuAffinity(cpuSet);
+
+    this->ring.registerSelfFileDescriptor();
 }
 
 auto coContext::Context::swap(Context &other) noexcept -> void {
