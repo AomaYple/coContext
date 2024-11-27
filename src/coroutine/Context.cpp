@@ -153,7 +153,7 @@ auto coContext::Context::shutdown(const std::int32_t socketFileDescriptor, const
 auto coContext::Context::receive(const std::int32_t socketFileDescriptor, const std::span<std::byte> buffer,
                                  const std::int32_t flags) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_recv(submissionQueueEntry, socketFileDescriptor, buffer.data(), buffer.size(), flags);
+    io_uring_prep_recv(submissionQueueEntry, socketFileDescriptor, std::data(buffer), std::size(buffer), flags);
     submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
 
     return submissionQueueEntry;
@@ -171,7 +171,7 @@ auto coContext::Context::receive(const std::int32_t socketFileDescriptor, msghdr
 auto coContext::Context::send(const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
                               const std::int32_t flags) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_send(submissionQueueEntry, socketFileDescriptor, buffer.data(), buffer.size(), flags);
+    io_uring_prep_send(submissionQueueEntry, socketFileDescriptor, std::data(buffer), std::size(buffer), flags);
     submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
 
     return submissionQueueEntry;
@@ -181,8 +181,8 @@ auto coContext::Context::send(const std::int32_t socketFileDescriptor, const std
                               const std::int32_t flags, const sockaddr *const address,
                               const std::uint32_t addressLength) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_sendto(submissionQueueEntry, socketFileDescriptor, buffer.data(), buffer.size(), flags, address,
-                         addressLength);
+    io_uring_prep_sendto(submissionQueueEntry, socketFileDescriptor, std::data(buffer), std::size(buffer), flags,
+                         address, addressLength);
 
     return submissionQueueEntry;
 }
@@ -199,7 +199,7 @@ auto coContext::Context::send(const std::int32_t socketFileDescriptor, const msg
 auto coContext::Context::open(const std::string_view pathname, const std::int32_t flags, const std::uint32_t mode)
     -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_open(submissionQueueEntry, pathname.data(), flags, mode);
+    io_uring_prep_open(submissionQueueEntry, std::data(pathname), flags, mode);
 
     return submissionQueueEntry;
 }
@@ -207,7 +207,7 @@ auto coContext::Context::open(const std::string_view pathname, const std::int32_
 auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
                               const std::int32_t flags, const std::uint32_t mode) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_openat(submissionQueueEntry, directoryFileDescriptor, pathname.data(), flags, mode);
+    io_uring_prep_openat(submissionQueueEntry, directoryFileDescriptor, std::data(pathname), flags, mode);
 
     return submissionQueueEntry;
 }
@@ -215,7 +215,7 @@ auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const 
 auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
                               open_how *const how) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_openat2(submissionQueueEntry, directoryFileDescriptor, pathname.data(), how);
+    io_uring_prep_openat2(submissionQueueEntry, directoryFileDescriptor, std::data(pathname), how);
 
     return submissionQueueEntry;
 }
@@ -223,7 +223,7 @@ auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const 
 auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer,
                               const std::uint64_t offset) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_read(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), offset);
+    io_uring_prep_read(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset);
 
     return submissionQueueEntry;
 }
@@ -231,7 +231,7 @@ auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span
 auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
                               const std::uint64_t offset) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_readv(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), offset);
+    io_uring_prep_readv(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset);
 
     return submissionQueueEntry;
 }
@@ -239,7 +239,7 @@ auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span
 auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
                               const std::uint64_t offset, const std::int32_t flags) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_readv2(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), offset, flags);
+    io_uring_prep_readv2(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset, flags);
 
     return submissionQueueEntry;
 }
@@ -247,7 +247,7 @@ auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span
 auto coContext::Context::write(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
                                const std::uint64_t offset) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_write(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), offset);
+    io_uring_prep_write(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset);
 
     return submissionQueueEntry;
 }
@@ -255,7 +255,7 @@ auto coContext::Context::write(const std::int32_t fileDescriptor, const std::spa
 auto coContext::Context::write(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
                                const std::uint64_t offset) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_writev(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), offset);
+    io_uring_prep_writev(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset);
 
     return submissionQueueEntry;
 }
@@ -263,7 +263,7 @@ auto coContext::Context::write(const std::int32_t fileDescriptor, const std::spa
 auto coContext::Context::write(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
                                const std::uint64_t offset, const std::int32_t flags) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_writev2(submissionQueueEntry, fileDescriptor, buffer.data(), buffer.size(), offset, flags);
+    io_uring_prep_writev2(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset, flags);
 
     return submissionQueueEntry;
 }

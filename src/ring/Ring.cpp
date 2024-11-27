@@ -82,8 +82,8 @@ auto coContext::Ring::allocateFileDescriptorRange(const std::uint32_t offset, co
 auto coContext::Ring::updateFileDescriptors(const std::uint32_t offset,
                                             const std::span<const std::int32_t> fileDescriptors,
                                             const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{io_uring_register_files_update(std::addressof(this->handle), offset,
-                                                                 fileDescriptors.data(), fileDescriptors.size())};
+    if (const std::int32_t result{io_uring_register_files_update(
+            std::addressof(this->handle), offset, std::data(fileDescriptors), std::size(fileDescriptors))};
         result < 0) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}
