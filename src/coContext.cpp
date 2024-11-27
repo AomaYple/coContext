@@ -10,11 +10,7 @@ auto coContext::spawn(Task &&task) -> void { context.spawn(std::move(task)); }
 
 auto coContext::run() -> void { context.run(); }
 
-auto coContext::stop() -> AsyncWaiter {
-    context.stop();
-
-    return cancel(std::uint64_t{}, true);
-}
+auto coContext::stop() -> AsyncWaiter { return AsyncWaiter{context.stop()}; }
 
 auto coContext::syncCancel(const std::uint64_t userData, const bool isMatchAll, const __kernel_timespec timeout)
     -> std::int32_t {

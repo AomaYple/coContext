@@ -28,7 +28,7 @@ namespace coContext {
 
         auto run() -> void;
 
-        auto stop() noexcept -> void;
+        [[nodiscard]] auto stop() -> io_uring_sqe *;
 
         [[nodiscard]] auto cancel(std::variant<std::uint64_t, std::int32_t> identify, std::int32_t flags,
                                   __kernel_timespec timeout) -> std::int32_t;
