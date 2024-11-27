@@ -108,8 +108,8 @@ namespace coContext {
         static constinit std::int32_t sharedRingFileDescriptor;
         static constinit std::uint32_t cpuCode;
 
-        Ring ring;
         bool isRunning{};
+        Ring ring;
         std::vector<Task> unscheduledTasks;
         std::unordered_map<std::size_t, Task> schedulingTasks;
     };
