@@ -213,9 +213,9 @@ auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const 
 }
 
 auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
-                              open_how *const how) -> io_uring_sqe * {
+                              open_how &how) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_openat2(submissionQueueEntry, directoryFileDescriptor, std::data(pathname), how);
+    io_uring_prep_openat2(submissionQueueEntry, directoryFileDescriptor, std::data(pathname), std::addressof(how));
 
     return submissionQueueEntry;
 }

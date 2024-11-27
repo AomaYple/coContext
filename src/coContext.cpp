@@ -111,7 +111,7 @@ auto coContext::open(const std::int32_t directoryFileDescriptor, const std::stri
     return AsyncWaiter{context.open(directoryFileDescriptor, pathname, flags, mode)};
 }
 
-auto coContext::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname, open_how *const how)
+auto coContext::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname, open_how &how)
     -> AsyncWaiter {
     return AsyncWaiter{context.open(directoryFileDescriptor, pathname, how)};
 }
