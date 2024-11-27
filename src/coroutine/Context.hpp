@@ -58,7 +58,7 @@ namespace coContext {
         [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, std::span<std::byte> buffer, std::int32_t flags)
             -> io_uring_sqe *;
 
-        [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, msghdr *message, std::uint32_t flags)
+        [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, msghdr &message, std::uint32_t flags)
             -> io_uring_sqe *;
 
         [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer,
@@ -68,7 +68,7 @@ namespace coContext {
                                 std::int32_t flags, const sockaddr *address, std::uint32_t addressLength)
             -> io_uring_sqe *;
 
-        [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr *message, std::uint32_t flags)
+        [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags)
             -> io_uring_sqe *;
 
         [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode) -> io_uring_sqe *;

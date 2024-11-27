@@ -80,7 +80,7 @@ auto coContext::receive(const std::int32_t socketFileDescriptor, const std::span
     return AsyncWaiter{context.receive(socketFileDescriptor, buffer, flags)};
 }
 
-auto coContext::receive(const std::int32_t socketFileDescriptor, msghdr *const message, const std::uint32_t flags)
+auto coContext::receive(const std::int32_t socketFileDescriptor, msghdr &message, const std::uint32_t flags)
     -> AsyncWaiter {
     return AsyncWaiter{context.receive(socketFileDescriptor, message, flags)};
 }
@@ -96,7 +96,7 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<co
     return AsyncWaiter{context.send(socketFileDescriptor, buffer, flags, address, addressLength)};
 }
 
-auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr *const message, const std::uint32_t flags)
+auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr &message, const std::uint32_t flags)
     -> AsyncWaiter {
     return AsyncWaiter{context.send(socketFileDescriptor, message, flags)};
 }

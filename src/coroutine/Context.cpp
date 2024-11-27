@@ -159,10 +159,10 @@ auto coContext::Context::receive(const std::int32_t socketFileDescriptor, const 
     return submissionQueueEntry;
 }
 
-auto coContext::Context::receive(const std::int32_t socketFileDescriptor, msghdr *const message,
-                                 const std::uint32_t flags) -> io_uring_sqe * {
+auto coContext::Context::receive(const std::int32_t socketFileDescriptor, msghdr &message, const std::uint32_t flags)
+    -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_recvmsg(submissionQueueEntry, socketFileDescriptor, message, flags);
+    io_uring_prep_recvmsg(submissionQueueEntry, socketFileDescriptor, std::addressof(message), flags);
     submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
 
     return submissionQueueEntry;
@@ -187,10 +187,10 @@ auto coContext::Context::send(const std::int32_t socketFileDescriptor, const std
     return submissionQueueEntry;
 }
 
-auto coContext::Context::send(const std::int32_t socketFileDescriptor, const msghdr *const message,
-                              const std::uint32_t flags) -> io_uring_sqe * {
+auto coContext::Context::send(const std::int32_t socketFileDescriptor, const msghdr &message, const std::uint32_t flags)
+    -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_sendmsg(submissionQueueEntry, socketFileDescriptor, message, flags);
+    io_uring_prep_sendmsg(submissionQueueEntry, socketFileDescriptor, std::addressof(message), flags);
     submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
 
     return submissionQueueEntry;
