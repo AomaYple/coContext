@@ -4,7 +4,26 @@
 
 namespace {
     thread_local coContext::Context context;
-}
+
+    [[nodiscard]] constexpr auto setClockSource(const coContext::ClockSource clockSource) noexcept {
+        std::uint32_t flags{};
+        switch (clockSource) {
+            case coContext::ClockSource::monotonic:
+                break;
+            case coContext::ClockSource::absolute:
+                flags = IORING_TIMEOUT_ABS;
+                break;
+            case coContext::ClockSource::boot:
+                flags = IORING_TIMEOUT_BOOTTIME;
+                break;
+            case coContext::ClockSource::real:
+                flags = IORING_TIMEOUT_REALTIME;
+                break;
+        }
+
+        return flags;
+    }
+}    // namespace
 
 auto coContext::spawn(Task &&task) -> void { context.spawn(std::move(task)); }
 
@@ -35,41 +54,13 @@ auto coContext::cancelAny() -> AsyncWaiter {
     return AsyncWaiter{context.cancel(std::uint64_t{}, IORING_ASYNC_CANCEL_ANY)};
 }
 
-auto coContext::timeout(__kernel_timespec &timeout, ClockSource clockSource) -> AsyncWaiter {
-    std::uint32_t flags{};
-    switch (clockSource) {
-        case ClockSource::monotonic:
-            break;
-        case ClockSource::absolute:
-            flags = IORING_TIMEOUT_ABS;
-            break;
-        case ClockSource::boot:
-            flags = IORING_TIMEOUT_BOOTTIME;
-            break;
-        case ClockSource::real:
-            flags = IORING_TIMEOUT_REALTIME;
-    }
-
-    return AsyncWaiter{context.timeout(timeout, 0, flags)};
+auto coContext::timeout(__kernel_timespec &timeout, const ClockSource clockSource) -> AsyncWaiter {
+    return AsyncWaiter{context.timeout(timeout, 0, setClockSource(clockSource))};
 }
 
 auto coContext::updateTimeout(__kernel_timespec &timeout, const std::uint64_t taskHash, const ClockSource clockSource)
     -> AsyncWaiter {
-    std::uint32_t flags{};
-    switch (clockSource) {
-        case ClockSource::monotonic:
-            break;
-        case ClockSource::absolute:
-            flags = IORING_TIMEOUT_ABS;
-            break;
-        case ClockSource::boot:
-            flags = IORING_TIMEOUT_BOOTTIME;
-            break;
-        case ClockSource::real:
-            flags = IORING_TIMEOUT_REALTIME;
-    }
-
-    return AsyncWaiter{context.updateTimeout(timeout, taskHash, flags)};
+    return AsyncWaiter{context.updateTimeout(timeout, taskHash, setClockSource(clockSource))};
 }
 
 auto coContext::removeTimeout(const std::uint64_t taskHash) -> AsyncWaiter {
