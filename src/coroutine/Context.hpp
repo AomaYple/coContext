@@ -2,6 +2,7 @@
 
 #include "../ring/Ring.hpp"
 
+#include <queue>
 #include <string_view>
 #include <variant>
 
@@ -36,6 +37,9 @@ namespace coContext {
         [[nodiscard]] auto cancel(std::uint64_t userData, std::int32_t flags) -> io_uring_sqe *;
 
         [[nodiscard]] auto cancel(std::int32_t fileDescriptor, std::int32_t flags) -> io_uring_sqe *;
+
+        [[nodiscard]] auto timeout(__kernel_timespec &timeout, std::uint32_t count, std::uint32_t flags)
+            -> io_uring_sqe *;
 
         [[nodiscard]] auto close(std::int32_t fileDescriptor) -> io_uring_sqe *;
 
@@ -110,7 +114,7 @@ namespace coContext {
 
         bool isRunning{};
         Ring ring;
-        std::vector<Task> unscheduledTasks;
+        std::queue<Task> unscheduledTasks;
         std::unordered_map<std::size_t, Task> schedulingTasks;
     };
 }    // namespace coContext

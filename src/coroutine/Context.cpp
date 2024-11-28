@@ -42,7 +42,7 @@ auto coContext::Context::swap(Context &other) noexcept -> void {
     std::swap(this->schedulingTasks, other.schedulingTasks);
 }
 
-auto coContext::Context::spawn(Task &&task) -> void { this->unscheduledTasks.emplace_back(std::move(task)); }
+auto coContext::Context::spawn(Task &&task) -> void { this->unscheduledTasks.emplace(std::move(task)); }
 
 auto coContext::Context::run() -> void {
     this->isRunning = true;
@@ -92,6 +92,14 @@ auto coContext::Context::cancel(const std::uint64_t userData, const std::int32_t
 auto coContext::Context::cancel(const std::int32_t fileDescriptor, const std::int32_t flags) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
     io_uring_prep_cancel_fd(submissionQueueEntry, fileDescriptor, flags);
+
+    return submissionQueueEntry;
+}
+
+auto coContext::Context::timeout(__kernel_timespec &timeout, const std::uint32_t count, const std::uint32_t flags)
+    -> io_uring_sqe * {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_timeout(submissionQueueEntry, std::addressof(timeout), count, flags);
 
     return submissionQueueEntry;
 }
@@ -281,12 +289,13 @@ auto coContext::Context::getFileDescriptorLimit(const std::source_location sourc
 }
 
 auto coContext::Context::scheduleTasks() -> void {
-    for (auto &task : this->unscheduledTasks) {
+    while (!std::empty(this->unscheduledTasks)) {
+        Task &task{this->unscheduledTasks.front()};
         task(0);
         this->schedulingTasks.emplace(task.getHash(), std::move(task));
-    }
 
-    this->unscheduledTasks.clear();
+        this->unscheduledTasks.pop();
+    }
 }
 
 std::mutex coContext::Context::mutex;

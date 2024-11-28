@@ -8,6 +8,8 @@
 #include <sys/socket.h>
 
 namespace coContext {
+    enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
+
     auto spawn(Task &&task) -> void;
 
     auto run() -> void;
@@ -26,6 +28,8 @@ namespace coContext {
     [[nodiscard]] auto cancel(std::int32_t fileDescriptor, bool isMatchAll = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto cancelAny() -> AsyncWaiter;
+
+    [[nodiscard]] auto timeout(__kernel_timespec &timeout, ClockSource clockSource = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 
