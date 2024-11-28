@@ -12,9 +12,8 @@ auto coContext::run() -> void { context.run(); }
 
 auto coContext::stop() -> AsyncWaiter { return AsyncWaiter{context.stop()}; }
 
-auto coContext::syncCancel(const std::uint64_t taskHash, const bool isMatchAll, const Timeout timeout) -> std::int32_t {
-    return context.cancel(taskHash, isMatchAll ? IORING_ASYNC_CANCEL_ALL : 0,
-                          __kernel_timespec{timeout.seconds.count(), timeout.nanoseconds.count()});
+auto coContext::syncCancel(const std::uint64_t taskHash, const Timeout timeout) -> std::int32_t {
+    return context.cancel(taskHash, 0, __kernel_timespec{timeout.seconds.count(), timeout.nanoseconds.count()});
 }
 
 auto coContext::syncCancel(const std::int32_t fileDescriptor, const bool isMatchAll, const Timeout timeout)
@@ -28,8 +27,8 @@ auto coContext::syncCancelAny(const Timeout timeout) -> std::int32_t {
                           __kernel_timespec{timeout.seconds.count(), timeout.nanoseconds.count()});
 }
 
-auto coContext::cancel(const std::uint64_t taskHash, const bool isMatchAll) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{context.cancel(taskHash, isMatchAll ? IORING_ASYNC_CANCEL_ALL : 0)};
+auto coContext::cancel(const std::uint64_t taskHash) -> AsyncWaiter {
+    io_uring_sqe *const submissionQueueEntry{context.cancel(taskHash, 0)};
 
     return AsyncWaiter{submissionQueueEntry};
 }

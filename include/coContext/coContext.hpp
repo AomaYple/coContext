@@ -18,14 +18,14 @@ namespace coContext {
 
     [[nodiscard]] auto stop() -> AsyncWaiter;
 
-    [[nodiscard]] auto syncCancel(std::uint64_t taskHash, bool isMatchAll = {}, Timeout timeout = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancel(std::uint64_t taskHash, Timeout timeout = {}) -> std::int32_t;
 
     [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool isMatchAll = {}, Timeout timeout = {})
         -> std::int32_t;
 
     [[nodiscard]] auto syncCancelAny(Timeout timeout = {}) -> std::int32_t;
 
-    [[nodiscard]] auto cancel(std::uint64_t taskHash, bool isMatchAll = {}) -> AsyncWaiter;
+    [[nodiscard]] auto cancel(std::uint64_t taskHash) -> AsyncWaiter;
 
     [[nodiscard]] auto cancel(std::int32_t fileDescriptor, bool isMatchAll = {}) -> AsyncWaiter;
 
