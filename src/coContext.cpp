@@ -53,6 +53,25 @@ auto coContext::timeout(__kernel_timespec &timeout, ClockSource clockSource) -> 
     return AsyncWaiter{context.timeout(timeout, 0, flags)};
 }
 
+auto coContext::updateTimeout(__kernel_timespec &timeout, const std::uint64_t taskHash, const ClockSource clockSource)
+    -> AsyncWaiter {
+    std::uint32_t flags{};
+    switch (clockSource) {
+        case ClockSource::monotonic:
+            break;
+        case ClockSource::absolute:
+            flags = IORING_TIMEOUT_ABS;
+            break;
+        case ClockSource::boot:
+            flags = IORING_TIMEOUT_BOOTTIME;
+            break;
+        case ClockSource::real:
+            flags = IORING_TIMEOUT_REALTIME;
+    }
+
+    return AsyncWaiter{context.updateTimeout(timeout, taskHash, flags)};
+}
+
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter {
     return AsyncWaiter{context.close(fileDescriptor)};
 }

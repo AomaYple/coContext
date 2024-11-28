@@ -41,6 +41,9 @@ namespace coContext {
         [[nodiscard]] auto timeout(__kernel_timespec &timeout, std::uint32_t count, std::uint32_t flags)
             -> io_uring_sqe *;
 
+        [[nodiscard]] auto updateTimeout(__kernel_timespec &timeout, std::uint64_t userData, std::uint32_t flags)
+            -> io_uring_sqe *;
+
         [[nodiscard]] auto close(std::int32_t fileDescriptor) -> io_uring_sqe *;
 
         [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol,

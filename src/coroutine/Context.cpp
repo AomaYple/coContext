@@ -104,6 +104,14 @@ auto coContext::Context::timeout(__kernel_timespec &timeout, const std::uint32_t
     return submissionQueueEntry;
 }
 
+auto coContext::Context::updateTimeout(__kernel_timespec &timeout, const std::uint64_t userData,
+                                       const std::uint32_t flags) -> io_uring_sqe * {
+    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+    io_uring_prep_timeout_update(submissionQueueEntry, std::addressof(timeout), userData, flags);
+
+    return submissionQueueEntry;
+}
+
 auto coContext::Context::close(const std::int32_t fileDescriptor) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
     io_uring_prep_close(submissionQueueEntry, fileDescriptor);
