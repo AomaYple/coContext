@@ -72,6 +72,10 @@ auto coContext::updateTimeout(__kernel_timespec &timeout, const std::uint64_t ta
     return AsyncWaiter{context.updateTimeout(timeout, taskHash, flags)};
 }
 
+auto coContext::removeTimeout(const std::uint64_t taskHash) -> AsyncWaiter {
+    return AsyncWaiter{context.removeTimeout(taskHash)};
+}
+
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter {
     return AsyncWaiter{context.close(fileDescriptor)};
 }

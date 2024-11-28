@@ -34,6 +34,8 @@ namespace coContext {
     [[nodiscard]] auto updateTimeout(__kernel_timespec &timeout, std::uint64_t taskHash, ClockSource clockSource = {})
         -> AsyncWaiter;
 
+    [[nodiscard]] auto removeTimeout(std::uint64_t taskHash) -> AsyncWaiter;
+
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 
     [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol) -> AsyncWaiter;
