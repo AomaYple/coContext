@@ -32,7 +32,7 @@ coContext::Context::Context() :
         CPU_SET(cpuCode++, &cpuSet);
         cpuCode %= std::thread::hardware_concurrency();
     }
-    this->ring.registerCpuAffinity(cpuSet);
+    this->ring.registerCpuAffinity(sizeof(cpuSet), std::addressof(cpuSet));
 
     this->ring.registerSelfFileDescriptor();
 }

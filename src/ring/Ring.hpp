@@ -24,7 +24,7 @@ namespace coContext {
 
         [[nodiscard]] auto getFileDescriptor() const noexcept -> std::int32_t;
 
-        auto registerCpuAffinity(const cpu_set_t &cpuSet,
+        auto registerCpuAffinity(std::size_t cpuSetSize, const cpu_set_t *cpuSet,
                                  std::source_location sourceLocation = std::source_location::current()) -> void;
 
         auto registerSelfFileDescriptor(std::source_location sourceLocation = std::source_location::current()) -> void;

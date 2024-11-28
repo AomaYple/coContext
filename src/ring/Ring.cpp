@@ -38,9 +38,9 @@ auto coContext::Ring::swap(Ring &other) noexcept -> void { std::swap(this->handl
 
 auto coContext::Ring::getFileDescriptor() const noexcept -> std::int32_t { return this->handle.ring_fd; }
 
-auto coContext::Ring::registerCpuAffinity(const cpu_set_t &cpuSet, const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{
-            io_uring_register_iowq_aff(std::addressof(this->handle), sizeof(cpuSet), std::addressof(cpuSet))};
+auto coContext::Ring::registerCpuAffinity(const std::size_t cpuSetSize, const cpu_set_t *const cpuSet,
+                                          const std::source_location sourceLocation) -> void {
+    if (const std::int32_t result{io_uring_register_iowq_aff(std::addressof(this->handle), cpuSetSize, cpuSet)};
         result != 0) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(), sourceLocation}

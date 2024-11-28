@@ -7,23 +7,18 @@
 #include <sys/socket.h>
 
 namespace coContext {
-    struct Timeout {
-        std::chrono::seconds seconds;
-        std::chrono::nanoseconds nanoseconds{};
-    };
-
     auto spawn(Task &&task) -> void;
 
     auto run() -> void;
 
     [[nodiscard]] auto stop() -> AsyncWaiter;
 
-    [[nodiscard]] auto syncCancel(std::uint64_t taskHash, Timeout timeout = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancel(std::uint64_t taskHash, __kernel_timespec timeout = {}) -> std::int32_t;
 
-    [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool isMatchAll = {}, Timeout timeout = {})
+    [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool isMatchAll = {}, __kernel_timespec timeout = {})
         -> std::int32_t;
 
-    [[nodiscard]] auto syncCancelAny(Timeout timeout = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancelAny(__kernel_timespec timeout = {}) -> std::int32_t;
 
     [[nodiscard]] auto cancel(std::uint64_t taskHash) -> AsyncWaiter;
 
