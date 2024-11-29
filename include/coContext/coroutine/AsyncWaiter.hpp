@@ -23,13 +23,13 @@ namespace coContext {
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
-        auto await_suspend(std::coroutine_handle<Task::promise_type> handle) noexcept -> void;
+        auto await_suspend(std::coroutine_handle<Task::Promise> handle) noexcept -> void;
 
         [[nodiscard]] auto await_resume() const -> std::int32_t;
 
     private:
         io_uring_sqe *submissionQueueEntry;
-        std::coroutine_handle<Task::promise_type> handle;
+        std::coroutine_handle<Task::Promise> handle;
     };
 }    // namespace coContext
 

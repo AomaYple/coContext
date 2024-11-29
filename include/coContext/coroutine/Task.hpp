@@ -6,7 +6,7 @@
 namespace coContext {
     class Task {
     public:
-        class promise_type {
+        class Promise {
         public:
             [[nodiscard]] auto get_return_object() -> Task;
 
@@ -25,6 +25,8 @@ namespace coContext {
         private:
             std::int32_t result;
         };
+
+        using promise_type = Promise;
 
         Task(const Task &) = delete;
 
@@ -45,14 +47,14 @@ namespace coContext {
         [[nodiscard]] auto done() const noexcept -> bool;
 
     private:
-        explicit Task(std::coroutine_handle<promise_type> handle) noexcept;
+        explicit Task(std::coroutine_handle<Promise> handle) noexcept;
 
         auto destroy() const -> void;
 
-        std::coroutine_handle<promise_type> handle;
+        std::coroutine_handle<Promise> handle;
     };
 
-    [[nodiscard]] auto operator==(const Task::promise_type &lhs, const Task::promise_type &rhs) noexcept -> bool;
+    [[nodiscard]] auto operator==(const Task::Promise &lhs, const Task::Promise &rhs) noexcept -> bool;
 }    // namespace coContext
 
 template<>
