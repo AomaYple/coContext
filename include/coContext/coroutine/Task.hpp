@@ -1,32 +1,13 @@
 #pragma once
 
-#include <coroutine>
-#include <cstdint>
+#include "Promise.hpp"
 
 namespace coContext {
     class Task {
     public:
-        class Promise {
-        public:
-            [[nodiscard]] auto get_return_object() -> Task;
-
-            [[nodiscard]] auto initial_suspend() const noexcept -> std::suspend_always;
-
-            [[nodiscard]] auto final_suspend() const noexcept -> std::suspend_always;
-
-            auto unhandled_exception() const -> void;
-
-            auto return_void() const noexcept -> void;
-
-            auto setResult(std::int32_t result) noexcept -> void;
-
-            [[nodiscard]] auto getResult() const noexcept -> std::int32_t;
-
-        private:
-            std::int32_t result;
-        };
-
         using promise_type = Promise;
+
+        explicit Task(std::coroutine_handle<Promise> handle) noexcept;
 
         Task(const Task &) = delete;
 
@@ -47,14 +28,12 @@ namespace coContext {
         [[nodiscard]] auto done() const noexcept -> bool;
 
     private:
-        explicit Task(std::coroutine_handle<Promise> handle) noexcept;
-
         auto destroy() const -> void;
 
         std::coroutine_handle<Promise> handle;
     };
 
-    [[nodiscard]] auto operator==(const Task::Promise &lhs, const Task::Promise &rhs) noexcept -> bool;
+    [[nodiscard]] auto operator==(const Promise &lhs, const Promise &rhs) noexcept -> bool;
 }    // namespace coContext
 
 template<>

@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Task.hpp"
-
+#include <coroutine>
+#include <cstdint>
 #include <liburing/io_uring.h>
 
 namespace coContext {
+    class Promise;
+
     class AsyncWaiter {
     public:
         explicit AsyncWaiter(io_uring_sqe *submissionQueueEntry) noexcept;
@@ -23,13 +25,13 @@ namespace coContext {
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
-        auto await_suspend(std::coroutine_handle<Task::Promise> handle) noexcept -> void;
+        auto await_suspend(std::coroutine_handle<Promise> handle) noexcept -> void;
 
         [[nodiscard]] auto await_resume() const -> std::int32_t;
 
     private:
         io_uring_sqe *submissionQueueEntry;
-        std::coroutine_handle<Task::Promise> handle;
+        std::coroutine_handle<Promise> handle;
     };
 }    // namespace coContext
 

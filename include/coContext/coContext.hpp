@@ -1,6 +1,7 @@
 #pragma once
 
 #include "coroutine/AsyncWaiter.hpp"
+#include "coroutine/Task.hpp"
 
 #include <linux/openat2.h>
 #include <span>

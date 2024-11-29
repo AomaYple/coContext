@@ -2,22 +2,6 @@
 
 #include <utility>
 
-auto coContext::Task::Promise::get_return_object() -> Task {
-    return Task{std::coroutine_handle<Promise>::from_promise(*this)};
-}
-
-auto coContext::Task::Promise::initial_suspend() const noexcept -> std::suspend_always { return {}; }
-
-auto coContext::Task::Promise::final_suspend() const noexcept -> std::suspend_always { return {}; }
-
-auto coContext::Task::Promise::unhandled_exception() const -> void { throw; }
-
-auto coContext::Task::Promise::return_void() const noexcept -> void {}
-
-auto coContext::Task::Promise::setResult(const std::int32_t result) noexcept -> void { this->result = result; }
-
-auto coContext::Task::Promise::getResult() const noexcept -> std::int32_t { return this->result; }
-
 coContext::Task::Task(Task &&other) noexcept : handle{std::exchange(other.handle, nullptr)} {}
 
 auto coContext::Task::operator=(Task &&other) noexcept -> Task & {
@@ -51,6 +35,6 @@ auto coContext::Task::destroy() const -> void {
     if (static_cast<bool>(this->handle)) this->handle.destroy();
 }
 
-auto coContext::operator==(const Task::Promise &lhs, const Task::Promise &rhs) noexcept -> bool {
+auto coContext::operator==(const Promise &lhs, const Promise &rhs) noexcept -> bool {
     return lhs.getResult() == rhs.getResult();
 }
