@@ -1,15 +1,18 @@
 #pragma once
 
 #include <coroutine>
-#include <cstdint>
 #include <liburing/io_uring.h>
+#include <memory>
+#include <unordered_map>
 
 namespace coContext {
-    class Promise;
+    class GenericTask;
 
     class AsyncWaiter {
+        using Tasks = std::shared_ptr<const std::unordered_map<std::size_t, GenericTask>>;
+
     public:
-        explicit AsyncWaiter(io_uring_sqe *submissionQueueEntry) noexcept;
+        AsyncWaiter(Tasks tasks, io_uring_sqe *submissionQueueEntry) noexcept;
 
         AsyncWaiter(const AsyncWaiter &) = delete;
 
@@ -25,13 +28,14 @@ namespace coContext {
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
-        auto await_suspend(std::coroutine_handle<Promise> handle) noexcept -> void;
+        auto await_suspend(std::coroutine_handle<> handle) noexcept -> void;
 
         [[nodiscard]] auto await_resume() const -> std::int32_t;
 
     private:
+        Tasks tasks;
         io_uring_sqe *submissionQueueEntry;
-        std::coroutine_handle<Promise> handle;
+        std::size_t coroutineHash;
     };
 }    // namespace coContext
 

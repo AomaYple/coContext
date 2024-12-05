@@ -22,7 +22,7 @@ coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &params) :
 coContext::Ring::Ring(Ring &&other) noexcept : handle{other.handle} { other.handle.ring_fd = -1; }
 
 auto coContext::Ring::operator=(Ring &&other) noexcept -> Ring & {
-    if (this == &other) return *this;
+    if (this == std::addressof(other)) return *this;
 
     this->destroy();
 
@@ -95,7 +95,8 @@ auto coContext::Ring::updateFileDescriptors(const std::uint32_t offset,
 auto coContext::Ring::setupRingBuffer(const std::uint32_t entries, const std::int32_t id, const std::uint32_t flags,
                                       const std::source_location sourceLocation) -> io_uring_buf_ring * {
     std::int32_t error;
-    io_uring_buf_ring *const handle{io_uring_setup_buf_ring(std::addressof(this->handle), entries, id, flags, &error)};
+    io_uring_buf_ring *const handle{
+        io_uring_setup_buf_ring(std::addressof(this->handle), entries, id, flags, std::addressof(error))};
     if (handle == nullptr) {
         throw Exception{
             Log{Log::Level::error, std::error_code{std::abs(error), std::generic_category()}.message(), sourceLocation}

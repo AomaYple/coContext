@@ -4,7 +4,7 @@ coContext::Exception::Exception(std::string &&message) noexcept : message{std::m
 
 auto coContext::Exception::swap(Exception &other) noexcept -> void { std::swap(this->message, other.message); }
 
-auto coContext::Exception::what() const noexcept -> const char * { return this->message.c_str(); }
+auto coContext::Exception::what() const noexcept -> const char * { return std::data(this->message); }
 
 auto coContext::Exception::getMessage() const noexcept -> std::string_view { return this->message; }
 

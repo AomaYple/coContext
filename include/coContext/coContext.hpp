@@ -1,17 +1,25 @@
 #pragma once
 
 #include "coroutine/AsyncWaiter.hpp"
+#include "coroutine/GenericTask.hpp"
 #include "coroutine/Task.hpp"
 
 #include <linux/openat2.h>
-#include <span>
-#include <string_view>
 #include <sys/socket.h>
 
 namespace coContext {
     enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
 
-    auto spawn(Task &&task) -> void;
+    auto spawn(GenericTask &&task) -> void;
+
+    template<TaskReturnValueType T>
+    [[nodiscard]] constexpr auto spawn(Task<T> &&task) {
+        spawn(GenericTask{std::move(task.getCoroutine())});
+
+        return std::future<T>{std::move(task.getReturnValue())};
+    }
+
+    auto spawn(Task<> &&task) -> void;
 
     auto run() -> void;
 

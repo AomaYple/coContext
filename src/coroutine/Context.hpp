@@ -2,12 +2,12 @@
 
 #include "../ring/Ring.hpp"
 
+#include <memory>
 #include <queue>
-#include <string_view>
-#include <variant>
 
 namespace coContext {
-    class Task;
+    class AsyncWaiter;
+    class GenericTask;
 
     class Context {
     public:
@@ -25,86 +25,85 @@ namespace coContext {
 
         auto swap(Context &other) noexcept -> void;
 
-        auto spawn(Task &&task) -> void;
+        auto spawn(GenericTask &&task) -> void;
 
         auto run() -> void;
 
-        [[nodiscard]] auto stop() -> io_uring_sqe *;
+        [[nodiscard]] auto stop() -> AsyncWaiter;
 
         [[nodiscard]] auto cancel(std::variant<std::uint64_t, std::int32_t> identify, std::int32_t flags,
                                   __kernel_timespec timeout) -> std::int32_t;
 
-        [[nodiscard]] auto cancel(std::uint64_t userData, std::int32_t flags) -> io_uring_sqe *;
+        [[nodiscard]] auto cancel(std::uint64_t userData, std::int32_t flags) -> AsyncWaiter;
 
-        [[nodiscard]] auto cancel(std::int32_t fileDescriptor, std::int32_t flags) -> io_uring_sqe *;
+        [[nodiscard]] auto cancel(std::int32_t fileDescriptor, std::int32_t flags) -> AsyncWaiter;
 
-        [[nodiscard]] auto timeout(__kernel_timespec &timeout, std::uint32_t count, std::uint32_t flags)
-            -> io_uring_sqe *;
+        [[nodiscard]] auto timeout(__kernel_timespec &timeout, std::uint32_t count, std::uint32_t flags) -> AsyncWaiter;
 
         [[nodiscard]] auto updateTimeout(__kernel_timespec &timeout, std::uint64_t userData, std::uint32_t flags)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
-        [[nodiscard]] auto removeTimeout(std::uint64_t userData, std::uint32_t flags = {}) -> io_uring_sqe *;
+        [[nodiscard]] auto removeTimeout(std::uint64_t userData, std::uint32_t flags = {}) -> AsyncWaiter;
 
-        [[nodiscard]] auto close(std::int32_t fileDescriptor) -> io_uring_sqe *;
+        [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 
         [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol,
-                                  std::uint32_t flags = {}) -> io_uring_sqe *;
+                                  std::uint32_t flags = {}) -> AsyncWaiter;
 
         [[nodiscard]] auto bind(std::int32_t socketFileDescriptor, sockaddr *address, std::uint32_t addressLength)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
-        [[nodiscard]] auto listen(std::int32_t socketFileDescriptor, std::int32_t backlog) -> io_uring_sqe *;
+        [[nodiscard]] auto listen(std::int32_t socketFileDescriptor, std::int32_t backlog) -> AsyncWaiter;
 
         [[nodiscard]] auto accept(std::int32_t socketFileDescriptor, sockaddr *address, std::uint32_t *addressLength,
-                                  std::int32_t flags) -> io_uring_sqe *;
+                                  std::int32_t flags) -> AsyncWaiter;
 
         [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr *address,
-                                   std::uint32_t addressLength) -> io_uring_sqe *;
+                                   std::uint32_t addressLength) -> AsyncWaiter;
 
-        [[nodiscard]] auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) -> io_uring_sqe *;
+        [[nodiscard]] auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) -> AsyncWaiter;
 
         [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, std::span<std::byte> buffer, std::int32_t flags)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
         [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, msghdr &message, std::uint32_t flags)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
         [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer,
-                                std::int32_t flags) -> io_uring_sqe *;
+                                std::int32_t flags) -> AsyncWaiter;
 
         [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer,
                                 std::int32_t flags, const sockaddr *address, std::uint32_t addressLength)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
         [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
-        [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode) -> io_uring_sqe *;
+        [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode) -> AsyncWaiter;
 
         [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, std::int32_t flags,
-                                std::uint32_t mode) -> io_uring_sqe *;
+                                std::uint32_t mode) -> AsyncWaiter;
 
         [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, open_how &how)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
         [[nodiscard]] auto read(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::uint64_t offset)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
         [[nodiscard]] auto read(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
         [[nodiscard]] auto read(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
-                                std::int32_t flags) -> io_uring_sqe *;
+                                std::int32_t flags) -> AsyncWaiter;
 
         [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::uint64_t offset)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
         [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset)
-            -> io_uring_sqe *;
+            -> AsyncWaiter;
 
         [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
-                                 std::int32_t flags) -> io_uring_sqe *;
+                                 std::int32_t flags) -> AsyncWaiter;
 
     private:
         [[nodiscard]] static auto
@@ -119,8 +118,9 @@ namespace coContext {
 
         bool isRunning{};
         Ring ring;
-        std::queue<Task> unscheduledTasks;
-        std::unordered_map<std::size_t, Task> schedulingTasks;
+        std::queue<GenericTask> unscheduledTasks;
+        std::shared_ptr<std::unordered_map<std::size_t, GenericTask>> schedulingTasks{
+            std::make_shared<std::unordered_map<std::size_t, GenericTask>>()};
     };
 }    // namespace coContext
 
