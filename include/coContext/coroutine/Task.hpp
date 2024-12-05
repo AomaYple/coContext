@@ -6,9 +6,9 @@
 
 namespace coContext {
     template<typename T>
-    concept TaskReturnValueType = std::movable<T> || std::is_void_v<T>;
+    concept TaskReturnType = std::movable<T> || std::is_void_v<T>;
 
-    template<TaskReturnValueType T = void>
+    template<TaskReturnType T = void>
     class Task {
     public:
         class Promise {
@@ -116,12 +116,12 @@ namespace coContext {
 }    // namespace coContext
 
 namespace std {
-    template<coContext::TaskReturnValueType T>
+    template<coContext::TaskReturnType T>
     constexpr auto swap(coContext::Task<T> &lhs, coContext::Task<T> &rhs) noexcept -> void {
         lhs.swap(rhs);
     }
 
-    template<coContext::TaskReturnValueType T>
+    template<coContext::TaskReturnType T>
     constexpr auto swap(typename coContext::Task<T>::Promise &lhs, typename coContext::Task<T>::Promise &rhs) noexcept
         -> void {
         lhs.swap(rhs);

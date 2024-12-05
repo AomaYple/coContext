@@ -13,7 +13,7 @@ namespace coContext {
 
     auto spawn(GenericTask &&task) -> void;
 
-    template<TaskReturnValueType T, typename F, typename... Args>
+    template<TaskReturnType T, typename F, typename... Args>
         requires std::is_invocable_r_v<Task<T>, F, Args...>
     [[nodiscard]] constexpr auto spawn(F &&func, Args &&...args) {
         Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
