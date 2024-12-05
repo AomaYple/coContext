@@ -39,7 +39,7 @@ constexpr auto std::swap(coContext::Coroutine &lhs, coContext::Coroutine &rhs) n
 
 template<>
 struct std::hash<coContext::Coroutine> {
-    [[nodiscard]] auto operator()(const coContext::Coroutine &coroutine) const noexcept {
+    [[nodiscard]] auto operator()(const coContext::Coroutine &coroutine) const noexcept -> std::size_t {
         return std::hash<std::coroutine_handle<>>{}(coroutine.get());
     }
 };

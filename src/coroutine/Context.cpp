@@ -39,7 +39,9 @@ coContext::Context::Context() :
 }
 
 auto coContext::Context::swap(Context &other) noexcept -> void {
+    std::swap(this->isRunning, other.isRunning);
     std::swap(this->ring, other.ring);
+    std::swap(this->unscheduledTasks, other.unscheduledTasks);
     std::swap(this->schedulingTasks, other.schedulingTasks);
 }
 

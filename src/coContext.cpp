@@ -5,7 +5,7 @@
 namespace {
     thread_local coContext::Context context;
 
-    [[nodiscard]] constexpr auto setClockSource(const coContext::ClockSource clockSource) noexcept {
+    [[nodiscard]] constexpr auto setClockSource(const coContext::ClockSource clockSource) noexcept -> std::uint32_t {
         std::uint32_t flags{};
         switch (clockSource) {
             case coContext::ClockSource::monotonic:
