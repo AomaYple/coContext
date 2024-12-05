@@ -4,6 +4,7 @@
 #include "coroutine/GenericTask.hpp"
 #include "coroutine/Task.hpp"
 
+#include <functional>
 #include <linux/openat2.h>
 #include <sys/socket.h>
 
@@ -12,14 +13,21 @@ namespace coContext {
 
     auto spawn(GenericTask &&task) -> void;
 
-    template<TaskReturnValueType T>
-    [[nodiscard]] constexpr auto spawn(Task<T> &&task) {
+    template<TaskReturnValueType T, typename F, typename... Args>
+        requires std::is_invocable_r_v<Task<T>, F, Args...>
+    [[nodiscard]] constexpr auto spawn(F &&func, Args &&...args) {
+        Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
         spawn(GenericTask{std::move(task.getCoroutine())});
 
         return std::future<T>{std::move(task.getReturnValue())};
     }
 
-    auto spawn(Task<> &&task) -> void;
+    template<typename F, typename... Args>
+        requires std::is_invocable_r_v<Task<>, F, Args...>
+    constexpr auto spawn(F &&func, Args &&...args) {
+        Task<> task{std::invoke(func, std::forward<Args>(args)...)};
+        spawn(GenericTask{std::move(task.getCoroutine())});
+    }
 
     auto run() -> void;
 

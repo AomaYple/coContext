@@ -27,8 +27,6 @@ namespace {
 
 auto coContext::spawn(GenericTask &&task) -> void { context.spawn(std::move(task)); }
 
-auto coContext::spawn(Task<> &&task) -> void { spawn(GenericTask{std::move(task.getCoroutine())}); }
-
 auto coContext::run() -> void { context.run(); }
 
 auto coContext::stop() -> AsyncWaiter { return context.stop(); }
