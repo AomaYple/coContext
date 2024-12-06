@@ -31,7 +31,7 @@ namespace coContext {
 
         [[nodiscard]] auto stop() -> AsyncWaiter;
 
-        [[nodiscard]] auto cancel(std::variant<std::uint64_t, std::int32_t> identify, std::int32_t flags,
+        [[nodiscard]] auto cancel(std::variant<std::uint64_t, std::int32_t> identity, std::int32_t flags,
                                   __kernel_timespec timeout) -> std::int32_t;
 
         [[nodiscard]] auto cancel(std::uint64_t userData, std::int32_t flags) -> AsyncWaiter;

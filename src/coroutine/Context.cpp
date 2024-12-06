@@ -72,13 +72,13 @@ auto coContext::Context::stop() -> AsyncWaiter {
     return this->cancel(std::uint64_t{}, IORING_ASYNC_CANCEL_ALL);
 }
 
-auto coContext::Context::cancel(const std::variant<std::uint64_t, std::int32_t> identify, const std::int32_t flags,
+auto coContext::Context::cancel(const std::variant<std::uint64_t, std::int32_t> identity, const std::int32_t flags,
                                 const __kernel_timespec timeout) -> std::int32_t {
     io_uring_sync_cancel_reg parameters{};
 
-    if (std::holds_alternative<std::uint64_t>(identify)) parameters.addr = std::get<std::uint64_t>(identify);
+    if (std::holds_alternative<std::uint64_t>(identity)) parameters.addr = std::get<std::uint64_t>(identity);
     else {
-        parameters.fd = std::get<std::int32_t>(identify);
+        parameters.fd = std::get<std::int32_t>(identity);
         parameters.flags = IORING_ASYNC_CANCEL_FD;
     }
 

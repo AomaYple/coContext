@@ -31,8 +31,8 @@ auto coContext::run() -> void { context.run(); }
 
 auto coContext::stop() -> AsyncWaiter { return context.stop(); }
 
-auto coContext::syncCancel(const std::uint64_t userData, const __kernel_timespec timeout) -> std::int32_t {
-    return context.cancel(userData, 0, timeout);
+auto coContext::syncCancel(const std::uint64_t taskIdentity, const __kernel_timespec timeout) -> std::int32_t {
+    return context.cancel(taskIdentity, 0, timeout);
 }
 
 auto coContext::syncCancel(const std::int32_t fileDescriptor, const bool isMatchAll, const __kernel_timespec timeout)
@@ -44,7 +44,7 @@ auto coContext::syncCancelAny(const __kernel_timespec timeout) -> std::int32_t {
     return context.cancel(std::uint64_t{}, IORING_ASYNC_CANCEL_ANY, timeout);
 }
 
-auto coContext::cancel(const std::uint64_t userData) -> AsyncWaiter { return context.cancel(userData, 0); }
+auto coContext::cancel(const std::uint64_t taskIdentity) -> AsyncWaiter { return context.cancel(taskIdentity, 0); }
 
 auto coContext::cancel(const std::int32_t fileDescriptor, const bool isMatchAll) -> AsyncWaiter {
     return context.cancel(fileDescriptor, isMatchAll ? IORING_ASYNC_CANCEL_ALL : 0);
@@ -56,12 +56,14 @@ auto coContext::timeout(__kernel_timespec &timeout, const ClockSource clockSourc
     return context.timeout(timeout, 0, setClockSource(clockSource));
 }
 
-auto coContext::updateTimeout(__kernel_timespec &timeout, const std::uint64_t userData, const ClockSource clockSource)
-    -> AsyncWaiter {
-    return context.updateTimeout(timeout, userData, setClockSource(clockSource));
+auto coContext::updateTimeout(__kernel_timespec &timeout, const std::uint64_t taskIdentity,
+                              const ClockSource clockSource) -> AsyncWaiter {
+    return context.updateTimeout(timeout, taskIdentity, setClockSource(clockSource));
 }
 
-auto coContext::removeTimeout(const std::uint64_t userData) -> AsyncWaiter { return context.removeTimeout(userData); }
+auto coContext::removeTimeout(const std::uint64_t taskIdentity) -> AsyncWaiter {
+    return context.removeTimeout(taskIdentity);
+}
 
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter { return context.close(fileDescriptor); }
 

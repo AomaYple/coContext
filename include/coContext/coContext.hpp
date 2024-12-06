@@ -12,7 +12,7 @@ namespace coContext {
     template<TaskReturnType T>
     struct SpawnResult {
         std::future<T> result;
-        std::uint64_t userData;
+        std::uint64_t taskIdentity;
     };
 
     enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
@@ -25,10 +25,10 @@ namespace coContext {
         Task<> task{std::invoke(func, std::forward<Args>(args)...)};
         Coroutine &coroutine{task.getCoroutine()};
 
-        const std::uint64_t userData{std::hash<Coroutine>{}(coroutine)};
+        const std::uint64_t taskIdentity{std::hash<Coroutine>{}(coroutine)};
         spawn(GenericTask{std::move(coroutine)});
 
-        return SpawnResult{std::future<void>{}, userData};
+        return SpawnResult{std::future<void>{}, taskIdentity};
     }
 
     template<TaskReturnType T, typename F, typename... Args>
@@ -37,24 +37,24 @@ namespace coContext {
         Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
         Coroutine &coroutine{task.getCoroutine()};
 
-        const std::uint64_t userData{std::hash<Coroutine>{}(coroutine)};
+        const std::uint64_t taskIdentity{std::hash<Coroutine>{}(coroutine)};
         spawn(GenericTask{std::move(coroutine)});
 
-        return SpawnResult{std::future<T>{std::move(task.getReturnValue())}, userData};
+        return SpawnResult{std::future<T>{std::move(task.getReturnValue())}, taskIdentity};
     }
 
     auto run() -> void;
 
     [[nodiscard]] auto stop() -> AsyncWaiter;
 
-    [[nodiscard]] auto syncCancel(std::uint64_t userData, __kernel_timespec timeout = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, __kernel_timespec timeout = {}) -> std::int32_t;
 
     [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool isMatchAll = {}, __kernel_timespec timeout = {})
         -> std::int32_t;
 
     [[nodiscard]] auto syncCancelAny(__kernel_timespec timeout = {}) -> std::int32_t;
 
-    [[nodiscard]] auto cancel(std::uint64_t userData) -> AsyncWaiter;
+    [[nodiscard]] auto cancel(std::uint64_t taskIdentity) -> AsyncWaiter;
 
     [[nodiscard]] auto cancel(std::int32_t fileDescriptor, bool isMatchAll = {}) -> AsyncWaiter;
 
@@ -62,10 +62,10 @@ namespace coContext {
 
     [[nodiscard]] auto timeout(__kernel_timespec &timeout, ClockSource clockSource = {}) -> AsyncWaiter;
 
-    [[nodiscard]] auto updateTimeout(__kernel_timespec &timeout, std::uint64_t userData, ClockSource clockSource = {})
-        -> AsyncWaiter;
+    [[nodiscard]] auto updateTimeout(__kernel_timespec &timeout, std::uint64_t taskIdentity,
+                                     ClockSource clockSource = {}) -> AsyncWaiter;
 
-    [[nodiscard]] auto removeTimeout(std::uint64_t userData) -> AsyncWaiter;
+    [[nodiscard]] auto removeTimeout(std::uint64_t taskIdentity) -> AsyncWaiter;
 
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 
