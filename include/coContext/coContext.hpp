@@ -13,34 +13,42 @@ namespace coContext {
 
     auto spawn(GenericTask &&task) -> void;
 
-    template<TaskReturnType T, typename F, typename... Args>
-        requires std::is_invocable_r_v<Task<T>, F, Args...>
-    [[nodiscard]] constexpr auto spawn(F &&func, Args &&...args) {
-        Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
-        spawn(GenericTask{std::move(task.getCoroutine())});
-
-        return std::future<T>{std::move(task.getReturnValue())};
-    }
-
     template<typename F, typename... Args>
         requires std::is_invocable_r_v<Task<>, F, Args...>
     constexpr auto spawn(F &&func, Args &&...args) {
         Task<> task{std::invoke(func, std::forward<Args>(args)...)};
-        spawn(GenericTask{std::move(task.getCoroutine())});
+        Coroutine &coroutine{task.getCoroutine()};
+
+        const std::uint64_t userData{std::hash<Coroutine>{}(coroutine)};
+        spawn(GenericTask{std::move(coroutine)});
+
+        return std::pair{std::future<void>{}, userData};
+    }
+
+    template<TaskReturnType T, typename F, typename... Args>
+        requires std::is_invocable_r_v<Task<T>, F, Args...>
+    [[nodiscard]] constexpr auto spawn(F &&func, Args &&...args) {
+        Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
+        Coroutine &coroutine{task.getCoroutine()};
+
+        const std::uint64_t userData{std::hash<Coroutine>{}(coroutine)};
+        spawn(GenericTask{std::move(coroutine)});
+
+        return std::pair{std::future<T>{std::move(task.getReturnValue())}, userData};
     }
 
     auto run() -> void;
 
     [[nodiscard]] auto stop() -> AsyncWaiter;
 
-    [[nodiscard]] auto syncCancel(std::uint64_t taskHash, __kernel_timespec timeout = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancel(std::uint64_t userData, __kernel_timespec timeout = {}) -> std::int32_t;
 
     [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool isMatchAll = {}, __kernel_timespec timeout = {})
         -> std::int32_t;
 
     [[nodiscard]] auto syncCancelAny(__kernel_timespec timeout = {}) -> std::int32_t;
 
-    [[nodiscard]] auto cancel(std::uint64_t taskHash) -> AsyncWaiter;
+    [[nodiscard]] auto cancel(std::uint64_t userData) -> AsyncWaiter;
 
     [[nodiscard]] auto cancel(std::int32_t fileDescriptor, bool isMatchAll = {}) -> AsyncWaiter;
 
