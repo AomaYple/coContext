@@ -9,7 +9,7 @@ namespace coContext {
     class GenericTask;
 
     class AsyncWaiter {
-        using Tasks = std::shared_ptr<const std::unordered_map<std::size_t, GenericTask>>;
+        using Tasks = std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>>;
 
     public:
         AsyncWaiter(Tasks tasks, io_uring_sqe *submissionQueueEntry) noexcept;
@@ -35,7 +35,7 @@ namespace coContext {
     private:
         Tasks tasks;
         io_uring_sqe *submissionQueueEntry;
-        std::size_t coroutineHash;
+        std::uint64_t taskIdentity;
     };
 }    // namespace coContext
 

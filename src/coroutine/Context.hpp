@@ -119,8 +119,8 @@ namespace coContext {
         bool isRunning{};
         Ring ring;
         std::queue<GenericTask> unscheduledTasks;
-        std::shared_ptr<std::unordered_map<std::size_t, GenericTask>> schedulingTasks{
-            std::make_shared<std::unordered_map<std::size_t, GenericTask>>()};
+        std::shared_ptr<std::unordered_map<std::uint64_t, GenericTask>> schedulingTasks{
+            std::make_shared<std::unordered_map<std::uint64_t, GenericTask>>()};
     };
 }    // namespace coContext
 
