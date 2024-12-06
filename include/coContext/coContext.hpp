@@ -9,6 +9,12 @@
 #include <sys/socket.h>
 
 namespace coContext {
+    template<TaskReturnType T>
+    struct SpawnResult {
+        std::future<T> result;
+        std::uint64_t userData;
+    };
+
     enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
 
     auto spawn(GenericTask &&task) -> void;
@@ -22,19 +28,19 @@ namespace coContext {
         const std::uint64_t userData{std::hash<Coroutine>{}(coroutine)};
         spawn(GenericTask{std::move(coroutine)});
 
-        return std::pair{std::future<void>{}, userData};
+        return SpawnResult{std::future<void>{}, userData};
     }
 
     template<TaskReturnType T, typename F, typename... Args>
         requires std::is_invocable_r_v<Task<T>, F, Args...>
-    [[nodiscard]] constexpr auto spawn(F &&func, Args &&...args) {
+    constexpr auto spawn(F &&func, Args &&...args) {
         Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
         Coroutine &coroutine{task.getCoroutine()};
 
         const std::uint64_t userData{std::hash<Coroutine>{}(coroutine)};
         spawn(GenericTask{std::move(coroutine)});
 
-        return std::pair{std::future<T>{std::move(task.getReturnValue())}, userData};
+        return SpawnResult{std::future<T>{std::move(task.getReturnValue())}, userData};
     }
 
     auto run() -> void;
@@ -56,10 +62,10 @@ namespace coContext {
 
     [[nodiscard]] auto timeout(__kernel_timespec &timeout, ClockSource clockSource = {}) -> AsyncWaiter;
 
-    [[nodiscard]] auto updateTimeout(__kernel_timespec &timeout, std::uint64_t taskHash, ClockSource clockSource = {})
+    [[nodiscard]] auto updateTimeout(__kernel_timespec &timeout, std::uint64_t userData, ClockSource clockSource = {})
         -> AsyncWaiter;
 
-    [[nodiscard]] auto removeTimeout(std::uint64_t taskHash) -> AsyncWaiter;
+    [[nodiscard]] auto removeTimeout(std::uint64_t userData) -> AsyncWaiter;
 
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 

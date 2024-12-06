@@ -56,12 +56,12 @@ auto coContext::timeout(__kernel_timespec &timeout, const ClockSource clockSourc
     return context.timeout(timeout, 0, setClockSource(clockSource));
 }
 
-auto coContext::updateTimeout(__kernel_timespec &timeout, const std::uint64_t taskHash, const ClockSource clockSource)
+auto coContext::updateTimeout(__kernel_timespec &timeout, const std::uint64_t userData, const ClockSource clockSource)
     -> AsyncWaiter {
-    return context.updateTimeout(timeout, taskHash, setClockSource(clockSource));
+    return context.updateTimeout(timeout, userData, setClockSource(clockSource));
 }
 
-auto coContext::removeTimeout(const std::uint64_t taskHash) -> AsyncWaiter { return context.removeTimeout(taskHash); }
+auto coContext::removeTimeout(const std::uint64_t userData) -> AsyncWaiter { return context.removeTimeout(userData); }
 
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter { return context.close(fileDescriptor); }
 
