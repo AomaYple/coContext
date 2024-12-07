@@ -49,10 +49,9 @@ auto coContext::Context::spawn(GenericTask &&task) -> void { this->unscheduledTa
 
 auto coContext::Context::run() -> void {
     this->isRunning = true;
+    this->scheduleTasks();
 
     while (this->isRunning) {
-        this->scheduleTasks();
-
         this->ring.submitAndWait(1);
         this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completionQueueEntry) {
             GenericTask &task{this->schedulingTasks->at(completionQueueEntry->user_data)};
@@ -63,6 +62,8 @@ auto coContext::Context::run() -> void {
 
             if (coroutine.done()) this->schedulingTasks->erase(completionQueueEntry->user_data);
         }));
+
+        this->scheduleTasks();
     }
 }
 
