@@ -31,7 +31,7 @@ namespace coContext {
         return SpawnResult{std::future<void>{}, taskIdentity};
     }
 
-    template<TaskReturnType T, typename F, typename... Args>
+    template<std::movable T, typename F, typename... Args>
         requires std::is_invocable_r_v<Task<T>, F, Args...>
     constexpr auto spawn(F &&func, Args &&...args) {
         Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
