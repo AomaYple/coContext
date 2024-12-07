@@ -113,6 +113,10 @@ namespace coContext {
     private:
         Coroutine coroutine;
     };
+
+    [[nodiscard]] constexpr auto operator==(const Task<>::Promise lhs, const Task<>::Promise rhs) noexcept {
+        return true;
+    }
 }    // namespace coContext
 
 namespace std {
