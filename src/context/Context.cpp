@@ -66,11 +66,7 @@ auto coContext::Context::run() -> void {
     }
 }
 
-auto coContext::Context::stop() -> AsyncWaiter {
-    this->isRunning = false;
-
-    return this->cancel(std::uint64_t{}, IORING_ASYNC_CANCEL_ALL);
-}
+auto coContext::Context::stop() noexcept -> void { this->isRunning = false; }
 
 auto coContext::Context::cancel(const std::variant<std::uint64_t, std::int32_t> identity, const std::int32_t flags,
                                 const __kernel_timespec timeout) -> std::int32_t {

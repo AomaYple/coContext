@@ -1,6 +1,6 @@
 #include "coContext/coContext.hpp"
 
-#include "coroutine/Context.hpp"
+#include "context/Context.hpp"
 
 namespace {
     thread_local coContext::Context context;
@@ -29,7 +29,7 @@ auto coContext::spawn(GenericTask &&task) -> void { context.spawn(std::move(task
 
 auto coContext::run() -> void { context.run(); }
 
-auto coContext::stop() -> AsyncWaiter { return context.stop(); }
+auto coContext::stop() noexcept -> void { return context.stop(); }
 
 auto coContext::syncCancel(const std::uint64_t taskIdentity, const __kernel_timespec timeout) -> std::int32_t {
     return context.cancel(taskIdentity, 0, timeout);

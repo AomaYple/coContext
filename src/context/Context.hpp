@@ -29,7 +29,7 @@ namespace coContext {
 
         auto run() -> void;
 
-        [[nodiscard]] auto stop() -> AsyncWaiter;
+        auto stop() noexcept -> void;
 
         [[nodiscard]] auto cancel(std::variant<std::uint64_t, std::int32_t> identity, std::int32_t flags,
                                   __kernel_timespec timeout) -> std::int32_t;

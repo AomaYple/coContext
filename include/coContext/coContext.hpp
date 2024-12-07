@@ -17,6 +17,10 @@ namespace coContext {
 
     enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
 
+    auto run() -> void;
+
+    auto stop() noexcept -> void;
+
     auto spawn(GenericTask &&task) -> void;
 
     template<typename F, typename... Args>
@@ -42,10 +46,6 @@ namespace coContext {
 
         return SpawnResult{std::future<T>{std::move(task.getReturnValue())}, taskIdentity};
     }
-
-    auto run() -> void;
-
-    [[nodiscard]] auto stop() -> AsyncWaiter;
 
     [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, __kernel_timespec timeout = {}) -> std::int32_t;
 
