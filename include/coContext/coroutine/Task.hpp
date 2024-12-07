@@ -114,7 +114,8 @@ namespace coContext {
         Coroutine coroutine;
     };
 
-    [[nodiscard]] constexpr auto operator==(const Task<>::Promise lhs, const Task<>::Promise rhs) noexcept {
+    [[nodiscard]] constexpr auto operator==([[maybe_unused]] const Task<>::Promise lhs,
+                                            [[maybe_unused]] const Task<>::Promise rhs) noexcept {
         return true;
     }
 }    // namespace coContext
