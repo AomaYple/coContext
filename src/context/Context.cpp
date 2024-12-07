@@ -2,25 +2,25 @@
 
 #include "../log/Exception.hpp"
 #include "../log/Log.hpp"
-#include "coContext/coroutine/AsyncWaiter.hpp"
 #include "coContext/coroutine/GenericTask.hpp"
+#include "coContext/ring/SubmissionQueueEntry.hpp"
 
 #include <sys/resource.h>
 
 coContext::Context::Context() :
     ring{[] {
-        io_uring_params params{};
-        params.flags = IORING_SETUP_SUBMIT_ALL | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_TASKRUN_FLAG |
-                       IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN;
+        io_uring_params parameters{};
+        parameters.flags = IORING_SETUP_SUBMIT_ALL | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_TASKRUN_FLAG |
+                           IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN;
 
         const std::lock_guard lock{mutex};
 
         if (sharedRingFileDescriptor != -1) {
-            params.flags |= IORING_SETUP_ATTACH_WQ;
-            params.wq_fd = sharedRingFileDescriptor;
+            parameters.flags |= IORING_SETUP_ATTACH_WQ;
+            parameters.wq_fd = sharedRingFileDescriptor;
         }
 
-        Ring ring{static_cast<std::uint32_t>(getFileDescriptorLimit()) * 2, params};
+        Ring ring{static_cast<std::uint32_t>(getFileDescriptorLimit()) * 2, parameters};
 
         if (sharedRingFileDescriptor == -1) sharedRingFileDescriptor = ring.getFileDescriptor();
 
@@ -69,8 +69,17 @@ auto coContext::Context::run() -> void {
 
 auto coContext::Context::stop() noexcept -> void { this->isRunning = false; }
 
-auto coContext::Context::cancel(const std::variant<std::uint64_t, std::int32_t> identity, const std::int32_t flags,
-                                const __kernel_timespec timeout) -> std::int32_t {
+auto coContext::Context::getConstSchedulingTasks() const noexcept
+    -> std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>> {
+    return this->schedulingTasks;
+}
+
+auto coContext::Context::getSubmissionQueueEntry() -> SubmissionQueueEntry {
+    return SubmissionQueueEntry{this->ring.getSubmissionQueueEntry()};
+}
+
+auto coContext::Context::syncCancel(const std::variant<std::uint64_t, std::int32_t> identity, const std::int32_t flags,
+                                    const __kernel_timespec timeSpecification) -> std::int32_t {
     io_uring_sync_cancel_reg parameters{};
 
     if (std::holds_alternative<std::uint64_t>(identity)) parameters.addr = std::get<std::uint64_t>(identity);
@@ -80,218 +89,9 @@ auto coContext::Context::cancel(const std::variant<std::uint64_t, std::int32_t> 
     }
 
     parameters.flags |= flags;
-    parameters.timeout = timeout;
+    parameters.timeout = timeSpecification;
 
     return this->ring.syncCancel(parameters);
-}
-
-auto coContext::Context::cancel(const std::uint64_t userData, const std::int32_t flags) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_cancel64(submissionQueueEntry, userData, flags);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::cancel(const std::int32_t fileDescriptor, const std::int32_t flags) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_cancel_fd(submissionQueueEntry, fileDescriptor, flags);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::timeout(__kernel_timespec &timeout, const std::uint32_t count, const std::uint32_t flags)
-    -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_timeout(submissionQueueEntry, std::addressof(timeout), count, flags);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::updateTimeout(__kernel_timespec &timeout, const std::uint64_t userData,
-                                       const std::uint32_t flags) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_timeout_update(submissionQueueEntry, std::addressof(timeout), userData, flags);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::removeTimeout(const std::uint64_t userData, const std::uint32_t flags) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_timeout_remove(submissionQueueEntry, userData, flags);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::close(const std::int32_t fileDescriptor) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_close(submissionQueueEntry, fileDescriptor);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::socket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol,
-                                const std::uint32_t flags) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_socket(submissionQueueEntry, domain, type, protocol, flags);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::bind(const std::int32_t socketFileDescriptor, sockaddr *const address,
-                              const std::uint32_t addressLength) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_bind(submissionQueueEntry, socketFileDescriptor, address, addressLength);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::listen(const std::int32_t socketFileDescriptor, const std::int32_t backlog) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_listen(submissionQueueEntry, socketFileDescriptor, backlog);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::accept(const std::int32_t socketFileDescriptor, sockaddr *const address,
-                                std::uint32_t *const addressLength, const std::int32_t flags) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_accept(submissionQueueEntry, socketFileDescriptor, address, addressLength, flags);
-    submissionQueueEntry->ioprio |= IORING_ACCEPT_POLL_FIRST;
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::connect(const std::int32_t socketFileDescriptor, const sockaddr *const address,
-                                 const std::uint32_t addressLength) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_connect(submissionQueueEntry, socketFileDescriptor, address, addressLength);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::shutdown(const std::int32_t socketFileDescriptor, const std::int32_t how) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_shutdown(submissionQueueEntry, socketFileDescriptor, how);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::receive(const std::int32_t socketFileDescriptor, const std::span<std::byte> buffer,
-                                 const std::int32_t flags) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_recv(submissionQueueEntry, socketFileDescriptor, std::data(buffer), std::size(buffer), flags);
-    submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::receive(const std::int32_t socketFileDescriptor, msghdr &message, const std::uint32_t flags)
-    -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_recvmsg(submissionQueueEntry, socketFileDescriptor, std::addressof(message), flags);
-    submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::send(const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
-                              const std::int32_t flags) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_send(submissionQueueEntry, socketFileDescriptor, std::data(buffer), std::size(buffer), flags);
-    submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::send(const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
-                              const std::int32_t flags, const sockaddr *const address,
-                              const std::uint32_t addressLength) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_sendto(submissionQueueEntry, socketFileDescriptor, std::data(buffer), std::size(buffer), flags,
-                         address, addressLength);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::send(const std::int32_t socketFileDescriptor, const msghdr &message, const std::uint32_t flags)
-    -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_sendmsg(submissionQueueEntry, socketFileDescriptor, std::addressof(message), flags);
-    submissionQueueEntry->ioprio |= IORING_RECVSEND_POLL_FIRST;
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::open(const std::string_view pathname, const std::int32_t flags, const std::uint32_t mode)
-    -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_open(submissionQueueEntry, std::data(pathname), flags, mode);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
-                              const std::int32_t flags, const std::uint32_t mode) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_openat(submissionQueueEntry, directoryFileDescriptor, std::data(pathname), flags, mode);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
-                              open_how &how) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_openat2(submissionQueueEntry, directoryFileDescriptor, std::data(pathname), std::addressof(how));
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer,
-                              const std::uint64_t offset) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_read(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
-                              const std::uint64_t offset) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_readv(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::read(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
-                              const std::uint64_t offset, const std::int32_t flags) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_readv2(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset, flags);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::write(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
-                               const std::uint64_t offset) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_write(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::write(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
-                               const std::uint64_t offset) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_writev(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset);
-
-    return {this->schedulingTasks, submissionQueueEntry};
-}
-
-auto coContext::Context::write(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
-                               const std::uint64_t offset, const std::int32_t flags) -> AsyncWaiter {
-    io_uring_sqe *const submissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-    io_uring_prep_writev2(submissionQueueEntry, fileDescriptor, std::data(buffer), std::size(buffer), offset, flags);
-
-    return {this->schedulingTasks, submissionQueueEntry};
 }
 
 auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> std::size_t {

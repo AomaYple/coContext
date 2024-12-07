@@ -3,11 +3,11 @@
 #include "../log/Exception.hpp"
 #include "../log/Log.hpp"
 
-coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &params) :
-    handle{[entries, &params](const std::source_location sourceLocation = std::source_location::current()) {
+coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) :
+    handle{[entries, &parameters](const std::source_location sourceLocation = std::source_location::current()) {
         io_uring handle{};
         if (const std::int32_t result{
-                io_uring_queue_init_params(entries, std::addressof(handle), std::addressof(params))};
+                io_uring_queue_init_params(entries, std::addressof(handle), std::addressof(parameters))};
             result != 0) {
             throw Exception{
                 Log{Log::Level::fatal, std::error_code{std::abs(result), std::generic_category()}.message(),
@@ -169,9 +169,10 @@ auto coContext::Ring::advance(const std::uint32_t count) noexcept -> void {
     io_uring_cq_advance(std::addressof(this->handle), count);
 }
 
-auto coContext::Ring::advance(io_uring_buf_ring *const ringBuffer, const std::int32_t completionQueueEntry,
-                              const std::int32_t bufferCount) noexcept -> void {
-    __io_uring_buf_ring_cq_advance(std::addressof(this->handle), ringBuffer, completionQueueEntry, bufferCount);
+auto coContext::Ring::advance(io_uring_buf_ring *const ringBuffer, const std::int32_t completionQueueEntryCount,
+                              const std::int32_t ringBufferBufferCount) noexcept -> void {
+    __io_uring_buf_ring_cq_advance(std::addressof(this->handle), ringBuffer, completionQueueEntryCount,
+                                   ringBufferBufferCount);
 }
 
 auto coContext::Ring::destroy() noexcept -> void {

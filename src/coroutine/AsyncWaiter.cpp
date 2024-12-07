@@ -2,10 +2,8 @@
 
 #include "coContext/coroutine/GenericTask.hpp"
 
-#include <liburing.h>
-
-coContext::AsyncWaiter::AsyncWaiter(Tasks tasks, io_uring_sqe *const submissionQueueEntry) noexcept :
-    tasks{std::move(tasks)}, submissionQueueEntry{submissionQueueEntry} {}
+coContext::AsyncWaiter::AsyncWaiter(TaskMap tasks, SubmissionQueueEntry &&submissionQueueEntry) noexcept :
+    tasks{std::move(tasks)}, submissionQueueEntry{std::move(submissionQueueEntry)} {}
 
 auto coContext::AsyncWaiter::swap(AsyncWaiter &other) noexcept -> void {
     std::swap(this->tasks, other.tasks);
@@ -17,7 +15,7 @@ auto coContext::AsyncWaiter::await_ready() const noexcept -> bool { return {}; }
 
 auto coContext::AsyncWaiter::await_suspend(const std::coroutine_handle<> handle) noexcept -> void {
     this->taskIdentity = std::hash<std::coroutine_handle<>>{}(handle);
-    io_uring_sqe_set_data64(this->submissionQueueEntry, this->taskIdentity);
+    this->submissionQueueEntry.setUserData(this->taskIdentity);
 }
 
 auto coContext::AsyncWaiter::await_resume() const -> std::int32_t {

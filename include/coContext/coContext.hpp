@@ -5,8 +5,6 @@
 #include "coroutine/Task.hpp"
 
 #include <functional>
-#include <linux/openat2.h>
-#include <sys/socket.h>
 
 namespace coContext {
     template<TaskReturnType T>
@@ -47,12 +45,12 @@ namespace coContext {
         return SpawnResult{std::future<T>{std::move(task.getReturnValue())}, taskIdentity};
     }
 
-    [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, __kernel_timespec timeout = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, __kernel_timespec timeSpecification = {}) -> std::int32_t;
 
-    [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool isMatchAll = {}, __kernel_timespec timeout = {})
-        -> std::int32_t;
+    [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool isMatchAll = {},
+                                  __kernel_timespec timeSpecification = {}) -> std::int32_t;
 
-    [[nodiscard]] auto syncCancelAny(__kernel_timespec timeout = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancelAny(__kernel_timespec timeSpecification = {}) -> std::int32_t;
 
     [[nodiscard]] auto cancel(std::uint64_t taskIdentity) -> AsyncWaiter;
 
@@ -60,9 +58,9 @@ namespace coContext {
 
     [[nodiscard]] auto cancelAny() -> AsyncWaiter;
 
-    [[nodiscard]] auto timeout(__kernel_timespec &timeout, ClockSource clockSource = {}) -> AsyncWaiter;
+    [[nodiscard]] auto timeout(__kernel_timespec &timeSpecification, ClockSource clockSource = {}) -> AsyncWaiter;
 
-    [[nodiscard]] auto updateTimeout(__kernel_timespec &timeout, std::uint64_t taskIdentity,
+    [[nodiscard]] auto updateTimeout(__kernel_timespec &timeSpecification, std::uint64_t taskIdentity,
                                      ClockSource clockSource = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto removeTimeout(std::uint64_t taskIdentity) -> AsyncWaiter;

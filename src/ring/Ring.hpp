@@ -8,7 +8,7 @@
 namespace coContext {
     class Ring {
     public:
-        Ring(std::uint32_t entries, io_uring_params &params);
+        Ring(std::uint32_t entries, io_uring_params &parameters);
 
         Ring(const Ring &) = delete;
 
@@ -62,8 +62,8 @@ namespace coContext {
 
         auto advance(std::uint32_t count) noexcept -> void;
 
-        auto advance(io_uring_buf_ring *ringBuffer, std::int32_t completionQueueEntry,
-                     std::int32_t bufferCount) noexcept -> void;
+        auto advance(io_uring_buf_ring *ringBuffer, std::int32_t completionQueueEntryCount,
+                     std::int32_t ringBufferBufferCount) noexcept -> void;
 
     private:
         auto destroy() noexcept -> void;
