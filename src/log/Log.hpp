@@ -7,7 +7,7 @@
 namespace coContext {
     class Log {
     public:
-        enum class Level : std::uint_least8_t { trace, debug, info, warn, error, fatal };
+        enum class Level : unsigned char { trace, debug, info, warn, error, fatal };
 
         explicit Log(Level level = Level::info, std::string &&message = {},
                      std::source_location sourceLocation = std::source_location::current(),
