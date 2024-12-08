@@ -66,22 +66,22 @@ auto coContext::cancelAny() -> AsyncWaiter {
     return {context.getConstSchedulingTasks(), std::move(submissionQueueEntry)};
 }
 
-auto coContext::timeout(__kernel_timespec &timeSpecification, const ClockSource clockSource) -> AsyncWaiter {
+auto coContext::sleep(__kernel_timespec &timeSpecification, const ClockSource clockSource) -> AsyncWaiter {
     SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.timeout(timeSpecification, 0, setClockSource(clockSource));
 
     return {context.getConstSchedulingTasks(), std::move(submissionQueueEntry)};
 }
 
-auto coContext::updateTimeout(__kernel_timespec &timeSpecification, const std::uint64_t taskIdentity,
-                              const ClockSource clockSource) -> AsyncWaiter {
+auto coContext::updateSleep(__kernel_timespec &timeSpecification, const std::uint64_t taskIdentity,
+                            const ClockSource clockSource) -> AsyncWaiter {
     SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.updateTimeout(timeSpecification, taskIdentity, setClockSource(clockSource));
 
     return {context.getConstSchedulingTasks(), std::move(submissionQueueEntry)};
 }
 
-auto coContext::removeTimeout(const std::uint64_t taskIdentity) -> AsyncWaiter {
+auto coContext::removeSleep(const std::uint64_t taskIdentity) -> AsyncWaiter {
     SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.removeTimeout(taskIdentity);
 
