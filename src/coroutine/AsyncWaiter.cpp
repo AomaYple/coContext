@@ -11,6 +11,12 @@ auto coContext::AsyncWaiter::swap(AsyncWaiter &other) noexcept -> void {
     std::swap(this->taskIdentity, other.taskIdentity);
 }
 
+auto coContext::AsyncWaiter::setTimeSpecification(__kernel_timespec timeSpecification) noexcept -> void {
+    this->timeSpecification = timeSpecification;
+}
+
+auto coContext::AsyncWaiter::getTimeSpecification() noexcept -> __kernel_timespec & { return this->timeSpecification; }
+
 auto coContext::AsyncWaiter::await_ready() const noexcept -> bool { return {}; }
 
 auto coContext::AsyncWaiter::await_suspend(const std::coroutine_handle<> handle) noexcept -> void {

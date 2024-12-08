@@ -31,18 +31,21 @@ auto coContext::run() -> void { context.run(); }
 
 auto coContext::stop() noexcept -> void { return context.stop(); }
 
-auto coContext::syncCancel(const std::uint64_t taskIdentity, const __kernel_timespec timeSpecification)
+auto coContext::syncCancel(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,
+                           const std::chrono::nanoseconds nanoseconds) -> std::int32_t {
+    return context.syncCancel(taskIdentity, 0, __kernel_timespec{seconds.count(), nanoseconds.count()});
+}
+
+auto coContext::syncCancel(const std::int32_t fileDescriptor, const bool isMatchAll, const std::chrono::seconds seconds,
+                           const std::chrono::nanoseconds nanoseconds) -> std::int32_t {
+    return context.syncCancel(fileDescriptor, isMatchAll ? IORING_ASYNC_CANCEL_ALL : 0,
+                              __kernel_timespec{seconds.count(), nanoseconds.count()});
+}
+
+auto coContext::syncCancelAny(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds)
     -> std::int32_t {
-    return context.syncCancel(taskIdentity, 0, timeSpecification);
-}
-
-auto coContext::syncCancel(const std::int32_t fileDescriptor, const bool isMatchAll,
-                           const __kernel_timespec timeSpecification) -> std::int32_t {
-    return context.syncCancel(fileDescriptor, isMatchAll ? IORING_ASYNC_CANCEL_ALL : 0, timeSpecification);
-}
-
-auto coContext::syncCancelAny(const __kernel_timespec timeSpecification) -> std::int32_t {
-    return context.syncCancel(std::uint64_t{}, IORING_ASYNC_CANCEL_ANY, timeSpecification);
+    return context.syncCancel(std::uint64_t{}, IORING_ASYNC_CANCEL_ANY,
+                              __kernel_timespec{seconds.count(), nanoseconds.count()});
 }
 
 auto coContext::cancel(const std::uint64_t taskIdentity) -> AsyncWaiter {
@@ -66,19 +69,26 @@ auto coContext::cancelAny() -> AsyncWaiter {
     return AsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 }
 
-auto coContext::sleep(__kernel_timespec &timeSpecification, const ClockSource clockSource) -> AsyncWaiter {
+auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
+                      const ClockSource clockSource) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.timeout(timeSpecification, 0, setClockSource(clockSource));
+    AsyncWaiter asyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 
-    return AsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
+    asyncWaiter.setTimeSpecification(__kernel_timespec{seconds.count(), nanoseconds.count()});
+    submissionQueueEntry.timeout(asyncWaiter.getTimeSpecification(), 0, setClockSource(clockSource));
+
+    return asyncWaiter;
 }
 
-auto coContext::updateSleep(__kernel_timespec &timeSpecification, const std::uint64_t taskIdentity,
-                            const ClockSource clockSource) -> AsyncWaiter {
+auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,
+                            const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.updateTimeout(timeSpecification, taskIdentity, setClockSource(clockSource));
+    AsyncWaiter asyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 
-    return AsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
+    asyncWaiter.setTimeSpecification(__kernel_timespec{seconds.count(), nanoseconds.count()});
+    submissionQueueEntry.updateTimeout(asyncWaiter.getTimeSpecification(), taskIdentity, setClockSource(clockSource));
+
+    return asyncWaiter;
 }
 
 auto coContext::removeSleep(const std::uint64_t taskIdentity) -> AsyncWaiter {

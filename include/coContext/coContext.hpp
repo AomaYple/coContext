@@ -45,12 +45,14 @@ namespace coContext {
         return SpawnResult{std::future<T>{std::move(task.getReturnValue())}, taskIdentity};
     }
 
-    [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, __kernel_timespec timeSpecification = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, std::chrono::seconds seconds = {},
+                                  std::chrono::nanoseconds nanoseconds = {}) -> std::int32_t;
 
-    [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool isMatchAll = {},
-                                  __kernel_timespec timeSpecification = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool isMatchAll = {}, std::chrono::seconds seconds = {},
+                                  std::chrono::nanoseconds nanoseconds = {}) -> std::int32_t;
 
-    [[nodiscard]] auto syncCancelAny(__kernel_timespec timeSpecification = {}) -> std::int32_t;
+    [[nodiscard]] auto syncCancelAny(std::chrono::seconds seconds = {}, std::chrono::nanoseconds nanoseconds = {})
+        -> std::int32_t;
 
     [[nodiscard]] auto cancel(std::uint64_t taskIdentity) -> AsyncWaiter;
 
@@ -58,10 +60,12 @@ namespace coContext {
 
     [[nodiscard]] auto cancelAny() -> AsyncWaiter;
 
-    [[nodiscard]] auto sleep(__kernel_timespec &timeSpecification, ClockSource clockSource = {}) -> AsyncWaiter;
+    [[nodiscard]] auto sleep(std::chrono::seconds seconds = {}, std::chrono::nanoseconds nanoseconds = {},
+                             ClockSource clockSource = {}) -> AsyncWaiter;
 
-    [[nodiscard]] auto updateSleep(__kernel_timespec &timeSpecification, std::uint64_t taskIdentity,
-                                   ClockSource clockSource = {}) -> AsyncWaiter;
+    [[nodiscard]] auto updateSleep(std::uint64_t taskIdentity, std::chrono::seconds seconds = {},
+                                   std::chrono::nanoseconds nanoseconds = {}, ClockSource clockSource = {})
+        -> AsyncWaiter;
 
     [[nodiscard]] auto removeSleep(std::uint64_t taskIdentity) -> AsyncWaiter;
 

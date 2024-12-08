@@ -30,6 +30,10 @@ namespace coContext {
 
         auto swap(AsyncWaiter &other) noexcept -> void;
 
+        auto setTimeSpecification(__kernel_timespec timeSpecification) noexcept -> void;
+
+        [[nodiscard]] auto getTimeSpecification() noexcept -> __kernel_timespec &;
+
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
         auto await_suspend(std::coroutine_handle<> handle) noexcept -> void;
@@ -40,6 +44,7 @@ namespace coContext {
         TaskMap tasks;
         SubmissionQueueEntry submissionQueueEntry;
         std::uint64_t taskIdentity{};
+        __kernel_timespec timeSpecification{};
     };
 
     [[nodiscard]] auto operator==(const AsyncWaiter &lhs, const AsyncWaiter &rhs) noexcept -> bool;
