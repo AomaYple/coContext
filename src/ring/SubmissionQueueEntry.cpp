@@ -8,8 +8,8 @@ auto coContext::SubmissionQueueEntry::swap(SubmissionQueueEntry &other) noexcept
     std::swap(this->handle, other.handle);
 }
 
-auto coContext::SubmissionQueueEntry::setFlags(const std::uint32_t flags) const noexcept -> void {
-    io_uring_sqe_set_flags(this->handle, flags);
+auto coContext::SubmissionQueueEntry::addFlags(const std::uint32_t flags) const noexcept -> void {
+    io_uring_sqe_set_flags(this->handle, this->handle->flags | flags);
 }
 
 auto coContext::SubmissionQueueEntry::addIoPriority(const std::uint16_t ioPriority) const noexcept -> void {

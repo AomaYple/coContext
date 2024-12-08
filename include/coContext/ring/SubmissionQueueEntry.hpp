@@ -24,7 +24,7 @@ namespace coContext {
 
         auto swap(SubmissionQueueEntry &other) noexcept -> void;
 
-        auto setFlags(std::uint32_t flags) const noexcept -> void;
+        auto addFlags(std::uint32_t flags) const noexcept -> void;
 
         auto addIoPriority(std::uint16_t ioPriority) const noexcept -> void;
 
