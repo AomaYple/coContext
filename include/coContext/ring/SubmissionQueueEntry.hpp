@@ -42,8 +42,6 @@ namespace coContext {
 
         auto removeTimeout(std::uint64_t userData, std::uint32_t flags = {}) const noexcept -> void;
 
-        auto linkTimeout(__kernel_timespec &timeSpecification, std::uint32_t flags) const noexcept -> void;
-
         auto close(std::int32_t fileDescriptor) const noexcept -> void;
 
         auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol,
