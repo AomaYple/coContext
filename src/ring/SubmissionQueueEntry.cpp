@@ -54,7 +54,7 @@ auto coContext::SubmissionQueueEntry::socket(const std::int32_t domain, const st
 }
 
 auto coContext::SubmissionQueueEntry::bind(const std::int32_t socketFileDescriptor, sockaddr *const address,
-                                           const std::uint32_t addressLength) const noexcept -> void {
+                                           const socklen_t addressLength) const noexcept -> void {
     io_uring_prep_bind(this->handle, socketFileDescriptor, address, addressLength);
 }
 
@@ -64,13 +64,13 @@ auto coContext::SubmissionQueueEntry::listen(const std::int32_t socketFileDescri
 }
 
 auto coContext::SubmissionQueueEntry::accept(const std::int32_t socketFileDescriptor, sockaddr *const address,
-                                             std::uint32_t *const addressLength,
-                                             const std::int32_t flags) const noexcept -> void {
+                                             socklen_t *const addressLength, const std::int32_t flags) const noexcept
+    -> void {
     io_uring_prep_accept(this->handle, socketFileDescriptor, address, addressLength, flags);
 }
 
 auto coContext::SubmissionQueueEntry::connect(const std::int32_t socketFileDescriptor, const sockaddr *const address,
-                                              const std::uint32_t addressLength) const noexcept -> void {
+                                              const socklen_t addressLength) const noexcept -> void {
     io_uring_prep_connect(this->handle, socketFileDescriptor, address, addressLength);
 }
 
@@ -98,8 +98,8 @@ auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescript
 
 auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescriptor,
                                            const std::span<const std::byte> buffer, const std::int32_t flags,
-                                           const sockaddr *const address,
-                                           const std::uint32_t addressLength) const noexcept -> void {
+                                           const sockaddr *const address, const socklen_t addressLength) const noexcept
+    -> void {
     io_uring_prep_sendto(this->handle, socketFileDescriptor, std::data(buffer), std::size(buffer), flags, address,
                          addressLength);
 }
@@ -110,12 +110,12 @@ auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescript
 }
 
 auto coContext::SubmissionQueueEntry::open(const std::string_view pathname, const std::int32_t flags,
-                                           const std::uint32_t mode) const noexcept -> void {
+                                           const mode_t mode) const noexcept -> void {
     io_uring_prep_open(this->handle, std::data(pathname), flags, mode);
 }
 
 auto coContext::SubmissionQueueEntry::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
-                                           const std::int32_t flags, const std::uint32_t mode) const noexcept -> void {
+                                           const std::int32_t flags, const mode_t mode) const noexcept -> void {
     io_uring_prep_openat(this->handle, directoryFileDescriptor, std::data(pathname), flags, mode);
 }
 

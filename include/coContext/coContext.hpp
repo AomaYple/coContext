@@ -69,15 +69,15 @@ namespace coContext {
 
     [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol) -> AsyncWaiter;
 
-    [[nodiscard]] auto bind(std::int32_t socketFileDescriptor, sockaddr *address, std::uint32_t addressLength)
+    [[nodiscard]] auto bind(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t addressLength)
         -> AsyncWaiter;
 
     [[nodiscard]] auto listen(std::int32_t socketFileDescriptor, std::int32_t backlog) -> AsyncWaiter;
 
-    [[nodiscard]] auto accept(std::int32_t socketFileDescriptor, sockaddr *address, std::uint32_t *addressLength,
+    [[nodiscard]] auto accept(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
                               std::int32_t flags = {}) -> AsyncWaiter;
 
-    [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr *address, std::uint32_t addressLength)
+    [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr *address, socklen_t addressLength)
         -> AsyncWaiter;
 
     [[nodiscard]] auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) -> AsyncWaiter;
@@ -91,15 +91,15 @@ namespace coContext {
         -> AsyncWaiter;
 
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
-                            const sockaddr *address, std::uint32_t addressLength) -> AsyncWaiter;
+                            const sockaddr *address, socklen_t addressLength) -> AsyncWaiter;
 
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags)
         -> AsyncWaiter;
 
-    [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode = {}) -> AsyncWaiter;
+    [[nodiscard]] auto open(std::string_view pathname, std::int32_t flags, mode_t mode = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, std::int32_t flags,
-                            std::uint32_t mode = {}) -> AsyncWaiter;
+                            mode_t mode = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, open_how &how)
         -> AsyncWaiter;

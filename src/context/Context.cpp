@@ -4,8 +4,6 @@
 #include "coContext/coroutine/GenericTask.hpp"
 #include "coContext/ring/SubmissionQueueEntry.hpp"
 
-#include <sys/resource.h>
-
 coContext::Context::Context() :
     ring{[] {
         io_uring_params parameters{};
@@ -93,7 +91,7 @@ auto coContext::Context::syncCancel(const std::variant<std::uint64_t, std::int32
     return this->ring.syncCancel(parameters);
 }
 
-auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> std::size_t {
+auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> rlim_t {
     rlimit limit{};
     if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
         throw Exception{

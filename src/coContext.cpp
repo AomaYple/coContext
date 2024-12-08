@@ -102,8 +102,8 @@ auto coContext::socket(const std::int32_t domain, const std::int32_t type, const
     return AsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 }
 
-auto coContext::bind(const std::int32_t socketFileDescriptor, sockaddr *const address,
-                     const std::uint32_t addressLength) -> AsyncWaiter {
+auto coContext::bind(const std::int32_t socketFileDescriptor, sockaddr *const address, const socklen_t addressLength)
+    -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.bind(socketFileDescriptor, address, addressLength);
 
@@ -117,8 +117,8 @@ auto coContext::listen(const std::int32_t socketFileDescriptor, const std::int32
     return AsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 }
 
-auto coContext::accept(const std::int32_t socketFileDescriptor, sockaddr *const address,
-                       std::uint32_t *const addressLength, const std::int32_t flags) -> AsyncWaiter {
+auto coContext::accept(const std::int32_t socketFileDescriptor, sockaddr *const address, socklen_t *const addressLength,
+                       const std::int32_t flags) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.accept(socketFileDescriptor, address, addressLength, flags);
     submissionQueueEntry.addIoPriority(IORING_ACCEPT_POLL_FIRST);
@@ -127,7 +127,7 @@ auto coContext::accept(const std::int32_t socketFileDescriptor, sockaddr *const 
 }
 
 auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr *const address,
-                        const std::uint32_t addressLength) -> AsyncWaiter {
+                        const socklen_t addressLength) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.connect(socketFileDescriptor, address, addressLength);
 
@@ -169,7 +169,7 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<co
 }
 
 auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
-                     const std::int32_t flags, const sockaddr *const address, const std::uint32_t addressLength)
+                     const std::int32_t flags, const sockaddr *const address, const socklen_t addressLength)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.send(socketFileDescriptor, buffer, flags, address, addressLength);
@@ -186,8 +186,7 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr &mess
     return AsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 }
 
-auto coContext::open(const std::string_view pathname, const std::int32_t flags, const std::uint32_t mode)
-    -> AsyncWaiter {
+auto coContext::open(const std::string_view pathname, const std::int32_t flags, const mode_t mode) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.open(pathname, flags, mode);
 
@@ -195,7 +194,7 @@ auto coContext::open(const std::string_view pathname, const std::int32_t flags, 
 }
 
 auto coContext::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
-                     const std::int32_t flags, const std::uint32_t mode) -> AsyncWaiter {
+                     const std::int32_t flags, const mode_t mode) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.open(directoryFileDescriptor, pathname, flags, mode);
 

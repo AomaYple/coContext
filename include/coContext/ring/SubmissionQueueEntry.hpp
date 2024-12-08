@@ -49,16 +49,15 @@ namespace coContext {
         auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol,
                     std::uint32_t flags = {}) const noexcept -> void;
 
-        auto bind(std::int32_t socketFileDescriptor, sockaddr *address, std::uint32_t addressLength) const noexcept
-            -> void;
+        auto bind(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t addressLength) const noexcept -> void;
 
         auto listen(std::int32_t socketFileDescriptor, std::int32_t backlog) const noexcept -> void;
 
-        auto accept(std::int32_t socketFileDescriptor, sockaddr *address, std::uint32_t *addressLength,
+        auto accept(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
                     std::int32_t flags) const noexcept -> void;
 
-        auto connect(std::int32_t socketFileDescriptor, const sockaddr *address,
-                     std::uint32_t addressLength) const noexcept -> void;
+        auto connect(std::int32_t socketFileDescriptor, const sockaddr *address, socklen_t addressLength) const noexcept
+            -> void;
 
         auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) const noexcept -> void;
 
@@ -71,14 +70,14 @@ namespace coContext {
                   std::int32_t flags) const noexcept -> void;
 
         auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
-                  const sockaddr *address, std::uint32_t addressLength) const noexcept -> void;
+                  const sockaddr *address, socklen_t addressLength) const noexcept -> void;
 
         auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags) const noexcept -> void;
 
-        auto open(std::string_view pathname, std::int32_t flags, std::uint32_t mode) const noexcept -> void;
+        auto open(std::string_view pathname, std::int32_t flags, mode_t mode) const noexcept -> void;
 
         auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, std::int32_t flags,
-                  std::uint32_t mode) const noexcept -> void;
+                  mode_t mode) const noexcept -> void;
 
         auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, open_how &how) const noexcept
             -> void;

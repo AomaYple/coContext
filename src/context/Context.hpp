@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <queue>
+#include <sys/resource.h>
 
 namespace coContext {
     class GenericTask;
@@ -41,8 +42,7 @@ namespace coContext {
 
     private:
         [[nodiscard]] static auto
-            getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current())
-                -> std::size_t;
+            getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current()) -> rlim_t;
 
         auto scheduleTasks() -> void;
 
