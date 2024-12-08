@@ -1,7 +1,6 @@
 #include "Context.hpp"
 
 #include "../log/Exception.hpp"
-#include "../log/Log.hpp"
 #include "coContext/coroutine/GenericTask.hpp"
 #include "coContext/ring/SubmissionQueueEntry.hpp"
 
@@ -99,7 +98,6 @@ auto coContext::Context::getFileDescriptorLimit(const std::source_location sourc
     if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
         throw Exception{
             Log{Log::Level::fatal, std::error_code{errno, std::generic_category()}.message(), sourceLocation}
-                .toString()
         };
     }
 

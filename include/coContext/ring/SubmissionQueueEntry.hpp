@@ -9,12 +9,14 @@
 
 namespace coContext {
     class SubmissionQueueEntry {
+        friend auto operator==(SubmissionQueueEntry lhs, SubmissionQueueEntry rhs) noexcept -> bool;
+
     public:
-        explicit SubmissionQueueEntry(io_uring_sqe *handle) noexcept;
+        explicit SubmissionQueueEntry(io_uring_sqe *handle = {}) noexcept;
 
-        SubmissionQueueEntry(const SubmissionQueueEntry &) = delete;
+        constexpr SubmissionQueueEntry(const SubmissionQueueEntry &) noexcept = default;
 
-        auto operator=(const SubmissionQueueEntry &) -> SubmissionQueueEntry & = delete;
+        constexpr auto operator=(const SubmissionQueueEntry &) noexcept -> SubmissionQueueEntry & = default;
 
         constexpr SubmissionQueueEntry(SubmissionQueueEntry &&) noexcept = default;
 
@@ -22,7 +24,7 @@ namespace coContext {
 
         constexpr ~SubmissionQueueEntry() = default;
 
-        auto swap(SubmissionQueueEntry &other) noexcept -> void;
+        explicit operator bool() const noexcept;
 
         auto addFlags(std::uint32_t flags) const noexcept -> void;
 
@@ -102,9 +104,6 @@ namespace coContext {
     private:
         io_uring_sqe *handle;
     };
-}    // namespace coContext
 
-template<>
-constexpr auto std::swap(coContext::SubmissionQueueEntry &lhs, coContext::SubmissionQueueEntry &rhs) noexcept -> void {
-    lhs.swap(rhs);
-}
+    [[nodiscard]] auto operator==(SubmissionQueueEntry lhs, SubmissionQueueEntry rhs) noexcept -> bool;
+}    // namespace coContext

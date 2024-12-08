@@ -16,8 +16,10 @@ auto coContext::Log::swap(Log &other) noexcept -> void {
     std::swap(this->threadId, other.threadId);
 }
 
+auto coContext::Log::getLevel() const noexcept -> Level { return this->level; }
+
 auto coContext::Log::toString() const -> std::string {
-    static constexpr std::array<const std::string_view, 4> levels{"info", "warn", "error", "fatal"};
+    static constexpr std::array<const std::string_view, 6> levels{"trace", "debug", "info", "warn", "error", "fatal"};
 
     return std::format("{} {} {} {}:{}:{}:{} {}\n", levels[std::to_underlying(this->level)], this->timestamp,
                        this->threadId, this->sourceLocation.file_name(), this->sourceLocation.line(),

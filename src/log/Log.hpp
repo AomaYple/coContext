@@ -7,14 +7,16 @@
 namespace coContext {
     class Log {
     public:
-        enum class Level : std::uint8_t { info, warn, error, fatal };
+        enum class Level : std::uint8_t { trace, debug, info, warn, error, fatal };
 
-        explicit Log(Level level = {}, std::string &&message = {},
+        explicit Log(Level level = Level::info, std::string &&message = {},
                      std::source_location sourceLocation = std::source_location::current(),
                      std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now(),
                      std::thread::id threadId = std::this_thread::get_id()) noexcept;
 
         auto swap(Log &other) noexcept -> void;
+
+        [[nodiscard]] auto getLevel() const noexcept -> Level;
 
         [[nodiscard]] auto toString() const -> std::string;
 
