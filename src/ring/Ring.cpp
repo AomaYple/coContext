@@ -2,6 +2,8 @@
 
 #include "../log/Exception.hpp"
 
+using namespace std::string_literals;
+
 coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) :
     handle{[entries, &parameters](const std::source_location sourceLocation = std::source_location::current()) {
         io_uring handle{};
@@ -133,7 +135,7 @@ auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceL
     io_uring_sqe *const submissionQueueEntry{io_uring_get_sqe(std::addressof(this->handle))};
     if (submissionQueueEntry == nullptr) {
         throw Exception{
-            Log{Log::Level::error, "no submission queue entry available", sourceLocation}
+            Log{Log::Level::error, "no submission queue entry available"s, sourceLocation}
         };
     }
 

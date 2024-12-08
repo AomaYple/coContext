@@ -3,6 +3,8 @@
 #include <chrono>
 #include <utility>
 
+using namespace std::string_view_literals;
+
 coContext::Log::Log(const Level level, std::string &&message, const std::source_location sourceLocation,
                     const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) noexcept :
     level{level}, message{std::move(message)}, sourceLocation{sourceLocation}, timestamp{timestamp},
@@ -19,9 +21,10 @@ auto coContext::Log::swap(Log &other) noexcept -> void {
 auto coContext::Log::getLevel() const noexcept -> Level { return this->level; }
 
 auto coContext::Log::toString() const -> std::string {
-    static constexpr std::array<const std::string_view, 6> levels{"trace", "debug", "info", "warn", "error", "fatal"};
+    static constexpr std::array<const std::string_view, 6> levels{"trace"sv, "debug"sv, "info"sv,
+                                                                  "warn"sv,  "error"sv, "fatal"sv};
 
-    return std::format("{} {} {} {}:{}:{}:{} {}\n", levels[std::to_underlying(this->level)], this->timestamp,
+    return std::format("{} {} {} {}:{}:{}:{} {}\n"sv, levels[std::to_underlying(this->level)], this->timestamp,
                        this->threadId, this->sourceLocation.file_name(), this->sourceLocation.line(),
                        this->sourceLocation.column(), this->sourceLocation.function_name(), this->message);
 }
