@@ -7,7 +7,7 @@
 #include <functional>
 
 namespace coContext {
-    template<TaskReturnType T>
+    template<std::movable T>
     struct SpawnResult {
         std::uint64_t taskIdentity;
         std::future<T> result;
