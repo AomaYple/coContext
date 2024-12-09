@@ -91,13 +91,6 @@ auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono:
     return asyncWaiter;
 }
 
-auto coContext::removeSleep(const std::uint64_t taskIdentity) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.removeTimeout(taskIdentity);
-
-    return AsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
-}
-
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.close(fileDescriptor);

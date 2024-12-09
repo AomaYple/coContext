@@ -67,8 +67,6 @@ namespace coContext {
                                    std::chrono::nanoseconds nanoseconds = {}, ClockSource clockSource = {})
         -> AsyncWaiter;
 
-    [[nodiscard]] auto removeSleep(std::uint64_t taskIdentity) -> AsyncWaiter;
-
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 
     [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol) -> AsyncWaiter;
