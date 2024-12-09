@@ -9,8 +9,8 @@
 namespace coContext {
     template<TaskReturnType T>
     struct SpawnResult {
-        std::future<T> result;
         std::uint64_t taskIdentity;
+        std::future<T> result;
     };
 
     enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
@@ -30,7 +30,7 @@ namespace coContext {
         const std::uint64_t taskIdentity{std::hash<Coroutine>{}(coroutine)};
         spawn(GenericTask{std::move(coroutine)});
 
-        return SpawnResult{std::future<void>{}, taskIdentity};
+        return taskIdentity;
     }
 
     template<std::movable T, typename F, typename... Args>
@@ -42,7 +42,7 @@ namespace coContext {
         const std::uint64_t taskIdentity{std::hash<Coroutine>{}(coroutine)};
         spawn(GenericTask{std::move(coroutine)});
 
-        return SpawnResult{std::future<T>{std::move(task.getReturnValue())}, taskIdentity};
+        return SpawnResult{taskIdentity, std::future<T>{std::move(task.getReturnValue())}};
     }
 
     [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, std::chrono::seconds seconds = {},
