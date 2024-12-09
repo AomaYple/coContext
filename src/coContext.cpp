@@ -189,23 +189,22 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr &mess
     return AsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 }
 
-auto coContext::open(const std::string_view pathname, const std::int32_t flags, const mode_t mode) -> AsyncWaiter {
+auto coContext::open(const char *pathname, const std::int32_t flags, const mode_t mode) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.open(pathname, flags, mode);
 
     return AsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 }
 
-auto coContext::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
-                     const std::int32_t flags, const mode_t mode) -> AsyncWaiter {
+auto coContext::open(const std::int32_t directoryFileDescriptor, const char *pathname, const std::int32_t flags,
+                     const mode_t mode) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.open(directoryFileDescriptor, pathname, flags, mode);
 
     return AsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 }
 
-auto coContext::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname, open_how &how)
-    -> AsyncWaiter {
+auto coContext::open(const std::int32_t directoryFileDescriptor, const char *pathname, open_how &how) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.open(directoryFileDescriptor, pathname, how);
 

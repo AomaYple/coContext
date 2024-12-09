@@ -4,7 +4,6 @@
 #include <liburing/io_uring.h>
 #include <linux/openat2.h>
 #include <span>
-#include <string_view>
 #include <sys/socket.h>
 
 namespace coContext {
@@ -72,13 +71,12 @@ namespace coContext {
 
         auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags) const noexcept -> void;
 
-        auto open(std::string_view pathname, std::int32_t flags, mode_t mode) const noexcept -> void;
+        auto open(const char *pathname, std::int32_t flags, mode_t mode) const noexcept -> void;
 
-        auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, std::int32_t flags,
+        auto open(std::int32_t directoryFileDescriptor, const char *pathname, std::int32_t flags,
                   mode_t mode) const noexcept -> void;
 
-        auto open(std::int32_t directoryFileDescriptor, std::string_view pathname, open_how &how) const noexcept
-            -> void;
+        auto open(std::int32_t directoryFileDescriptor, const char *pathname, open_how &how) const noexcept -> void;
 
         auto read(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::uint64_t offset) const noexcept
             -> void;
