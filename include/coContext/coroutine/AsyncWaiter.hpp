@@ -10,12 +10,12 @@ namespace coContext {
     class GenericTask;
 
     class AsyncWaiter {
-        using TaskMap = std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>>;
+        using Tasks = std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>>;
 
         friend auto operator==(const AsyncWaiter &lhs, const AsyncWaiter &rhs) noexcept -> bool;
 
     public:
-        explicit AsyncWaiter(TaskMap tasks = {},
+        explicit AsyncWaiter(Tasks tasks = {},
                              SubmissionQueueEntry submissionQueueEntry = SubmissionQueueEntry{}) noexcept;
 
         AsyncWaiter(const AsyncWaiter &) noexcept = default;
@@ -41,7 +41,7 @@ namespace coContext {
         [[nodiscard]] auto await_resume() const -> std::int32_t;
 
     private:
-        TaskMap tasks;
+        Tasks tasks;
         SubmissionQueueEntry submissionQueueEntry;
         std::uint64_t taskIdentity{};
         __kernel_timespec timeSpecification{};
