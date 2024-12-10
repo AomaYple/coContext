@@ -42,8 +42,6 @@ auto coContext::Context::swap(Context &other) noexcept -> void {
     std::swap(this->schedulingTasks, other.schedulingTasks);
 }
 
-auto coContext::Context::spawn(GenericTask &&task) -> void { this->unscheduledTasks.emplace(std::move(task)); }
-
 auto coContext::Context::run() -> void {
     this->isRunning = true;
     this->scheduleTasks();
@@ -68,6 +66,8 @@ auto coContext::Context::run() -> void {
 }
 
 auto coContext::Context::stop() noexcept -> void { this->isRunning = false; }
+
+auto coContext::Context::spawn(GenericTask &&task) -> void { this->unscheduledTasks.emplace(std::move(task)); }
 
 auto coContext::Context::getConstSchedulingTasks() const noexcept
     -> std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>> {

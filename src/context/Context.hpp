@@ -26,11 +26,11 @@ namespace coContext {
 
         auto swap(Context &other) noexcept -> void;
 
-        auto spawn(GenericTask &&task) -> void;
-
         auto run() -> void;
 
         auto stop() noexcept -> void;
+
+        auto spawn(GenericTask &&task) -> void;
 
         [[nodiscard]] auto getConstSchedulingTasks() const noexcept
             -> std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>>;
