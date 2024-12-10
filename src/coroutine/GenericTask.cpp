@@ -11,6 +11,6 @@ auto coContext::GenericTask::swap(GenericTask &other) noexcept -> void {
 
 auto coContext::GenericTask::getCoroutine() const noexcept -> const Coroutine & { return this->coroutine; }
 
-auto coContext::GenericTask::setResult(const std::int32_t result) noexcept -> void { this->result = result; }
-
 auto coContext::GenericTask::getResult() const noexcept -> std::int32_t { return this->result; }
+
+auto coContext::GenericTask::setResult(const std::int32_t result) noexcept -> void { this->result = result; }

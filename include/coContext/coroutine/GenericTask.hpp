@@ -23,9 +23,9 @@ namespace coContext {
 
         [[nodiscard]] auto getCoroutine() const noexcept -> const Coroutine &;
 
-        auto setResult(std::int32_t result) noexcept -> void;
-
         [[nodiscard]] auto getResult() const noexcept -> std::int32_t;
+
+        auto setResult(std::int32_t result) noexcept -> void;
 
     private:
         Coroutine coroutine;
