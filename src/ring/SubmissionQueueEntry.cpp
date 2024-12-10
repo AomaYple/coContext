@@ -4,7 +4,7 @@
 
 coContext::SubmissionQueueEntry::SubmissionQueueEntry(io_uring_sqe *const handle) noexcept : handle{handle} {}
 
-coContext::SubmissionQueueEntry::operator bool() const noexcept { return this->handle != nullptr; }
+auto coContext::SubmissionQueueEntry::get() const noexcept -> io_uring_sqe * { return this->handle; }
 
 auto coContext::SubmissionQueueEntry::addFlags(const std::uint32_t flags) const noexcept -> void {
     io_uring_sqe_set_flags(this->handle, this->handle->flags | flags);
@@ -152,5 +152,5 @@ auto coContext::SubmissionQueueEntry::write(const std::int32_t fileDescriptor, c
 }
 
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
-    return lhs.handle == rhs.handle;
+    return lhs.get() == rhs.get();
 }

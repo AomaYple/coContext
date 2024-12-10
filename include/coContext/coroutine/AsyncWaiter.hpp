@@ -12,8 +12,6 @@ namespace coContext {
     class AsyncWaiter {
         using Tasks = std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>>;
 
-        friend auto operator==(const AsyncWaiter &lhs, const AsyncWaiter &rhs) noexcept -> bool;
-
     public:
         explicit AsyncWaiter(Tasks tasks = {},
                              SubmissionQueueEntry submissionQueueEntry = SubmissionQueueEntry{}) noexcept;
@@ -30,9 +28,17 @@ namespace coContext {
 
         auto swap(AsyncWaiter &other) noexcept -> void;
 
-        auto setTimeSpecification(__kernel_timespec timeSpecification) noexcept -> void;
+        [[nodiscard]] auto getTasks() const noexcept -> Tasks;
+
+        [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry;
+
+        [[nodiscard]] auto getTaskIdentity() const noexcept -> std::uint64_t;
+
+        [[nodiscard]] auto getTimeSpecification() const noexcept -> __kernel_timespec;
 
         [[nodiscard]] auto getTimeSpecification() noexcept -> __kernel_timespec &;
+
+        auto setTimeSpecification(__kernel_timespec timeSpecification) noexcept -> void;
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 

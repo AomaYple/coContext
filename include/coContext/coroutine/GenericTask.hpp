@@ -29,7 +29,7 @@ namespace coContext {
 
     private:
         Coroutine coroutine;
-        std::int32_t result;
+        std::int32_t result{};
     };
 }    // namespace coContext
 

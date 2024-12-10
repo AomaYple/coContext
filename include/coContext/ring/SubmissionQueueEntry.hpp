@@ -9,8 +9,6 @@
 
 namespace coContext {
     class SubmissionQueueEntry {
-        friend auto operator==(SubmissionQueueEntry lhs, SubmissionQueueEntry rhs) noexcept -> bool;
-
     public:
         explicit SubmissionQueueEntry(io_uring_sqe *handle = {}) noexcept;
 
@@ -24,7 +22,7 @@ namespace coContext {
 
         constexpr ~SubmissionQueueEntry() = default;
 
-        explicit operator bool() const noexcept;
+        [[nodiscard]] auto get() const noexcept -> io_uring_sqe *;
 
         auto addFlags(std::uint32_t flags) const noexcept -> void;
 
