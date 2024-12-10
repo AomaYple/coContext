@@ -91,6 +91,21 @@ auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono:
     return asyncWaiter;
 }
 
+auto coContext::timeout(AsyncWaiter &&asyncWaiter, const std::chrono::seconds seconds,
+                        const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource) -> AsyncWaiter {
+    asyncWaiter.getSubmissionQueueEntry().addFlags(IOSQE_IO_LINK);
+
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    AsyncWaiter timeoutAsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
+
+    timeoutAsyncWaiter.setTimeSpecification(__kernel_timespec{seconds.count(), nanoseconds.count()});
+    submissionQueueEntry.linkTimeout(timeoutAsyncWaiter.getTimeSpecification(), setClockSource(clockSource));
+
+    asyncWaiter.setTimeoutAsyncWaiter(std::move(timeoutAsyncWaiter));
+
+    return asyncWaiter;
+}
+
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.close(fileDescriptor);

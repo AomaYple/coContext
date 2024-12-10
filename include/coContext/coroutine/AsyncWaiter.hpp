@@ -13,12 +13,11 @@ namespace coContext {
         using Tasks = std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>>;
 
     public:
-        explicit AsyncWaiter(Tasks tasks = {},
-                             SubmissionQueueEntry submissionQueueEntry = SubmissionQueueEntry{}) noexcept;
+        AsyncWaiter(Tasks tasks, SubmissionQueueEntry submissionQueueEntry) noexcept;
 
-        AsyncWaiter(const AsyncWaiter &) noexcept = default;
+        AsyncWaiter(const AsyncWaiter &) = delete;
 
-        auto operator=(const AsyncWaiter &) noexcept -> AsyncWaiter & = default;
+        auto operator=(const AsyncWaiter &) = delete;
 
         AsyncWaiter(AsyncWaiter &&) noexcept = default;
 
@@ -28,17 +27,13 @@ namespace coContext {
 
         auto swap(AsyncWaiter &other) noexcept -> void;
 
-        [[nodiscard]] auto getTasks() const noexcept -> Tasks;
-
         [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry;
 
-        [[nodiscard]] auto getTaskIdentity() const noexcept -> std::uint64_t;
+        [[nodiscard]] auto getTimeSpecification() const -> __kernel_timespec &;
 
-        [[nodiscard]] auto getTimeSpecification() const noexcept -> __kernel_timespec;
+        auto setTimeSpecification(__kernel_timespec timeSpecification) -> void;
 
-        [[nodiscard]] auto getTimeSpecification() noexcept -> __kernel_timespec &;
-
-        auto setTimeSpecification(__kernel_timespec timeSpecification) noexcept -> void;
+        auto setTimeoutAsyncWaiter(AsyncWaiter &&timeoutAsyncWaiter) -> void;
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
@@ -50,10 +45,9 @@ namespace coContext {
         Tasks tasks;
         SubmissionQueueEntry submissionQueueEntry;
         std::uint64_t taskIdentity{};
-        __kernel_timespec timeSpecification{};
+        std::unique_ptr<__kernel_timespec> timeSpecification;
+        std::unique_ptr<AsyncWaiter> timeoutAsyncWaiter;
     };
-
-    [[nodiscard]] auto operator==(const AsyncWaiter &lhs, const AsyncWaiter &rhs) noexcept -> bool;
 }    // namespace coContext
 
 template<>

@@ -38,6 +38,11 @@ auto coContext::SubmissionQueueEntry::updateTimeout(__kernel_timespec &timeSpeci
     io_uring_prep_timeout_update(this->handle, std::addressof(timeSpecification), userData, flags);
 }
 
+auto coContext::SubmissionQueueEntry::linkTimeout(__kernel_timespec &timeSpecification,
+                                                  const std::uint32_t flags) const noexcept -> void {
+    io_uring_prep_link_timeout(this->handle, std::addressof(timeSpecification), flags);
+}
+
 auto coContext::SubmissionQueueEntry::close(const std::int32_t fileDescriptor) const noexcept -> void {
     io_uring_prep_close(this->handle, fileDescriptor);
 }
