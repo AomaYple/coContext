@@ -51,13 +51,16 @@ auto coContext::Context::run() -> void {
     while (this->isRunning) {
         this->ring.submitAndWait(1);
         this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completionQueueEntry) {
-            GenericTask &task{this->schedulingTasks->at(completionQueueEntry->user_data)};
-            const Coroutine &coroutine{task.getCoroutine()};
+            if (const auto findResult{this->schedulingTasks->find(completionQueueEntry->user_data)};
+                findResult != std::cend(*this->schedulingTasks)) {
+                GenericTask &task{findResult->second};
+                const Coroutine &coroutine{task.getCoroutine()};
 
-            task.setResult(completionQueueEntry->res);
-            coroutine();
+                task.setResult(completionQueueEntry->res);
+                coroutine();
 
-            if (coroutine.done()) this->schedulingTasks->erase(completionQueueEntry->user_data);
+                if (coroutine.done()) this->schedulingTasks->erase(findResult);
+            }
         }));
 
         this->scheduleTasks();

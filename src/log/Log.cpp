@@ -33,5 +33,5 @@ auto coContext::Log::toByte() const -> std::vector<std::byte> {
     const auto log{this->toString()};
     const auto bytes{std::as_bytes(std::span{log})};
 
-    return {bytes.cbegin(), bytes.cend()};
+    return {std::cbegin(bytes), std::cend(bytes)};
 }
