@@ -9,22 +9,31 @@ auto coContext::AsyncWaiter::swap(AsyncWaiter &other) noexcept -> void {
     std::swap(this->tasks, other.tasks);
     std::swap(this->submissionQueueEntry, other.submissionQueueEntry);
     std::swap(this->taskIdentity, other.taskIdentity);
-    std::swap(this->timeSpecification, other.timeSpecification);
-    std::swap(this->timeoutAsyncWaiter, other.timeoutAsyncWaiter);
+    std::swap(this->timeSpecifications, other.timeSpecifications);
 }
 
 auto coContext::AsyncWaiter::getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry {
     return this->submissionQueueEntry;
 }
 
-auto coContext::AsyncWaiter::getTimeSpecification() const -> __kernel_timespec & { return *this->timeSpecification; }
-
-auto coContext::AsyncWaiter::setTimeSpecification(const __kernel_timespec timeSpecification) -> void {
-    this->timeSpecification = std::make_unique<__kernel_timespec>(timeSpecification);
+auto coContext::AsyncWaiter::setFirstTimeSpecification(const std::chrono::seconds seconds,
+                                                       const std::chrono::nanoseconds nanoseconds) -> void {
+    this->timeSpecifications.first.tv_sec = seconds.count();
+    this->timeSpecifications.first.tv_nsec = nanoseconds.count();
 }
 
-auto coContext::AsyncWaiter::setTimeoutAsyncWaiter(AsyncWaiter &&timeoutAsyncWaiter) -> void {
-    this->timeoutAsyncWaiter = std::make_unique<AsyncWaiter>(std::move(timeoutAsyncWaiter));
+auto coContext::AsyncWaiter::setSecondTimeSpecification(const std::chrono::seconds seconds,
+                                                        const std::chrono::nanoseconds nanoseconds) -> void {
+    this->timeSpecifications.second.tv_sec = seconds.count();
+    this->timeSpecifications.second.tv_nsec = nanoseconds.count();
+}
+
+auto coContext::AsyncWaiter::getFirstTimeSpecification() noexcept -> __kernel_timespec & {
+    return this->timeSpecifications.first;
+}
+
+auto coContext::AsyncWaiter::getSecondTimeSpecification() noexcept -> __kernel_timespec & {
+    return this->timeSpecifications.second;
 }
 
 auto coContext::AsyncWaiter::await_ready() const noexcept -> bool { return {}; }

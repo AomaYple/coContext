@@ -2,8 +2,8 @@
 
 #include "../ring/SubmissionQueueEntry.hpp"
 
+#include <chrono>
 #include <coroutine>
-#include <memory>
 #include <unordered_map>
 
 namespace coContext {
@@ -29,11 +29,13 @@ namespace coContext {
 
         [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry;
 
-        [[nodiscard]] auto getTimeSpecification() const -> __kernel_timespec &;
+        auto setFirstTimeSpecification(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds) -> void;
 
-        auto setTimeSpecification(__kernel_timespec timeSpecification) -> void;
+        auto setSecondTimeSpecification(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds) -> void;
 
-        auto setTimeoutAsyncWaiter(AsyncWaiter &&timeoutAsyncWaiter) -> void;
+        [[nodiscard]] auto getFirstTimeSpecification() noexcept -> __kernel_timespec &;
+
+        [[nodiscard]] auto getSecondTimeSpecification() noexcept -> __kernel_timespec &;
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
@@ -45,8 +47,7 @@ namespace coContext {
         Tasks tasks;
         SubmissionQueueEntry submissionQueueEntry;
         std::uint64_t taskIdentity{};
-        std::unique_ptr<__kernel_timespec> timeSpecification;
-        std::unique_ptr<AsyncWaiter> timeoutAsyncWaiter;
+        std::pair<__kernel_timespec, __kernel_timespec> timeSpecifications;
     };
 }    // namespace coContext
 

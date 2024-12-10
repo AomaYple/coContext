@@ -74,8 +74,8 @@ auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nan
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     AsyncWaiter asyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 
-    asyncWaiter.setTimeSpecification(__kernel_timespec{seconds.count(), nanoseconds.count()});
-    submissionQueueEntry.timeout(asyncWaiter.getTimeSpecification(), 0, setClockSource(clockSource));
+    asyncWaiter.setFirstTimeSpecification(seconds, nanoseconds);
+    submissionQueueEntry.timeout(asyncWaiter.getFirstTimeSpecification(), 0, setClockSource(clockSource));
 
     return asyncWaiter;
 }
@@ -85,8 +85,9 @@ auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono:
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     AsyncWaiter asyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
 
-    asyncWaiter.setTimeSpecification(__kernel_timespec{seconds.count(), nanoseconds.count()});
-    submissionQueueEntry.updateTimeout(asyncWaiter.getTimeSpecification(), taskIdentity, setClockSource(clockSource));
+    asyncWaiter.setFirstTimeSpecification(seconds, nanoseconds);
+    submissionQueueEntry.updateTimeout(asyncWaiter.getFirstTimeSpecification(), taskIdentity,
+                                       setClockSource(clockSource));
 
     return asyncWaiter;
 }
@@ -94,14 +95,10 @@ auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono:
 auto coContext::timeout(AsyncWaiter &&asyncWaiter, const std::chrono::seconds seconds,
                         const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource) -> AsyncWaiter {
     asyncWaiter.getSubmissionQueueEntry().addFlags(IOSQE_IO_LINK);
+    asyncWaiter.setSecondTimeSpecification(seconds, nanoseconds);
 
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    AsyncWaiter timeoutAsyncWaiter{context.getConstSchedulingTasks(), submissionQueueEntry};
-
-    timeoutAsyncWaiter.setTimeSpecification(__kernel_timespec{seconds.count(), nanoseconds.count()});
-    submissionQueueEntry.linkTimeout(timeoutAsyncWaiter.getTimeSpecification(), setClockSource(clockSource));
-
-    asyncWaiter.setTimeoutAsyncWaiter(std::move(timeoutAsyncWaiter));
+    context.getSubmissionQueueEntry().linkTimeout(asyncWaiter.getSecondTimeSpecification(),
+                                                  setClockSource(clockSource));
 
     return asyncWaiter;
 }
