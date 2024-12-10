@@ -21,7 +21,7 @@ ninja
 ninja install
 ```
 
-## 使用
+## 导入
 
 ```cmake
 find_package(coContext REQUIRED)
