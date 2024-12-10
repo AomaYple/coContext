@@ -13,11 +13,12 @@ namespace coContext {
         using Tasks = std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>>;
 
     public:
-        AsyncWaiter(Tasks tasks, SubmissionQueueEntry submissionQueueEntry) noexcept;
+        explicit AsyncWaiter(Tasks tasks = {},
+                             SubmissionQueueEntry submissionQueueEntry = SubmissionQueueEntry{}) noexcept;
 
-        AsyncWaiter(const AsyncWaiter &) = delete;
+        AsyncWaiter(const AsyncWaiter &) noexcept = default;
 
-        auto operator=(const AsyncWaiter &) = delete;
+        auto operator=(const AsyncWaiter &) noexcept -> AsyncWaiter & = default;
 
         AsyncWaiter(AsyncWaiter &&) noexcept = default;
 
@@ -27,15 +28,23 @@ namespace coContext {
 
         auto swap(AsyncWaiter &other) noexcept -> void;
 
+        [[nodiscard]] auto getTasks() const noexcept -> Tasks;
+
         [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry;
 
-        auto setFirstTimeSpecification(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds) -> void;
+        [[nodiscard]] auto getTaskIdentity() const noexcept -> std::uint64_t;
 
-        auto setSecondTimeSpecification(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds) -> void;
+        [[nodiscard]] auto getFirstTimeSpecification() const noexcept -> __kernel_timespec;
 
         [[nodiscard]] auto getFirstTimeSpecification() noexcept -> __kernel_timespec &;
 
+        auto setFirstTimeSpecification(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds) -> void;
+
+        [[nodiscard]] auto getSecondTimeSpecification() const noexcept -> __kernel_timespec;
+
         [[nodiscard]] auto getSecondTimeSpecification() noexcept -> __kernel_timespec &;
+
+        auto setSecondTimeSpecification(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds) -> void;
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
@@ -49,6 +58,8 @@ namespace coContext {
         std::uint64_t taskIdentity{};
         std::pair<__kernel_timespec, __kernel_timespec> timeSpecifications;
     };
+
+    [[nodiscard]] auto operator==(const AsyncWaiter &lhs, const AsyncWaiter &rhs) noexcept -> bool;
 }    // namespace coContext
 
 template<>
