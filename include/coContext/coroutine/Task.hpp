@@ -5,13 +5,21 @@
 #include <future>
 
 namespace coContext {
+    struct BasePromise {
+        [[nodiscard]] constexpr auto initial_suspend() const noexcept { return std::suspend_always{}; }
+
+        [[nodiscard]] constexpr auto final_suspend() const noexcept { return std::suspend_always{}; }
+
+        constexpr auto unhandled_exception() const { throw; }
+    };
+
     template<typename T>
     concept TaskReturnType = std::movable<T> || std::is_void_v<T>;
 
     template<TaskReturnType T = void>
     class Task {
     public:
-        class Promise {
+        class Promise : public BasePromise {
         public:
             constexpr Promise() = default;
 
@@ -30,12 +38,6 @@ namespace coContext {
             [[nodiscard]] constexpr auto get_return_object() {
                 return Task{std::coroutine_handle<Promise>::from_promise(*this)};
             }
-
-            [[nodiscard]] constexpr auto initial_suspend() const noexcept { return std::suspend_always{}; }
-
-            [[nodiscard]] constexpr auto final_suspend() const noexcept { return std::suspend_always{}; }
-
-            constexpr auto unhandled_exception() const { throw; }
 
             constexpr auto return_value(T &&returnValue) { this->returnValue.set_value(std::move(returnValue)); }
 
@@ -77,17 +79,11 @@ namespace coContext {
     template<>
     class Task<> {
     public:
-        class Promise {
+        class Promise : public BasePromise {
         public:
             [[nodiscard]] constexpr auto get_return_object() {
                 return Task{std::coroutine_handle<Promise>::from_promise(*this)};
             }
-
-            [[nodiscard]] constexpr auto initial_suspend() const noexcept { return std::suspend_always{}; }
-
-            [[nodiscard]] constexpr auto final_suspend() const noexcept { return std::suspend_always{}; }
-
-            constexpr auto unhandled_exception() const { throw; }
 
             constexpr auto return_void() const noexcept {}
         };
