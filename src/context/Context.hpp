@@ -2,15 +2,18 @@
 
 #include "../ring/Ring.hpp"
 
-#include <memory>
+#include <coroutine>
 #include <queue>
 #include <sys/resource.h>
+#include <variant>
 
 namespace coContext {
-    class GenericTask;
+    class BasePromise;
     class SubmissionQueueEntry;
 
     class Context {
+        using Coroutine = std::coroutine_handle<BasePromise>;
+
     public:
         Context();
 
@@ -30,10 +33,7 @@ namespace coContext {
 
         auto stop() noexcept -> void;
 
-        auto spawn(GenericTask &&task) -> void;
-
-        [[nodiscard]] auto getConstSchedulingTasks() const noexcept
-            -> std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>>;
+        auto spawn(Coroutine coroutine) -> void;
 
         [[nodiscard]] auto getSubmissionQueueEntry() -> SubmissionQueueEntry;
 
@@ -52,9 +52,8 @@ namespace coContext {
 
         bool isRunning{};
         Ring ring;
-        std::queue<GenericTask> unscheduledTasks;
-        std::shared_ptr<std::unordered_map<std::uint64_t, GenericTask>> schedulingTasks{
-            std::make_shared<std::unordered_map<std::uint64_t, GenericTask>>()};
+        std::queue<Coroutine> unscheduledCoroutines;
+        std::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines;
     };
 }    // namespace coContext
 

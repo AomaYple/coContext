@@ -1,7 +1,7 @@
 #include "Context.hpp"
 
 #include "../log/Exception.hpp"
-#include "coContext/coroutine/GenericTask.hpp"
+#include "coContext/coroutine/BasePromise.hpp"
 #include "coContext/ring/SubmissionQueueEntry.hpp"
 
 coContext::Context::Context() :
@@ -38,8 +38,8 @@ coContext::Context::Context() :
 auto coContext::Context::swap(Context &other) noexcept -> void {
     std::swap(this->isRunning, other.isRunning);
     std::swap(this->ring, other.ring);
-    std::swap(this->unscheduledTasks, other.unscheduledTasks);
-    std::swap(this->schedulingTasks, other.schedulingTasks);
+    std::swap(this->unscheduledCoroutines, other.unscheduledCoroutines);
+    std::swap(this->schedulingCoroutines, other.schedulingCoroutines);
 }
 
 auto coContext::Context::run() -> void {
@@ -49,15 +49,17 @@ auto coContext::Context::run() -> void {
     while (this->isRunning) {
         this->ring.submitAndWait(1);
         this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completionQueueEntry) {
-            if (const auto findResult{this->schedulingTasks->find(completionQueueEntry->user_data)};
-                findResult != std::cend(*this->schedulingTasks)) {
-                GenericTask &task{findResult->second};
-                const Coroutine &coroutine{task.getCoroutine()};
+            if (const auto findResult{this->schedulingCoroutines.find(completionQueueEntry->user_data)};
+                findResult != std::cend(this->schedulingCoroutines)) {
+                const Coroutine coroutine{findResult->second};
 
-                task.setResult(completionQueueEntry->res);
+                coroutine.promise().setResult(completionQueueEntry->res);
                 coroutine();
 
-                if (coroutine.done()) this->schedulingTasks->erase(findResult);
+                if (coroutine.done()) {
+                    this->schedulingCoroutines.erase(findResult);
+                    coroutine.destroy();
+                }
             }
         }));
 
@@ -67,12 +69,7 @@ auto coContext::Context::run() -> void {
 
 auto coContext::Context::stop() noexcept -> void { this->isRunning = false; }
 
-auto coContext::Context::spawn(GenericTask &&task) -> void { this->unscheduledTasks.emplace(std::move(task)); }
-
-auto coContext::Context::getConstSchedulingTasks() const noexcept
-    -> std::shared_ptr<const std::unordered_map<std::uint64_t, GenericTask>> {
-    return this->schedulingTasks;
-}
+auto coContext::Context::spawn(const Coroutine coroutine) -> void { this->unscheduledCoroutines.emplace(coroutine); }
 
 auto coContext::Context::getSubmissionQueueEntry() -> SubmissionQueueEntry {
     return SubmissionQueueEntry{this->ring.getSubmissionQueueEntry()};
@@ -106,14 +103,14 @@ auto coContext::Context::getFileDescriptorLimit(const std::source_location sourc
 }
 
 auto coContext::Context::scheduleTasks() -> void {
-    while (!std::empty(this->unscheduledTasks)) {
-        GenericTask &task{this->unscheduledTasks.front()};
-        const Coroutine &coroutine{task.getCoroutine()};
+    while (!std::empty(this->unscheduledCoroutines)) {
+        const Coroutine coroutine{this->unscheduledCoroutines.front()};
 
         coroutine();
-        if (!coroutine.done()) this->schedulingTasks->emplace(std::hash<Coroutine>{}(coroutine), std::move(task));
+        if (!coroutine.done()) this->schedulingCoroutines.emplace(std::hash<Coroutine>{}(coroutine), coroutine);
+        else coroutine.destroy();
 
-        this->unscheduledTasks.pop();
+        this->unscheduledCoroutines.pop();
     }
 }
 

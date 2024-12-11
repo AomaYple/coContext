@@ -1,7 +1,6 @@
 #pragma once
 
 #include "coroutine/AsyncWaiter.hpp"
-#include "coroutine/GenericTask.hpp"
 #include "coroutine/Task.hpp"
 
 #include <functional>
@@ -15,34 +14,36 @@ namespace coContext {
 
     enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
 
+    using Coroutine = std::coroutine_handle<BasePromise>;
+
     auto run() -> void;
 
     auto stop() noexcept -> void;
 
-    auto spawn(GenericTask &&task) -> void;
-
-    template<typename F, typename... Args>
-        requires std::is_invocable_r_v<Task<>, F, Args...>
-    constexpr auto spawn(F &&func, Args &&...args) {
-        Task<> task{std::invoke(func, std::forward<Args>(args)...)};
-        Coroutine &coroutine{task.getCoroutine()};
-
-        const std::uint64_t taskIdentity{std::hash<Coroutine>{}(coroutine)};
-        spawn(GenericTask{std::move(coroutine)});
-
-        return taskIdentity;
-    }
+    auto spawn(Coroutine coroutine) -> void;
 
     template<std::movable T, typename F, typename... Args>
         requires std::is_invocable_r_v<Task<T>, F, Args...>
     constexpr auto spawn(F &&func, Args &&...args) {
         Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
-        Coroutine &coroutine{task.getCoroutine()};
 
-        const std::uint64_t taskIdentity{std::hash<Coroutine>{}(coroutine)};
-        spawn(GenericTask{std::move(coroutine)});
+        std::future<T> result{std::move(task.getReturnValue())};
+        const Coroutine coroutine{Coroutine::from_address(task.getCoroutine().address())};
 
-        return SpawnResult{taskIdentity, std::future<T>{std::move(task.getReturnValue())}};
+        spawn(coroutine);
+
+        return SpawnResult{std::hash<Coroutine>{}(coroutine), std::move(result)};
+    }
+
+    template<typename F, typename... Args>
+        requires std::is_invocable_r_v<Task<>, F, Args...>
+    constexpr auto spawn(F &&func, Args &&...args) {
+        const Task<> task{std::invoke(func, std::forward<Args>(args)...)};
+
+        const Coroutine coroutine{Coroutine::from_address(task.getCoroutine().address())};
+        spawn(coroutine);
+
+        return std::uint64_t{std::hash<Coroutine>{}(coroutine)};
     }
 
     [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, std::chrono::seconds seconds = {},

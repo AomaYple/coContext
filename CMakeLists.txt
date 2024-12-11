@@ -13,7 +13,6 @@ set_target_properties(${PROJECT_NAME}
 )
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
-        include/coContext/coroutine/Task.hpp
         src/*.cpp
 )
 target_sources(${PROJECT_NAME}
