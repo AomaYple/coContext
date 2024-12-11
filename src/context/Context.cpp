@@ -57,8 +57,8 @@ auto coContext::Context::run() -> void {
                 coroutine();
 
                 if (coroutine.done()) {
-                    this->schedulingCoroutines.erase(findResult);
                     coroutine.destroy();
+                    this->schedulingCoroutines.erase(findResult);
                 }
             }
         }));
