@@ -34,7 +34,11 @@ namespace coContext {
 
             constexpr auto return_value(T &&returnValue) { this->returnValue.set_value(std::move(returnValue)); }
 
-            constexpr auto return_value(const T &returnValue) { this->returnValue.set_value(returnValue); }
+            constexpr auto return_value(const T &returnValue)
+                requires std::copyable<T>
+            {
+                this->returnValue.set_value(returnValue);
+            }
 
             [[nodiscard]] constexpr auto getReturnValue() { return this->returnValue.get_future(); }
 
