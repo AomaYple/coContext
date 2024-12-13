@@ -5,10 +5,10 @@
 
 using namespace std::string_view_literals;
 
-coContext::Log::Log(const Level level, std::string &&message, const std::source_location sourceLocation,
+coContext::Log::Log(const Level level, std::pmr::string &&message, const std::source_location sourceLocation,
                     const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) noexcept :
-    level{level}, message{std::move(message)}, sourceLocation{sourceLocation}, timestamp{timestamp},
-    threadId{threadId} {}
+    level{level}, message{std::move(message), getMemoryResource()}, sourceLocation{sourceLocation},
+    timestamp{timestamp}, threadId{threadId} {}
 
 auto coContext::Log::swap(Log &other) noexcept -> void {
     std::swap(this->level, other.level);
@@ -20,18 +20,20 @@ auto coContext::Log::swap(Log &other) noexcept -> void {
 
 auto coContext::Log::getLevel() const noexcept -> Level { return this->level; }
 
-auto coContext::Log::toString() const -> std::string {
+auto coContext::Log::toString() const -> std::pmr::string {
     static constexpr std::array<const std::string_view, 6> levels{"trace"sv, "debug"sv, "info"sv,
                                                                   "warn"sv,  "error"sv, "fatal"sv};
 
-    return std::format("{} {} {} {}:{}:{}:{} {}\n"sv, levels[std::to_underlying(this->level)], this->timestamp,
-                       this->threadId, this->sourceLocation.file_name(), this->sourceLocation.line(),
-                       this->sourceLocation.column(), this->sourceLocation.function_name(), this->message);
+    return std::pmr::string{std::format("{} {} {} {}:{}:{}:{} {}\n"sv, levels[std::to_underlying(this->level)],
+                                        this->timestamp, this->threadId, this->sourceLocation.file_name(),
+                                        this->sourceLocation.line(), this->sourceLocation.column(),
+                                        this->sourceLocation.function_name(), this->message),
+                            getMemoryResource()};
 }
 
-auto coContext::Log::toByte() const -> std::vector<std::byte> {
+auto coContext::Log::toByte() const -> std::pmr::vector<std::byte> {
     const auto log{this->toString()};
     const auto bytes{std::as_bytes(std::span{log})};
 
-    return {std::cbegin(bytes), std::cend(bytes)};
+    return {std::cbegin(bytes), std::cend(bytes), getMemoryResource()};
 }

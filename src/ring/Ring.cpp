@@ -2,7 +2,7 @@
 
 #include "../log/Exception.hpp"
 
-using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) :
     handle{[entries, &parameters](const std::source_location sourceLocation = std::source_location::current()) {
@@ -11,7 +11,9 @@ coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) 
                 io_uring_queue_init_params(entries, std::addressof(handle), std::addressof(parameters))};
             result != 0) {
             throw Exception{
-                Log{Log::Level::fatal, std::error_code{std::abs(result), std::generic_category()}.message(),
+                Log{Log::Level::fatal,
+                    std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                     getMemoryResource()},
                     sourceLocation}
             };
         }
@@ -43,7 +45,9 @@ auto coContext::Ring::registerCpuAffinity(const std::size_t cpuSetSize, const cp
     if (const std::int32_t result{io_uring_register_iowq_aff(std::addressof(this->handle), cpuSetSize, cpuSet)};
         result != 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::error,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getMemoryResource()},
                 sourceLocation}
         };
     }
@@ -52,7 +56,9 @@ auto coContext::Ring::registerCpuAffinity(const std::size_t cpuSetSize, const cp
 auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_ring_fd(std::addressof(this->handle))}; result != 1) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::error,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getMemoryResource()},
                 sourceLocation}
         };
     }
@@ -62,7 +68,9 @@ auto coContext::Ring::registerSparseFileDescriptor(const std::uint32_t count, co
     -> void {
     if (const std::int32_t result{io_uring_register_files_sparse(std::addressof(this->handle), count)}; result != 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::error,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getMemoryResource()},
                 sourceLocation}
         };
     }
@@ -73,7 +81,9 @@ auto coContext::Ring::allocateFileDescriptorRange(const std::uint32_t offset, co
     if (const std::int32_t result{io_uring_register_file_alloc_range(std::addressof(this->handle), offset, length)};
         result != 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::error,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getMemoryResource()},
                 sourceLocation}
         };
     }
@@ -86,7 +96,9 @@ auto coContext::Ring::updateFileDescriptors(const std::uint32_t offset,
             std::addressof(this->handle), offset, std::data(fileDescriptors), std::size(fileDescriptors))};
         result < 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::error,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getMemoryResource()},
                 sourceLocation}
         };
     }
@@ -99,7 +111,9 @@ auto coContext::Ring::setupRingBuffer(const std::uint32_t entries, const std::in
         io_uring_setup_buf_ring(std::addressof(this->handle), entries, id, flags, std::addressof(error))};
     if (handle == nullptr) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(error), std::generic_category()}.message(),
+            Log{Log::Level::error,
+                std::pmr::string{std::error_code{std::abs(error), std::generic_category()}.message(),
+                                 getMemoryResource()},
                 sourceLocation}
         };
     }
@@ -112,7 +126,9 @@ auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const 
     if (const std::int32_t result{io_uring_free_buf_ring(std::addressof(this->handle), ringBuffer, entries, id)};
         result != 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::error,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getMemoryResource()},
                 sourceLocation}
         };
     }
@@ -123,7 +139,9 @@ auto coContext::Ring::syncCancel(io_uring_sync_cancel_reg &parameters, const std
     const std::int32_t result{io_uring_register_sync_cancel(std::addressof(this->handle), std::addressof(parameters))};
     if (result < 0) {
         throw Exception{
-            Log{Log::Level::warn, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::warn,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getMemoryResource()},
                 sourceLocation}
         };
     }
@@ -135,7 +153,8 @@ auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceL
     io_uring_sqe *const submissionQueueEntry{io_uring_get_sqe(std::addressof(this->handle))};
     if (submissionQueueEntry == nullptr) {
         throw Exception{
-            Log{Log::Level::error, "no submission queue entry available"s, sourceLocation}
+            Log{Log::Level::error, std::pmr::string{"no submission queue entry available"sv, getMemoryResource()},
+                sourceLocation}
         };
     }
 
@@ -145,7 +164,9 @@ auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceL
 auto coContext::Ring::submitAndWait(const std::uint32_t count, const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_submit_and_wait(std::addressof(this->handle), count)}; result < 0) {
         throw Exception{
-            Log{Log::Level::error, std::error_code{std::abs(result), std::generic_category()}.message(),
+            Log{Log::Level::error,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getMemoryResource()},
                 sourceLocation}
         };
     }
