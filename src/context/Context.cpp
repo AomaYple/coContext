@@ -4,6 +4,8 @@
 #include "coContext/coroutine/BasePromise.hpp"
 #include "coContext/ring/SubmissionQueueEntry.hpp"
 
+#include <ranges>
+
 coContext::Context::Context() :
     ring{[] {
         io_uring_params parameters{};
@@ -35,6 +37,15 @@ coContext::Context::Context() :
     this->ring.registerSelfFileDescriptor();
 }
 
+coContext::Context::~Context() {
+    while (!std::empty(this->unscheduledCoroutines)) {
+        this->unscheduledCoroutines.front().destroy();
+        this->unscheduledCoroutines.pop();
+    }
+
+    for (const auto coroutine : this->schedulingCoroutines | std::views::values) coroutine.destroy();
+}
+
 auto coContext::Context::swap(Context &other) noexcept -> void {
     std::swap(this->isRunning, other.isRunning);
     std::swap(this->ring, other.ring);
@@ -46,6 +57,7 @@ auto coContext::Context::run() -> void {
     this->isRunning = true;
 
     this->scheduleUnscheduledCoroutines();
+
     while (this->isRunning) {
         this->ring.submitAndWait(1);
         this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completionQueueEntry) {

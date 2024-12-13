@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../memory/memoryResource.hpp"
 #include "../ring/Ring.hpp"
 
 #include <coroutine>
@@ -25,7 +26,7 @@ namespace coContext {
 
         auto operator=(Context &&) noexcept -> Context & = default;
 
-        ~Context() = default;
+        ~Context();
 
         auto swap(Context &other) noexcept -> void;
 
@@ -54,10 +55,9 @@ namespace coContext {
 
         bool isRunning{};
         Ring ring;
-        std::queue<Coroutine> unscheduledCoroutines;
-        std::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{
-            std::pair<std::uint64_t, Coroutine>{0, Coroutine::from_address(std::noop_coroutine().address())}
-        };
+        std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{&getMemoryResource()};
+        std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{
+            {{0, Coroutine::from_address(std::noop_coroutine().address())}}, &getMemoryResource()};
     };
 }    // namespace coContext
 
