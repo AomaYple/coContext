@@ -44,7 +44,9 @@ namespace coContext {
         [[nodiscard]] static auto
             getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current()) -> rlim_t;
 
-        auto scheduleTasks() -> void;
+        auto scheduleUnscheduledCoroutines() -> void;
+
+        auto scheduleCoroutine(Coroutine coroutine, std::int32_t result = {}) -> void;
 
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
@@ -53,7 +55,9 @@ namespace coContext {
         bool isRunning{};
         Ring ring;
         std::queue<Coroutine> unscheduledCoroutines;
-        std::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines;
+        std::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{
+            std::pair<std::uint64_t, Coroutine>{0, Coroutine::from_address(std::noop_coroutine().address())}
+        };
     };
 }    // namespace coContext
 

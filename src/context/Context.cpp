@@ -44,26 +44,16 @@ auto coContext::Context::swap(Context &other) noexcept -> void {
 
 auto coContext::Context::run() -> void {
     this->isRunning = true;
-    this->scheduleTasks();
 
+    this->scheduleUnscheduledCoroutines();
     while (this->isRunning) {
         this->ring.submitAndWait(1);
         this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completionQueueEntry) {
-            if (const auto findResult{this->schedulingCoroutines.find(completionQueueEntry->user_data)};
-                findResult != std::cend(this->schedulingCoroutines)) {
-                const Coroutine coroutine{findResult->second};
-
-                coroutine.promise().setResult(completionQueueEntry->res);
-                coroutine();
-
-                if (coroutine.done()) {
-                    coroutine.destroy();
-                    this->schedulingCoroutines.erase(findResult);
-                }
-            }
+            this->scheduleCoroutine(this->schedulingCoroutines.at(completionQueueEntry->user_data),
+                                    completionQueueEntry->res);
         }));
 
-        this->scheduleTasks();
+        this->scheduleUnscheduledCoroutines();
     }
 }
 
@@ -102,15 +92,33 @@ auto coContext::Context::getFileDescriptorLimit(const std::source_location sourc
     return limit.rlim_cur;
 }
 
-auto coContext::Context::scheduleTasks() -> void {
+auto coContext::Context::scheduleUnscheduledCoroutines() -> void {
     while (!std::empty(this->unscheduledCoroutines)) {
-        const Coroutine coroutine{this->unscheduledCoroutines.front()};
-
-        coroutine();
-        if (!coroutine.done()) this->schedulingCoroutines.emplace(std::hash<Coroutine>{}(coroutine), coroutine);
-        else coroutine.destroy();
-
+        this->scheduleCoroutine(this->unscheduledCoroutines.front());
         this->unscheduledCoroutines.pop();
+    }
+}
+
+auto coContext::Context::scheduleCoroutine(const Coroutine coroutine, const std::int32_t result) -> void {
+    if (coroutine == std::noop_coroutine()) return;
+
+    coroutine.promise().setResult(result);
+    coroutine();
+
+    if (const std::uint64_t coroutineIdentity{std::hash<Coroutine>{}(coroutine)}; !coroutine.done()) {
+        this->schedulingCoroutines.try_emplace(coroutineIdentity, coroutine);
+
+        const Coroutine childCoroutine{coroutine.promise().getChildCoroutine()};
+        coroutine.promise().setChildCoroutine(Coroutine::from_address(std::noop_coroutine().address()));
+
+        this->scheduleCoroutine(childCoroutine);
+    } else {
+        this->schedulingCoroutines.erase(coroutineIdentity);
+
+        const Coroutine parentCoroutine{coroutine.promise().getParentCoroutine()};
+        coroutine.destroy();
+
+        this->scheduleCoroutine(parentCoroutine);
     }
 }
 

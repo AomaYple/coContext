@@ -10,6 +10,19 @@ auto coContext::BasePromise::getResult() const noexcept -> std::int32_t { return
 
 auto coContext::BasePromise::setResult(const std::int32_t result) noexcept -> void { this->result = result; }
 
-auto coContext::operator==(const BasePromise lhs, const BasePromise rhs) noexcept -> bool {
-    return lhs.getResult() == rhs.getResult();
+auto coContext::BasePromise::getParentCoroutine() const noexcept -> Coroutine { return this->parentCoroutine; }
+
+auto coContext::BasePromise::setParentCoroutine(const Coroutine parentCoroutine) noexcept -> void {
+    this->parentCoroutine = parentCoroutine;
+}
+
+auto coContext::BasePromise::getChildCoroutine() const noexcept -> Coroutine { return this->childCoroutine; }
+
+auto coContext::BasePromise::setChildCoroutine(const Coroutine childCoroutine) noexcept -> void {
+    this->childCoroutine = childCoroutine;
+}
+
+auto coContext::operator==(const BasePromise &lhs, const BasePromise &rhs) noexcept -> bool {
+    return lhs.getResult() == rhs.getResult() && lhs.getParentCoroutine() == rhs.getParentCoroutine() &&
+           lhs.getChildCoroutine() == rhs.getChildCoroutine();
 }

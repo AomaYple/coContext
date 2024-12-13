@@ -1,13 +1,14 @@
 #pragma once
 
 #include "BasePromise.hpp"
+#include "BaseTask.hpp"
 
 #include <future>
 
 namespace coContext {
     template<typename T = void>
         requires std::movable<T> || std::is_void_v<T>
-    class Task {
+    class Task : public BaseTask {
     public:
         class Promise;
 
@@ -28,9 +29,12 @@ namespace coContext {
 
             constexpr ~Promise() = default;
 
-            constexpr auto swap(Promise &other) noexcept { std::swap(this->returnValue, other.returnValue); }
+            constexpr auto swap(Promise &other) noexcept {
+                std::swap(static_cast<BasePromise &>(*this), static_cast<BasePromise &>(other));
+                std::swap(this->returnValue, other.returnValue);
+            }
 
-            [[nodiscard]] constexpr auto get_return_object() { return Task{Coroutine::from_promise(*this)}; }
+            [[nodiscard]] constexpr auto get_return_object() { return Task{Task::Coroutine::from_promise(*this)}; }
 
             constexpr auto return_value(T &&returnValue) { this->returnValue.set_value(std::move(returnValue)); }
 
@@ -47,34 +51,34 @@ namespace coContext {
         };
 
         explicit constexpr Task(const Coroutine coroutine) :
-            coroutine{coroutine}, returnValue{coroutine.promise().getReturnValue()} {}
+            BaseTask{BaseTask::Coroutine::from_address(coroutine.address())},
+            returnValue{coroutine.promise().getReturnValue()} {}
 
         Task(const Task &) = delete;
 
         auto operator=(const Task &) -> Task & = delete;
 
-        constexpr Task(Task &&other) noexcept = default;
+        constexpr Task(Task &&) noexcept = default;
 
-        constexpr auto operator=(Task &&other) noexcept -> Task & = default;
+        constexpr auto operator=(Task &&) noexcept -> Task & = default;
 
         constexpr ~Task() = default;
 
         constexpr auto swap(Task &other) noexcept {
-            std::swap(this->coroutine, other.coroutine);
+            std::swap(static_cast<BaseTask &>(*this), static_cast<BaseTask &>(other));
             std::swap(this->returnValue, other.returnValue);
         }
 
-        [[nodiscard]] constexpr auto getCoroutine() const noexcept -> Coroutine { return this->coroutine; }
-
         [[nodiscard]] constexpr auto getReturnValue() noexcept -> std::future<T> & { return this->returnValue; }
 
+        [[nodiscard]] constexpr auto await_resume() { return this->returnValue.get(); }
+
     private:
-        Coroutine coroutine;
         std::future<T> returnValue;
     };
 
     template<>
-    class Task<> {
+    class Task<> : public BaseTask {
     public:
         class Promise;
 
@@ -83,13 +87,13 @@ namespace coContext {
 
         class Promise : public BasePromise {
         public:
-            [[nodiscard]] constexpr auto get_return_object() { return Task{Coroutine::from_promise(*this)}; }
+            [[nodiscard]] constexpr auto get_return_object() { return Task{Task::Coroutine::from_promise(*this)}; }
 
             constexpr auto return_void() const noexcept {}
         };
 
-        explicit constexpr Task(const Coroutine coroutine = Coroutine::from_address(
-                                    std::noop_coroutine().address())) noexcept : coroutine{coroutine} {}
+        explicit constexpr Task(const Coroutine coroutine = Coroutine::from_address(std::noop_coroutine().address()))
+            noexcept : BaseTask{BaseTask::Coroutine::from_address(coroutine.address())} {}
 
         constexpr Task(const Task &) noexcept = default;
 
@@ -101,13 +105,10 @@ namespace coContext {
 
         constexpr ~Task() = default;
 
-        [[nodiscard]] constexpr auto getCoroutine() const noexcept -> Coroutine { return this->coroutine; }
-
-    private:
-        Coroutine coroutine;
+        constexpr auto await_resume() const noexcept {}
     };
 
-    [[nodiscard]] auto operator==(Task<>::Promise lhs, Task<>::Promise rhs) noexcept -> bool;
+    [[nodiscard]] auto operator==(const Task<>::Promise &lhs, const Task<>::Promise &rhs) noexcept -> bool;
 
     [[nodiscard]] auto operator==(Task<> lhs, Task<> rhs) noexcept -> bool;
 }    // namespace coContext
