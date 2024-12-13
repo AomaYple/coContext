@@ -6,10 +6,17 @@
 #include <functional>
 
 namespace coContext {
-    template<std::movable T>
+    template<typename T>
+        requires std::movable<T> || std::is_lvalue_reference_v<T>
     struct SpawnResult {
         std::uint64_t taskIdentity;
         std::future<T> result;
+    };
+
+    template<typename T>
+    struct SpawnResult<T &> {
+        std::uint64_t taskIdentity;
+        std::future<T &> result;
     };
 
     enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
@@ -28,6 +35,19 @@ namespace coContext {
         Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
 
         std::future<T> result{std::move(task.getReturnValue())};
+        const Coroutine coroutine{Coroutine::from_address(task.getCoroutine().address())};
+
+        spawn(coroutine);
+
+        return SpawnResult{std::hash<Coroutine>{}(coroutine), std::move(result)};
+    }
+
+    template<typename T, typename F, typename... Args>
+        requires std::is_invocable_r_v<Task<T &>, F, Args...>
+    constexpr auto spawn(F &&func, Args &&...args) {
+        Task<T &> task{std::invoke(func, std::forward<Args>(args)...)};
+
+        std::future<T &> result{std::move(task.getReturnValue())};
         const Coroutine coroutine{Coroutine::from_address(task.getCoroutine().address())};
 
         spawn(coroutine);
