@@ -55,9 +55,9 @@ namespace coContext {
 
         bool isRunning{};
         Ring ring;
-        std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{&getMemoryResource()};
+        std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{
-            {{0, Coroutine::from_address(std::noop_coroutine().address())}}, &getMemoryResource()};
+            {{0, Coroutine::from_address(std::noop_coroutine().address())}}, getMemoryResource()};
     };
 }    // namespace coContext
 
