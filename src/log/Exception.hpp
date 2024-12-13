@@ -14,7 +14,7 @@ namespace coContext {
         [[nodiscard]] auto getLog() noexcept -> Log &;
 
     private:
-        std::string message;
+        std::pmr::string message;
         Log log;
     };
 
