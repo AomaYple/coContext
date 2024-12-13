@@ -6,7 +6,7 @@
 using namespace std::string_view_literals;
 
 coContext::Log::Log(const Level level, std::pmr::string &&message, const std::source_location sourceLocation,
-                    const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) noexcept :
+                    const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) :
     level{level}, message{std::move(message), getMemoryResource()}, sourceLocation{sourceLocation},
     timestamp{timestamp}, threadId{threadId} {}
 

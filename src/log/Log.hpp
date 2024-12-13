@@ -14,7 +14,7 @@ namespace coContext {
         explicit Log(Level level = Level::info, std::pmr::string &&message = std::pmr::string{getMemoryResource()},
                      std::source_location sourceLocation = std::source_location::current(),
                      std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now(),
-                     std::thread::id threadId = std::this_thread::get_id()) noexcept;
+                     std::thread::id threadId = std::this_thread::get_id());
 
         auto swap(Log &other) noexcept -> void;
 
