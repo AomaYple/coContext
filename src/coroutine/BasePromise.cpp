@@ -1,5 +1,13 @@
 #include "coContext/coroutine/BasePromise.hpp"
 
+#include "../memory/memoryResource.hpp"
+
+auto coContext::BasePromise::operator new(const std::size_t bytes) -> void * { return allocator.allocate(bytes); }
+
+auto coContext::BasePromise::operator delete(void *const pointer, const std::size_t bytes) noexcept -> void {
+    allocator.deallocate(static_cast<std::byte *>(pointer), bytes);
+}
+
 auto coContext::BasePromise::initial_suspend() const noexcept -> std::suspend_always { return {}; }
 
 auto coContext::BasePromise::final_suspend() const noexcept -> std::suspend_always { return {}; }
@@ -26,3 +34,5 @@ auto coContext::operator==(const BasePromise &lhs, const BasePromise &rhs) noexc
     return lhs.getResult() == rhs.getResult() && lhs.getParentCoroutine() == rhs.getParentCoroutine() &&
            lhs.getChildCoroutine() == rhs.getChildCoroutine();
 }
+
+thread_local std::pmr::polymorphic_allocator<> coContext::BasePromise::allocator{getMemoryResource()};
