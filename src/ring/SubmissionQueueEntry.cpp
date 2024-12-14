@@ -170,6 +170,17 @@ auto coContext::SubmissionQueueEntry::link(const std::int32_t oldDirectoryFileDe
                          std::data(newPath), flags);
 }
 
+auto coContext::SubmissionQueueEntry::symbolicLink(const std::string_view target,
+                                                   const std::string_view linkPath) const noexcept -> void {
+    io_uring_prep_symlink(this->handle, std::data(target), std::data(linkPath));
+}
+
+auto coContext::SubmissionQueueEntry::symbolicLink(const std::string_view target,
+                                                   const std::int32_t newDirectoryFileDescriptor,
+                                                   const std::string_view linkPath) const noexcept -> void {
+    io_uring_prep_symlinkat(this->handle, std::data(target), newDirectoryFileDescriptor, std::data(linkPath));
+}
+
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
     return lhs.get() == rhs.get();
 }
