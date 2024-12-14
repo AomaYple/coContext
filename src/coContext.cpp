@@ -371,3 +371,19 @@ auto coContext::getExtendedAttribute(const std::int32_t fileDescriptor, const st
 
     return AsyncWaiter{submissionQueueEntry};
 }
+
+auto coContext::setExtendedAttribute(const std::string_view path, const std::string_view name,
+                                     const std::span<char> value, const std::int32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.setExtendedAttribute(path, name, value, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::setExtendedAttribute(const std::int32_t fileDescriptor, const std::string_view name,
+                                     const std::span<char> value, const std::int32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.setExtendedAttribute(fileDescriptor, name, value, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}

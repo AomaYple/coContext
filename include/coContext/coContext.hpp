@@ -182,4 +182,10 @@ namespace coContext {
 
     [[nodiscard]] auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value)
         -> AsyncWaiter;
+
+    [[nodiscard]] auto setExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value,
+                                            std::int32_t flags) -> AsyncWaiter;
+
+    [[nodiscard]] auto setExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value,
+                                            std::int32_t flags) -> AsyncWaiter;
 }    // namespace coContext
