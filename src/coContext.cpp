@@ -349,9 +349,9 @@ auto coContext::rename(const std::int32_t oldDirectoryFileDescriptor, const std:
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::fileDescriptorTruncate(const std::int32_t fileDescriptor, const loff_t length) -> AsyncWaiter {
+auto coContext::truncate(const std::int32_t fileDescriptor, const loff_t length) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.fileDescriptorTruncate(fileDescriptor, length);
+    submissionQueueEntry.truncate(fileDescriptor, length);
 
     return AsyncWaiter{submissionQueueEntry};
 }

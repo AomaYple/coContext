@@ -216,8 +216,8 @@ auto coContext::SubmissionQueueEntry::rename(const std::int32_t oldDirectoryFile
                            std::data(newPath), flags);
 }
 
-auto coContext::SubmissionQueueEntry::fileDescriptorTruncate(const std::int32_t fileDescriptor,
-                                                             const loff_t length) const noexcept -> void {
+auto coContext::SubmissionQueueEntry::truncate(const std::int32_t fileDescriptor, const loff_t length) const noexcept
+    -> void {
     io_uring_prep_ftruncate(this->handle, fileDescriptor, length);
 }
 

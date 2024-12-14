@@ -125,7 +125,7 @@ namespace coContext {
                     std::int32_t newDirectoryFileDescriptor, std::string_view newPath,
                     std::uint32_t flags) const noexcept -> void;
 
-        auto fileDescriptorTruncate(std::int32_t fileDescriptor, loff_t length) const noexcept -> void;
+        auto truncate(std::int32_t fileDescriptor, loff_t length) const noexcept -> void;
 
         auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value) const noexcept
             -> void;
