@@ -4,12 +4,12 @@
 
 ## 特性
 
-- 支持嵌套**任意数量**的**任意返回值**的协程
-- 支持多线程
 - 支持绝大部分的io_uring支持的系统调用`read` `write` `send` `recv` `accept`等
 - 支持纳秒级别的定时器`sleep(1ns)` `sleep(1s)`
 - 支持IO超时`timeout(accpet, 1s)`
 - 支持IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
+- 支持嵌套**任意数量**的**任意返回值**的协程
+- 支持多线程
 
 ## 基础用法
 
