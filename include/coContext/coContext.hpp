@@ -158,4 +158,9 @@ namespace coContext {
 
     [[nodiscard]] auto symbolicLink(std::string_view target, std::int32_t newDirectoryFileDescriptor,
                                     std::string_view linkPath) -> AsyncWaiter;
+
+    [[nodiscard]] auto unlink(std::string_view path) -> AsyncWaiter;
+
+    [[nodiscard]] auto unlink(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags)
+        -> AsyncWaiter;
 }    // namespace coContext

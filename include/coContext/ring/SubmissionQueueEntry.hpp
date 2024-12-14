@@ -109,6 +109,11 @@ namespace coContext {
         auto symbolicLink(std::string_view target, std::int32_t newDirectoryFileDescriptor,
                           std::string_view linkPath) const noexcept -> void;
 
+        auto unlink(std::string_view path, std::int32_t flags) const noexcept -> void;
+
+        auto unlink(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags) const noexcept
+            -> void;
+
     private:
         io_uring_sqe *handle;
     };

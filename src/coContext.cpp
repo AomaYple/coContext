@@ -302,3 +302,18 @@ auto coContext::symbolicLink(const std::string_view target, const std::int32_t n
 
     return AsyncWaiter{submissionQueueEntry};
 }
+
+auto coContext::unlink(const std::string_view path) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.unlink(path, 0);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::unlink(const std::int32_t directoryFileDescriptor, const std::string_view path,
+                       const std::int32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.unlink(directoryFileDescriptor, path, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
