@@ -11,62 +11,28 @@
 - 支持IO超时`timeout(accpet, 1s)`
 - 支持IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
 
-## 用法
+## 基础用法
 
 仅需引入`coContext.hpp`头文件，即可使用所有功能
 
-```cpp
+```c++
 #include <coContext/coContext.hpp> 
 ```
 
-异步发起close系统调用，`Task`类模板参数为`<>`代表当前协程无返回值，使用`spawn`添加协程，使用`coContext::run()`启动调度器
+简单示例，异步发起close系统调用
 
-```cpp
+```c++
 #include <coContext/coContext.hpp>
 
-[[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::close(-1); }
-
-auto main() -> int {
-    spawn(func);
-    coContext::run();
-}
-```
-
-任意嵌套任意返回值的协程，协程可以通过`coContext::spawn()`添加，也可以通过`co_await`关键字等同步调用
-
-```cpp
-#include <coContext/coContext.hpp>
-#include <print>
-#include <thread>
-
-[[nodiscard]] auto funcA() -> coContext::Task<std::int32_t> { co_return 1; }
-
-[[nodiscard]] auto funcB() -> coContext::Task<std::int32_t> {
-    std::int32_t result{co_await coContext::close(-1)};
-
-    result += co_await funcA() + co_await funcA();
-
-    co_return result;
-}
-
-[[nodiscard]] auto funcD() -> coContext::Task<> { co_await coContext::close(-1); }
-
-[[nodiscard]] auto func() -> coContext::Task<std::int32_t> {
-    std::int32_t result{co_await coContext::close(-1)};
-
-    result += co_await funcB();
-
-    co_await funcD();
-
-    co_return result;
+[[nodiscard]] auto func() -> coContext::Task<> {    // Task模板参数为<>，表示该协程不返回任何值
+    co_await coContext::close(-1);                  // 发起close操作
+    // co_return; 无返回值的协程可以省略co_return语句
 }
 
 auto main() -> int {
-    coContext::SpawnResult result{spawn<std::int32_t>(func)};
+    spawn(func);         // 将func函数作为协程任务加入到协程调度器中
 
-    const std::jthread worker{[&result] { std::println("{}", result.result.get()); }};
-
-    coContext::run();
+    coContext::run();    //启动调度器
 }
 ```
 
@@ -100,4 +66,69 @@ target_link_libraries(your_target
         PRIVATE
         coContext
 )
+```
+
+## 更多示例
+
+IO超时控制
+
+```c++
+[[nodiscard]] auto func(const std::int32_t socketFileDescriptor) -> coContext::Task<> {
+    std::vector<std::byte> buffer{1024};
+    const std::int32_t result{co_await timeout(coContext::receive(socketFileDescriptor, buffer, 0), 3s)};    // 限时3秒
+
+    std::println("received: {}", result);
+}
+```
+
+每秒触发的定时器
+
+```c++
+[[nodiscard]] auto func() -> coContext::Task<> {
+    while (true) {
+        co_await coContext::sleep(1s);
+
+        std::println("Hello, coContext!");
+    }
+}
+```
+
+任意嵌套任意返回值的协程
+
+```c++
+#include <coContext/coContext.hpp>
+#include <print>
+#include <thread>
+
+[[nodiscard]] auto funcA() -> coContext::Task<std::int32_t> { co_return 1; }    // 该协程什么也不做，直接返回1
+
+[[nodiscard]] auto funcB() -> coContext::Task<std::int32_t> {
+    std::int32_t result{co_await coContext::close(-1)};    // 发起close请求
+
+    result += co_await funcA() + co_await funcA();    // 将result加上两次funcA的返回值
+
+    co_return result;    // 返回result
+}
+
+[[nodiscard]] auto funcD() -> coContext::Task<> {
+    co_await coContext::close(-1);
+}    // 该协程发起close请求，但不返回任何值
+
+[[nodiscard]] auto func() -> coContext::Task<std::int32_t> {
+    std::int32_t result{co_await coContext::close(-1)};    // 发起close请求
+
+    result += co_await funcB();    // 将result加上funcB的返回值
+
+    co_await funcD();    // 调用funcD
+
+    co_return result;    // 返回result
+}
+
+auto main() -> int {
+    coContext::SpawnResult result{spawn<std::int32_t>(func)};    // 添加func，并以SpawnResult类型保存返回值
+
+    const std::jthread worker{[&result] { std::println("{}", result.result.get()); }};    // 在新线程中输出result的值
+
+    coContext::run();
+}
 ```
