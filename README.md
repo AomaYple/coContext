@@ -11,6 +11,27 @@
 - 支持IO超时`timeout(accpet, 1s)`
 - 支持IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
 
+## 用法
+
+仅需引入`coContext.hpp`头文件，即可使用所有功能
+
+```cpp
+#include <coContext/coContext.hpp> 
+```
+
+异步发起close系统调用，`Task`类模板参数为`<>`代表当前协程无返回值，使用`spawn`添加协程，使用`coContext::run()`启动调度器
+
+```cpp
+#include <coContext/coContext.hpp>
+
+[[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::close(-1); }
+
+auto main() -> int {
+    spawn(func);
+    coContext::run();
+}
+```
+
 ## 依赖
 
 - [Linux内核](https://www.kernel.org) >= 6.11
