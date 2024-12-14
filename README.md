@@ -32,6 +32,44 @@ auto main() -> int {
 }
 ```
 
+任意嵌套任意返回值的协程，协程可以通过`coContext::spawn()`添加，也可以通过`co_await`关键字等同步调用
+
+```cpp
+#include <coContext/coContext.hpp>
+#include <print>
+#include <thread>
+
+[[nodiscard]] auto funcA() -> coContext::Task<std::int32_t> { co_return 1; }
+
+[[nodiscard]] auto funcB() -> coContext::Task<std::int32_t> {
+    std::int32_t result{co_await coContext::close(-1)};
+
+    result += co_await funcA() + co_await funcA();
+
+    co_return result;
+}
+
+[[nodiscard]] auto funcD() -> coContext::Task<> { co_await coContext::close(-1); }
+
+[[nodiscard]] auto func() -> coContext::Task<std::int32_t> {
+    std::int32_t result{co_await coContext::close(-1)};
+
+    result += co_await funcB();
+
+    co_await funcD();
+
+    co_return result;
+}
+
+auto main() -> int {
+    coContext::SpawnResult result{spawn<std::int32_t>(func)};
+
+    const std::jthread worker{[&result] { std::println("{}", result.result.get()); }};
+
+    coContext::run();
+}
+```
+
 ## 依赖
 
 - [Linux内核](https://www.kernel.org) >= 6.11
