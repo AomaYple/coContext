@@ -98,6 +98,8 @@ namespace coContext {
         auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
                    std::int32_t flags) const noexcept -> void;
 
+        auto link(std::string_view oldPath, std::string_view newPath, std::int32_t flags) const noexcept -> void;
+
     private:
         io_uring_sqe *handle;
     };

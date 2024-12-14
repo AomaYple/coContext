@@ -156,6 +156,11 @@ auto coContext::SubmissionQueueEntry::write(const std::int32_t fileDescriptor, c
     io_uring_prep_writev2(this->handle, fileDescriptor, std::data(buffer), std::size(buffer), offset, flags);
 }
 
+auto coContext::SubmissionQueueEntry::link(const std::string_view oldPath, const std::string_view newPath,
+                                           const std::int32_t flags) const noexcept -> void {
+    io_uring_prep_link(this->handle, std::data(oldPath), std::data(newPath), flags);
+}
+
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
     return lhs.get() == rhs.get();
 }

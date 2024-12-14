@@ -271,3 +271,11 @@ auto coContext::write(const std::int32_t fileDescriptor, const std::span<const i
 
     return AsyncWaiter{submissionQueueEntry};
 }
+
+auto coContext::link(const std::string_view oldPath, const std::string_view newPath) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.link(oldPath, newPath, 0);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+

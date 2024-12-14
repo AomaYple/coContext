@@ -147,4 +147,6 @@ namespace coContext {
 
     [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
                              std::int32_t flags) -> AsyncWaiter;
+
+    [[nodiscard]] auto link(std::string_view oldPath, std::string_view newPath) -> AsyncWaiter;
 }    // namespace coContext
