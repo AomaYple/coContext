@@ -1,11 +1,23 @@
 ## 介绍
 
-本项目是Linux上一个基于协程和io_uring的C++高并发异步框架
+本项目是Linux上一个基于**协程**和**io_uring**的C++高并发异步框架，让你可以像写同步代码一样实现高并发异步编程。
+
+## 特性
+
+- 支持嵌套**任意数量**的**任意返回值**的协程
+- 支持多线程
+- 支持绝大部分的io_uring支持的系统调用`read` `write` `send` `recv` `accept`等
+- 支持纳秒级别的定时器`sleep(1ns)` `sleep(1s)`
+- 支持IO超时`timeout(accpet, 1s)`
+- 支持IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
 
 ## 依赖
 
-[Linux内核](https://www.kernel.org) >= 6.11，[GCC](https://gcc.gnu.org) >= 14，[CMake](https://cmake.org) >=
-3.30，[Ninja](https://ninja-build.org) >= 1.8.2，[liburing](https://github.com/axboe/liburing) >= 2.7
+- [Linux内核](https://www.kernel.org) >= 6.11
+- [GCC](https://gcc.gnu.org) >= 14
+- [CMake](https://cmake.org) >= 3.30
+- [Ninja](https://ninja-build.org) >= 1.8.2
+- [liburing](https://github.com/axboe/liburing) >= 2.7
 
 ## 构建
 
