@@ -149,3 +149,25 @@ auto main() -> int {
     coContext::run();
 }
 ```
+
+多线程
+
+```c++
+#include <coContext/coContext.hpp>
+#include <thread>
+
+[[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::close(-1); }
+
+auto main() -> int {
+    std::vector<std::jthread> workers;
+    for (std::uint8_t i{}; i != std::thread::hardware_concurrency() - 1; ++i) {
+        workers.emplace_back([] {
+            spawn(func);
+            coContext::run();
+        });
+    }
+
+    spawn(func);
+    coContext::run();
+}
+```
