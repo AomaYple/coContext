@@ -317,3 +317,18 @@ auto coContext::unlink(const std::int32_t directoryFileDescriptor, const std::st
 
     return AsyncWaiter{submissionQueueEntry};
 }
+
+auto coContext::makeDirectory(const std::string_view path, const mode_t mode) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.makeDirectory(path, mode);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::makeDirectory(const std::int32_t directoryFileDescriptor, const std::string_view path,
+                              const mode_t mode) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.makeDirectory(directoryFileDescriptor, path, mode);
+
+    return AsyncWaiter{submissionQueueEntry};
+}

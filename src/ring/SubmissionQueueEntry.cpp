@@ -191,6 +191,17 @@ auto coContext::SubmissionQueueEntry::unlink(const std::int32_t directoryFileDes
     io_uring_prep_unlinkat(this->handle, directoryFileDescriptor, std::data(path), flags);
 }
 
+auto coContext::SubmissionQueueEntry::makeDirectory(const std::string_view path, const mode_t mode) const noexcept
+    -> void {
+    io_uring_prep_mkdir(this->handle, std::data(path), mode);
+}
+
+auto coContext::SubmissionQueueEntry::makeDirectory(const std::int32_t directoryFileDescriptor,
+                                                    const std::string_view path, const mode_t mode) const noexcept
+    -> void {
+    io_uring_prep_mkdirat(this->handle, directoryFileDescriptor, std::data(path), mode);
+}
+
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
     return lhs.get() == rhs.get();
 }

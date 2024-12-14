@@ -163,4 +163,9 @@ namespace coContext {
 
     [[nodiscard]] auto unlink(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags)
         -> AsyncWaiter;
+
+    [[nodiscard]] auto makeDirectory(std::string_view path, mode_t mode) -> AsyncWaiter;
+
+    [[nodiscard]] auto makeDirectory(std::int32_t directoryFileDescriptor, std::string_view path, mode_t mode)
+        -> AsyncWaiter;
 }    // namespace coContext

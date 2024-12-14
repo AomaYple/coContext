@@ -114,6 +114,11 @@ namespace coContext {
         auto unlink(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags) const noexcept
             -> void;
 
+        auto makeDirectory(std::string_view path, mode_t mode) const noexcept -> void;
+
+        auto makeDirectory(std::int32_t directoryFileDescriptor, std::string_view path, mode_t mode) const noexcept
+            -> void;
+
     private:
         io_uring_sqe *handle;
     };
