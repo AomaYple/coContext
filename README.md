@@ -4,7 +4,7 @@
 
 ## 特性
 
-- 支持绝大部分的io_uring支持的系统调用`read` `write` `send` `recv` `accept`等
+- 支持io_uring支持的所有系统调用`read` `write` `send` `recv` `accept`等
 - 支持纳秒级别的定时器`sleep(1s, 1ns)`
 - 支持IO超时`timeout(operation, 1s)`
 - 支持IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
