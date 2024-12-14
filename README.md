@@ -70,7 +70,7 @@ target_link_libraries(your_target
 
 ## 更多示例
 
-每秒触发的定时器
+### 每秒触发的定时器
 
 ```c++
 [[nodiscard]] auto func() -> coContext::Task<> {
@@ -82,7 +82,7 @@ target_link_libraries(your_target
 }
 ```
 
-IO超时控制
+### IO超时控制
 
 ```c++
 [[nodiscard]] auto func(const std::int32_t socketFileDescriptor) -> coContext::Task<> {
@@ -93,7 +93,9 @@ IO超时控制
 }
 ```
 
-IO取消
+### IO取消
+
+- 基于taskIdentity取消任务中正在运行的io
 
 ```c++
 [[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::sleep(4s); }    // 发起一个4s的定时
@@ -110,7 +112,31 @@ auto main() -> int {
 }
 ```
 
-任意嵌套任意返回值的协程
+- 基于文件描述符取消io
+
+```c++
+[[nodiscard]] auto cancelFunc(const std::int32_t socketFileDescriptor) -> coContext::Task<> {
+    co_await coContext::cancel(socketFileDescriptor,
+                               true);    // 第二个参数为 true 时，会取消该文件描述符上的所有io，否则只取消第一个io
+}
+
+[[nodiscard]] auto func(const std::int32_t socketFileDescriptor) -> coContext::Task<> {
+    spawn(cancelFunc, socketFileDescriptor);
+
+    std::vector<std::byte> buffer{1024};
+    co_await coContext::receive(socketFileDescriptor, buffer, 0);
+}
+```
+
+- 取消所有IO
+
+```c++
+[[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::cancelAny(); }
+```
+
+并且，支持同步取消版本`syncCancel`，用法与`cancel`相同
+
+### 任意嵌套任意返回值的协程
 
 ```c++
 #include <coContext/coContext.hpp>
@@ -150,7 +176,7 @@ auto main() -> int {
 }
 ```
 
-多线程
+### 多线程
 
 ```c++
 #include <coContext/coContext.hpp>
