@@ -70,6 +70,18 @@ target_link_libraries(your_target
 
 ## 更多示例
 
+每秒触发的定时器
+
+```c++
+[[nodiscard]] auto func() -> coContext::Task<> {
+    while (true) {
+        co_await coContext::sleep(1s);
+
+        std::println("Hello, coContext!");
+    }
+}
+```
+
 IO超时控制
 
 ```c++
@@ -81,15 +93,20 @@ IO超时控制
 }
 ```
 
-每秒触发的定时器
+IO取消
 
 ```c++
-[[nodiscard]] auto func() -> coContext::Task<> {
-    while (true) {
-        co_await coContext::sleep(1s);
+[[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::sleep(4s); }    // 发起一个4s的定时
 
-        std::println("Hello, coContext!");
-    }
+[[nodiscard]] auto cancelFunc(const std::uint64_t taskIdentity) -> coContext::Task<> {
+    co_await coContext::cancel(taskIdentity);    // 基于任务标识符取消任务中正在运行的io
+}
+
+auto main() -> int {
+    const std::uint64_t taskIdentity{spawn(func)};
+    spawn(cancelFunc, taskIdentity);
+
+    coContext::run();
 }
 ```
 
