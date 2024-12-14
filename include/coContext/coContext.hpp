@@ -168,4 +168,10 @@ namespace coContext {
 
     [[nodiscard]] auto makeDirectory(std::int32_t directoryFileDescriptor, std::string_view path, mode_t mode)
         -> AsyncWaiter;
+
+    [[nodiscard]] auto rename(std::string_view oldPath, std::string_view newPath) -> AsyncWaiter;
+
+    [[nodiscard]] auto rename(std::int32_t oldDirectoryFileDescriptor, std::string_view oldPath,
+                              std::int32_t newDirectoryFileDescriptor, std::string_view newPath,
+                              std::uint32_t flags = {}) -> AsyncWaiter;
 }    // namespace coContext

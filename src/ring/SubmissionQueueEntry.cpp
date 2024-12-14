@@ -202,6 +202,20 @@ auto coContext::SubmissionQueueEntry::makeDirectory(const std::int32_t directory
     io_uring_prep_mkdirat(this->handle, directoryFileDescriptor, std::data(path), mode);
 }
 
+auto coContext::SubmissionQueueEntry::rename(const std::string_view oldPath,
+                                             const std::string_view newPath) const noexcept -> void {
+    io_uring_prep_rename(this->handle, std::data(oldPath), std::data(newPath));
+}
+
+auto coContext::SubmissionQueueEntry::rename(const std::int32_t oldDirectoryFileDescriptor,
+                                             const std::string_view oldPath,
+                                             const std::int32_t newDirectoryFileDescriptor,
+                                             const std::string_view newPath, const std::uint32_t flags) const noexcept
+    -> void {
+    io_uring_prep_renameat(this->handle, oldDirectoryFileDescriptor, std::data(oldPath), newDirectoryFileDescriptor,
+                           std::data(newPath), flags);
+}
+
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
     return lhs.get() == rhs.get();
 }

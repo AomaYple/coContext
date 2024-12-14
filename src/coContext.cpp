@@ -332,3 +332,19 @@ auto coContext::makeDirectory(const std::int32_t directoryFileDescriptor, const 
 
     return AsyncWaiter{submissionQueueEntry};
 }
+
+auto coContext::rename(const std::string_view oldPath, const std::string_view newPath) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.rename(oldPath, newPath);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::rename(const std::int32_t oldDirectoryFileDescriptor, const std::string_view oldPath,
+                       const std::int32_t newDirectoryFileDescriptor, const std::string_view newPath,
+                       const std::uint32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.rename(oldDirectoryFileDescriptor, oldPath, newDirectoryFileDescriptor, newPath, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}

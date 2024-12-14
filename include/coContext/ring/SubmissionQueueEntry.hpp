@@ -119,6 +119,12 @@ namespace coContext {
         auto makeDirectory(std::int32_t directoryFileDescriptor, std::string_view path, mode_t mode) const noexcept
             -> void;
 
+        auto rename(std::string_view oldPath, std::string_view newPath) const noexcept -> void;
+
+        auto rename(std::int32_t oldDirectoryFileDescriptor, std::string_view oldPath,
+                    std::int32_t newDirectoryFileDescriptor, std::string_view newPath,
+                    std::uint32_t flags) const noexcept -> void;
+
     private:
         io_uring_sqe *handle;
     };
