@@ -125,6 +125,8 @@ namespace coContext {
                     std::int32_t newDirectoryFileDescriptor, std::string_view newPath,
                     std::uint32_t flags) const noexcept -> void;
 
+        auto fileDescriptorTruncate(std::int32_t fileDescriptor, loff_t length) const noexcept -> void;
+
     private:
         io_uring_sqe *handle;
     };

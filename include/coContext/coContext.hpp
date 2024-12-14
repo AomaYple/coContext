@@ -174,4 +174,6 @@ namespace coContext {
     [[nodiscard]] auto rename(std::int32_t oldDirectoryFileDescriptor, std::string_view oldPath,
                               std::int32_t newDirectoryFileDescriptor, std::string_view newPath,
                               std::uint32_t flags = {}) -> AsyncWaiter;
+
+    [[nodiscard]] auto fileDescriptorTruncate(std::int32_t fileDescriptor, loff_t length) -> AsyncWaiter;
 }    // namespace coContext

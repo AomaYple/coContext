@@ -216,6 +216,11 @@ auto coContext::SubmissionQueueEntry::rename(const std::int32_t oldDirectoryFile
                            std::data(newPath), flags);
 }
 
+auto coContext::SubmissionQueueEntry::fileDescriptorTruncate(const std::int32_t fileDescriptor,
+                                                             const loff_t length) const noexcept -> void {
+    io_uring_prep_ftruncate(this->handle, fileDescriptor, length);
+}
+
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
     return lhs.get() == rhs.get();
 }
