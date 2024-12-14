@@ -8,9 +8,9 @@ namespace coContext {
         using Coroutine = std::coroutine_handle<BasePromise>;
 
     public:
-        [[nodiscard]] auto operator new(std::size_t bytes) -> void *;
+        [[nodiscard]] auto operator new(std::size_t numberOfBytes) -> void *;
 
-        auto operator delete(void *pointer, std::size_t bytes) noexcept -> void;
+        auto operator delete(void *pointer, std::size_t numberOfBytes) noexcept -> void;
 
         [[nodiscard]] auto initial_suspend() const noexcept -> std::suspend_always;
 

@@ -2,10 +2,12 @@
 
 #include "../memory/memoryResource.hpp"
 
-auto coContext::BasePromise::operator new(const std::size_t bytes) -> void * { return allocator.allocate(bytes); }
+auto coContext::BasePromise::operator new(const std::size_t numberOfBytes) -> void * {
+    return allocator.allocate_bytes(numberOfBytes);
+}
 
-auto coContext::BasePromise::operator delete(void *const pointer, const std::size_t bytes) noexcept -> void {
-    allocator.deallocate(static_cast<std::byte *>(pointer), bytes);
+auto coContext::BasePromise::operator delete(void *const pointer, const std::size_t numberOfBytes) noexcept -> void {
+    allocator.deallocate_bytes(pointer, numberOfBytes);
 }
 
 auto coContext::BasePromise::initial_suspend() const noexcept -> std::suspend_always { return {}; }
