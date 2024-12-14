@@ -221,6 +221,17 @@ auto coContext::SubmissionQueueEntry::fileDescriptorTruncate(const std::int32_t 
     io_uring_prep_ftruncate(this->handle, fileDescriptor, length);
 }
 
+auto coContext::SubmissionQueueEntry::getExtendedAttribute(const std::string_view path, const std::string_view name,
+                                                           const std::span<char> value) const noexcept -> void {
+    io_uring_prep_getxattr(this->handle, std::data(name), std::data(value), std::data(path), value.size());
+}
+
+auto coContext::SubmissionQueueEntry::getExtendedAttribute(const std::int32_t fileDescriptor,
+                                                           const std::string_view name,
+                                                           const std::span<char> value) const noexcept -> void {
+    io_uring_prep_fgetxattr(this->handle, fileDescriptor, std::data(name), std::data(value), value.size());
+}
+
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
     return lhs.get() == rhs.get();
 }

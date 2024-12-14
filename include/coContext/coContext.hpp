@@ -176,4 +176,10 @@ namespace coContext {
                               std::uint32_t flags = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto fileDescriptorTruncate(std::int32_t fileDescriptor, loff_t length) -> AsyncWaiter;
+
+    [[nodiscard]] auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value)
+        -> AsyncWaiter;
+
+    [[nodiscard]] auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value)
+        -> AsyncWaiter;
 }    // namespace coContext

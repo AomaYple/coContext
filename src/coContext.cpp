@@ -356,3 +356,18 @@ auto coContext::fileDescriptorTruncate(const std::int32_t fileDescriptor, const 
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::getExtendedAttribute(const std::string_view path, const std::string_view name,
+                                     const std::span<char> value) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.getExtendedAttribute(path, name, value);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::getExtendedAttribute(const std::int32_t fileDescriptor, const std::string_view name,
+                                     const std::span<char> value) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.getExtendedAttribute(fileDescriptor, name, value);
+
+    return AsyncWaiter{submissionQueueEntry};
+}

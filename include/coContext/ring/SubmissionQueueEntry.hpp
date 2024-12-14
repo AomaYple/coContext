@@ -127,6 +127,12 @@ namespace coContext {
 
         auto fileDescriptorTruncate(std::int32_t fileDescriptor, loff_t length) const noexcept -> void;
 
+        auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value) const noexcept
+            -> void;
+
+        auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name,
+                                  std::span<char> value) const noexcept -> void;
+
     private:
         io_uring_sqe *handle;
     };
