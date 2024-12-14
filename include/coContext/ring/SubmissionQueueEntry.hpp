@@ -100,6 +100,10 @@ namespace coContext {
 
         auto link(std::string_view oldPath, std::string_view newPath, std::int32_t flags) const noexcept -> void;
 
+        auto link(std::int32_t oldDirectoryFileDescriptor, std::string_view oldPath,
+                  std::int32_t newDirectoryFileDescriptor, std::string_view newPath, std::int32_t flags) const noexcept
+            -> void;
+
     private:
         io_uring_sqe *handle;
     };

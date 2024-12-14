@@ -279,3 +279,12 @@ auto coContext::link(const std::string_view oldPath, const std::string_view newP
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::link(const std::int32_t oldDirectoryFileDescriptor, const std::string_view oldPath,
+                     const std::int32_t newDirectoryFileDescriptor, const std::string_view newPath,
+                     const std::int32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.link(oldDirectoryFileDescriptor, oldPath, newDirectoryFileDescriptor, newPath, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+

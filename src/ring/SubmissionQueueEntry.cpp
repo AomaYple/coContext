@@ -161,6 +161,15 @@ auto coContext::SubmissionQueueEntry::link(const std::string_view oldPath, const
     io_uring_prep_link(this->handle, std::data(oldPath), std::data(newPath), flags);
 }
 
+auto coContext::SubmissionQueueEntry::link(const std::int32_t oldDirectoryFileDescriptor,
+                                           const std::string_view oldPath,
+                                           const std::int32_t newDirectoryFileDescriptor,
+                                           const std::string_view newPath, const std::int32_t flags) const noexcept
+    -> void {
+    io_uring_prep_linkat(this->handle, oldDirectoryFileDescriptor, std::data(oldPath), newDirectoryFileDescriptor,
+                         std::data(newPath), flags);
+}
+
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
     return lhs.get() == rhs.get();
 }
