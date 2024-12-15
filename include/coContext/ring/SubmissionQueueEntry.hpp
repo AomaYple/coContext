@@ -139,9 +139,6 @@ namespace coContext {
         auto setExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value,
                                   std::int32_t flags) const noexcept -> void;
 
-        auto fileAdvise(std::int32_t fileDescriptor, std::uint64_t offset, std::uint32_t length,
-                        std::int32_t advice) const noexcept -> void;
-
         auto fileAdvise(std::int32_t fileDescriptor, std::uint64_t offset, off_t length,
                         std::int32_t advice) const noexcept -> void;
 

@@ -245,12 +245,6 @@ auto coContext::SubmissionQueueEntry::setExtendedAttribute(const std::int32_t fi
 }
 
 auto coContext::SubmissionQueueEntry::fileAdvise(const std::int32_t fileDescriptor, const std::uint64_t offset,
-                                                 const std::uint32_t length, const std::int32_t advice) const noexcept
-    -> void {
-    io_uring_prep_fadvise(this->handle, fileDescriptor, offset, length, advice);
-}
-
-auto coContext::SubmissionQueueEntry::fileAdvise(const std::int32_t fileDescriptor, const std::uint64_t offset,
                                                  const off_t length, const std::int32_t advice) const noexcept -> void {
     io_uring_prep_fadvise64(this->handle, fileDescriptor, offset, length, advice);
 }

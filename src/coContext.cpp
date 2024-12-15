@@ -389,14 +389,6 @@ auto coContext::setExtendedAttribute(const std::int32_t fileDescriptor, const st
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::fileAdvise(const std::int32_t fileDescriptor, const std::uint64_t offset, const std::uint32_t length,
-                           const std::int32_t advice) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.fileAdvise(fileDescriptor, offset, length, advice);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
 auto coContext::fileAdvise(const std::int32_t fileDescriptor, const std::uint64_t offset, const off_t length,
                            const std::int32_t advice) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
