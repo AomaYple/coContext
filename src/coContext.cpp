@@ -273,6 +273,14 @@ auto coContext::write(const std::int32_t fileDescriptor, const std::span<const i
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::fileSync(const std::int32_t fileDescriptor, const bool isSyncMetadata, const std::uint64_t offset,
+                         const std::uint32_t length) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.fileSync(fileDescriptor, isSyncMetadata ? 0 : IORING_FSYNC_DATASYNC, offset, length);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::link(const std::string_view oldPath, const std::string_view newPath) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.link(oldPath, newPath, 0);
