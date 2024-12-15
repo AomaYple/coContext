@@ -25,9 +25,7 @@ auto coContext::Coroutine::swap(Coroutine &other) noexcept -> void { std::swap(t
 
 auto coContext::Coroutine::getHandle() const noexcept -> Handle { return this->handle; }
 
-coContext::Coroutine::operator bool() const noexcept {
-    return static_cast<bool>(this->handle) && this->handle != noOperationCoroutineHandle();
-}
+coContext::Coroutine::operator bool() const noexcept { return this->handle != noOperationCoroutineHandle(); }
 
 auto coContext::Coroutine::promise() const -> BasePromise & { return this->handle.promise(); }
 
