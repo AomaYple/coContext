@@ -44,8 +44,8 @@ namespace coContext {
 
         auto close(std::int32_t fileDescriptor) const noexcept -> void;
 
-        auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol,
-                    std::uint32_t flags = {}) const noexcept -> void;
+        auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol, std::uint32_t flags) const noexcept
+            -> void;
 
         auto bind(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t addressLength) const noexcept -> void;
 
@@ -98,8 +98,8 @@ namespace coContext {
         auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
                    std::int32_t flags) const noexcept -> void;
 
-        auto fileSync(std::int32_t fileDescriptor, std::uint32_t flags, std::uint64_t offset = {},
-                      std::uint32_t length = {}) const noexcept -> void;
+        auto fileSync(std::int32_t fileDescriptor, std::uint32_t flags, std::uint64_t offset,
+                      std::uint32_t length) const noexcept -> void;
 
         auto link(std::string_view oldPath, std::string_view newPath, std::int32_t flags) const noexcept -> void;
 

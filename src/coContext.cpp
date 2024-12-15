@@ -113,7 +113,7 @@ auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter {
 
 auto coContext::socket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.socket(domain, type, protocol);
+    submissionQueueEntry.socket(domain, type, protocol, 0);
 
     return AsyncWaiter{submissionQueueEntry};
 }
