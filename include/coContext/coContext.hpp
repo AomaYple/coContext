@@ -189,6 +189,8 @@ namespace coContext {
     [[nodiscard]] auto setExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value,
                                             std::int32_t flags) -> AsyncWaiter;
 
+    [[nodiscard]] auto memoryAdvise(std::span<std::byte> buffer, std::int32_t advice) -> AsyncWaiter;
+
     [[nodiscard]] auto fileAdvise(std::int32_t fileDescriptor, std::uint64_t offset, off_t length, std::int32_t advice)
         -> AsyncWaiter;
 }    // namespace coContext

@@ -244,6 +244,11 @@ auto coContext::SubmissionQueueEntry::setExtendedAttribute(const std::int32_t fi
     io_uring_prep_fsetxattr(this->handle, fileDescriptor, std::data(name), std::data(value), flags, value.size());
 }
 
+auto coContext::SubmissionQueueEntry::memoryAdvise(const std::span<std::byte> buffer,
+                                                   const std::int32_t advice) const noexcept -> void {
+    io_uring_prep_madvise64(this->handle, std::data(buffer), static_cast<off_t>(std::size(buffer)), advice);
+}
+
 auto coContext::SubmissionQueueEntry::fileAdvise(const std::int32_t fileDescriptor, const std::uint64_t offset,
                                                  const off_t length, const std::int32_t advice) const noexcept -> void {
     io_uring_prep_fadvise64(this->handle, fileDescriptor, offset, length, advice);
