@@ -2,8 +2,8 @@
 
 #include "../ring/SubmissionQueueEntry.hpp"
 
+#include <chrono>
 #include <coroutine>
-#include <future>
 
 namespace coContext {
     class AsyncWaiter {
@@ -40,11 +40,11 @@ namespace coContext {
 
         auto await_suspend(std::coroutine_handle<> genericCoroutineHandle) -> void;
 
-        [[nodiscard]] auto await_resume() -> std::int32_t;
+        [[nodiscard]] auto await_resume() const noexcept -> std::int32_t;
 
     private:
         SubmissionQueueEntry submissionQueueEntry;
-        std::future<std::int32_t> result;
+        std::shared_ptr<std::int32_t> result;
         std::pair<__kernel_timespec, __kernel_timespec> timeSpecifications;
     };
 }    // namespace coContext

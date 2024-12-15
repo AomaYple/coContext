@@ -16,12 +16,9 @@ auto coContext::BasePromise::swap(BasePromise &other) noexcept -> void {
     std::swap(this->childCoroutine, other.childCoroutine);
 }
 
-auto coContext::BasePromise::getResult() -> std::future<std::int32_t> { return this->result.get_future(); }
+auto coContext::BasePromise::getResult() const noexcept -> std::shared_ptr<std::int32_t> { return this->result; }
 
-auto coContext::BasePromise::setResult(const std::int32_t result) -> void {
-    this->result = std::promise<std::int32_t>{};
-    this->result.set_value(result);
-}
+auto coContext::BasePromise::setResult(const std::int32_t result) const noexcept -> void { *this->result = result; }
 
 auto coContext::BasePromise::getParentCoroutineIdentity() const noexcept -> std::uint64_t {
     return this->parentCoroutineIdentity;

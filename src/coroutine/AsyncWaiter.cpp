@@ -52,4 +52,4 @@ auto coContext::AsyncWaiter::await_suspend(const std::coroutine_handle<> generic
     this->result = coroutineHandle.promise().getResult();
 }
 
-auto coContext::AsyncWaiter::await_resume() -> std::int32_t { return this->result.get(); }
+auto coContext::AsyncWaiter::await_resume() const noexcept -> std::int32_t { return *this->result; }

@@ -3,6 +3,8 @@
 #include "BasePromise.hpp"
 #include "BaseTask.hpp"
 
+#include <future>
+
 namespace coContext {
     template<typename T = void>
         requires std::movable<T> || std::is_lvalue_reference_v<T> || std::is_void_v<T>

@@ -2,7 +2,7 @@
 
 #include "Coroutine.hpp"
 
-#include <future>
+#include <memory>
 #include <memory_resource>
 
 namespace coContext {
@@ -26,9 +26,9 @@ namespace coContext {
 
         auto swap(BasePromise &other) noexcept -> void;
 
-        [[nodiscard]] auto getResult() -> std::future<std::int32_t>;
+        [[nodiscard]] auto getResult() const noexcept -> std::shared_ptr<std::int32_t>;
 
-        auto setResult(std::int32_t result) -> void;
+        auto setResult(std::int32_t result) const noexcept -> void;
 
         [[nodiscard]] auto getParentCoroutineIdentity() const noexcept -> std::uint64_t;
 
@@ -47,7 +47,7 @@ namespace coContext {
     private:
         static thread_local std::pmr::polymorphic_allocator<> allocator;
 
-        std::promise<std::int32_t> result;
+        std::shared_ptr<std::int32_t> result{std::make_shared<std::int32_t>()};
         std::uint64_t parentCoroutineIdentity{std::hash<Coroutine>{}(Coroutine{})};
         Coroutine childCoroutine;
     };
