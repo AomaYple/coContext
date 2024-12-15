@@ -143,5 +143,5 @@ namespace coContext {
         io_uring_sqe *handle;
     };
 
-    [[nodiscard]] auto operator==(SubmissionQueueEntry lhs, SubmissionQueueEntry rhs) noexcept -> bool;
+    [[nodiscard]] auto operator==(SubmissionQueueEntry, SubmissionQueueEntry) noexcept -> bool;
 }    // namespace coContext

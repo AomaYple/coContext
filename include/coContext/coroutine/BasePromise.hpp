@@ -8,9 +8,9 @@
 namespace coContext {
     class BasePromise {
     public:
-        [[nodiscard]] auto operator new(std::size_t numberOfBytes) -> void *;
+        [[nodiscard]] auto operator new(std::size_t) -> void *;
 
-        auto operator delete(void *pointer, std::size_t numberOfBytes) noexcept -> void;
+        auto operator delete(void *, std::size_t) noexcept -> void;
 
         BasePromise() = default;
 
