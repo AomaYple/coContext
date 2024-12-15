@@ -8,11 +8,11 @@
 namespace coContext {
     class AsyncWaiter {
     public:
-        explicit AsyncWaiter(SubmissionQueueEntry submissionQueueEntry) noexcept;
+        explicit AsyncWaiter(SubmissionQueueEntry submissionQueueEntry = SubmissionQueueEntry{}) noexcept;
 
-        AsyncWaiter(const AsyncWaiter &) = delete;
+        AsyncWaiter(const AsyncWaiter &) noexcept = default;
 
-        auto operator=(const AsyncWaiter &) -> AsyncWaiter & = delete;
+        auto operator=(const AsyncWaiter &) noexcept -> AsyncWaiter & = default;
 
         AsyncWaiter(AsyncWaiter &&) noexcept = default;
 
@@ -20,9 +20,9 @@ namespace coContext {
 
         ~AsyncWaiter() = default;
 
-        auto swap(AsyncWaiter &other) noexcept -> void;
-
         [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry;
+
+        [[nodiscard]] auto getResult() const noexcept -> const std::shared_ptr<std::int32_t> &;
 
         [[nodiscard]] auto getFirstTimeSpecification() const noexcept -> __kernel_timespec;
 
@@ -47,9 +47,6 @@ namespace coContext {
         std::shared_ptr<std::int32_t> result;
         std::pair<__kernel_timespec, __kernel_timespec> timeSpecifications;
     };
-}    // namespace coContext
 
-template<>
-constexpr auto std::swap(coContext::AsyncWaiter &lhs, coContext::AsyncWaiter &rhs) noexcept -> void {
-    lhs.swap(rhs);
-}
+    [[nodiscard]] auto operator==(const AsyncWaiter &, const AsyncWaiter &) noexcept -> bool;
+}    // namespace coContext
