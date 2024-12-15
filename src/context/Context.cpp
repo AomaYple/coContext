@@ -4,8 +4,6 @@
 #include "coContext/coroutine/BasePromise.hpp"
 #include "coContext/ring/SubmissionQueueEntry.hpp"
 
-#include <ranges>
-
 coContext::Context::Context() :
     ring{[] {
         io_uring_params parameters{};
@@ -35,15 +33,8 @@ coContext::Context::Context() :
     this->ring.registerCpuAffinity(sizeof(cpuSet), std::addressof(cpuSet));
 
     this->ring.registerSelfFileDescriptor();
-}
 
-coContext::Context::~Context() {
-    while (!std::empty(this->unscheduledCoroutines)) {
-        this->unscheduledCoroutines.front().destroy();
-        this->unscheduledCoroutines.pop();
-    }
-
-    for (const auto coroutine : this->schedulingCoroutines | std::views::values) coroutine.destroy();
+    this->schedulingCoroutines.emplace(std::hash<Coroutine>{}(Coroutine{}), Coroutine{});
 }
 
 auto coContext::Context::swap(Context &other) noexcept -> void {
@@ -71,7 +62,9 @@ auto coContext::Context::run() -> void {
 
 auto coContext::Context::stop() noexcept -> void { this->isRunning = false; }
 
-auto coContext::Context::spawn(const Coroutine coroutine) -> void { this->unscheduledCoroutines.emplace(coroutine); }
+auto coContext::Context::spawn(Coroutine &&coroutine) -> void {
+    this->unscheduledCoroutines.emplace(std::move(coroutine));
+}
 
 auto coContext::Context::getSubmissionQueueEntry() -> SubmissionQueueEntry {
     return SubmissionQueueEntry{this->ring.getSubmissionQueueEntry()};
@@ -109,30 +102,27 @@ auto coContext::Context::getFileDescriptorLimit(const std::source_location sourc
 auto coContext::Context::scheduleUnscheduledCoroutines() -> void {
     while (!std::empty(this->unscheduledCoroutines)) {
         this->scheduleCoroutine(this->unscheduledCoroutines.front());
+
         this->unscheduledCoroutines.pop();
     }
 }
 
-auto coContext::Context::scheduleCoroutine(const Coroutine coroutine, const std::int32_t result) -> void {
-    if (coroutine == std::noop_coroutine()) return;
+auto coContext::Context::scheduleCoroutine(Coroutine &coroutine, const std::int32_t result) -> void {
+    if (!static_cast<bool>(coroutine)) return;
 
     coroutine.promise().setResult(result);
     coroutine();
 
     if (const std::uint64_t coroutineIdentity{std::hash<Coroutine>{}(coroutine)}; !coroutine.done()) {
-        this->schedulingCoroutines.try_emplace(coroutineIdentity, coroutine);
+        Coroutine childCoroutine{std::move(coroutine.promise().getChildCoroutine())};
 
-        const Coroutine childCoroutine{coroutine.promise().getChildCoroutine()};
-        coroutine.promise().setChildCoroutine(Coroutine::from_address(std::noop_coroutine().address()));
+        this->schedulingCoroutines.try_emplace(coroutineIdentity, std::move(coroutine));
 
         this->scheduleCoroutine(childCoroutine);
     } else {
         this->schedulingCoroutines.erase(coroutineIdentity);
 
-        const Coroutine parentCoroutine{coroutine.promise().getParentCoroutine()};
-        coroutine.destroy();
-
-        this->scheduleCoroutine(parentCoroutine);
+        this->scheduleCoroutine(this->schedulingCoroutines.at(coroutine.promise().getParentCoroutineIdentity()));
     }
 }
 

@@ -2,31 +2,27 @@
 
 #include "../ring/SubmissionQueueEntry.hpp"
 
-#include <chrono>
 #include <coroutine>
+#include <future>
 
 namespace coContext {
-    class BasePromise;
-
     class AsyncWaiter {
-        using Coroutine = std::coroutine_handle<BasePromise>;
-
     public:
-        explicit AsyncWaiter(SubmissionQueueEntry submissionQueueEntry = SubmissionQueueEntry{}) noexcept;
+        explicit AsyncWaiter(SubmissionQueueEntry submissionQueueEntry) noexcept;
 
-        constexpr AsyncWaiter(const AsyncWaiter &) noexcept = default;
+        AsyncWaiter(const AsyncWaiter &) = delete;
 
-        constexpr auto operator=(const AsyncWaiter &) noexcept -> AsyncWaiter & = default;
+        auto operator=(const AsyncWaiter &) -> AsyncWaiter & = delete;
 
-        constexpr AsyncWaiter(AsyncWaiter &&) noexcept = default;
+        AsyncWaiter(AsyncWaiter &&) noexcept = default;
 
-        constexpr auto operator=(AsyncWaiter &&) noexcept -> AsyncWaiter & = default;
+        auto operator=(AsyncWaiter &&) noexcept -> AsyncWaiter & = default;
 
-        constexpr ~AsyncWaiter() = default;
+        ~AsyncWaiter() = default;
+
+        auto swap(AsyncWaiter &other) noexcept -> void;
 
         [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry;
-
-        [[nodiscard]] auto getCoroutine() const noexcept -> Coroutine;
 
         [[nodiscard]] auto getFirstTimeSpecification() const noexcept -> __kernel_timespec;
 
@@ -42,15 +38,18 @@ namespace coContext {
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
-        auto await_suspend(std::coroutine_handle<> coroutine) noexcept -> void;
+        auto await_suspend(std::coroutine_handle<> genericCoroutineHandle) -> void;
 
-        [[nodiscard]] auto await_resume() const -> std::int32_t;
+        [[nodiscard]] auto await_resume() -> std::int32_t;
 
     private:
         SubmissionQueueEntry submissionQueueEntry;
-        Coroutine coroutine{Coroutine::from_address(std::noop_coroutine().address())};
+        std::future<std::int32_t> result;
         std::pair<__kernel_timespec, __kernel_timespec> timeSpecifications;
     };
-
-    [[nodiscard]] auto operator==(const AsyncWaiter &lhs, const AsyncWaiter &rhs) noexcept -> bool;
 }    // namespace coContext
+
+template<>
+constexpr auto std::swap(coContext::AsyncWaiter &lhs, coContext::AsyncWaiter &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}

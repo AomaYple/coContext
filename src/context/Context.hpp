@@ -2,19 +2,16 @@
 
 #include "../memory/memoryResource.hpp"
 #include "../ring/Ring.hpp"
+#include "coContext/coroutine/Coroutine.hpp"
 
-#include <coroutine>
 #include <queue>
 #include <sys/resource.h>
 #include <variant>
 
 namespace coContext {
-    class BasePromise;
     class SubmissionQueueEntry;
 
     class Context {
-        using Coroutine = std::coroutine_handle<BasePromise>;
-
     public:
         Context();
 
@@ -26,7 +23,7 @@ namespace coContext {
 
         auto operator=(Context &&) noexcept -> Context & = default;
 
-        ~Context();
+        ~Context() = default;
 
         auto swap(Context &other) noexcept -> void;
 
@@ -34,7 +31,7 @@ namespace coContext {
 
         auto stop() noexcept -> void;
 
-        auto spawn(Coroutine coroutine) -> void;
+        auto spawn(Coroutine &&coroutine) -> void;
 
         [[nodiscard]] auto getSubmissionQueueEntry() -> SubmissionQueueEntry;
 
@@ -47,7 +44,7 @@ namespace coContext {
 
         auto scheduleUnscheduledCoroutines() -> void;
 
-        auto scheduleCoroutine(Coroutine coroutine, std::int32_t result = {}) -> void;
+        auto scheduleCoroutine(Coroutine &coroutine, std::int32_t result = {}) -> void;
 
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
@@ -56,8 +53,7 @@ namespace coContext {
         bool isRunning{};
         Ring ring;
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
-        std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{
-            {{0, Coroutine::from_address(std::noop_coroutine().address())}}, getMemoryResource()};
+        std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
     };
 }    // namespace coContext
 

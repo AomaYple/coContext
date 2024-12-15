@@ -25,7 +25,7 @@ namespace {
     }
 }    // namespace
 
-auto coContext::spawn(const Coroutine coroutine) -> void { context.spawn(coroutine); }
+auto coContext::spawn(Coroutine &&coroutine) -> void { context.spawn(std::move(coroutine)); }
 
 auto coContext::run() -> void { context.run(); }
 
@@ -97,8 +97,9 @@ auto coContext::timeout(AsyncWaiter &&asyncWaiter, const std::chrono::seconds se
     asyncWaiter.getSubmissionQueueEntry().addFlags(IOSQE_IO_LINK);
     asyncWaiter.setSecondTimeSpecification(seconds, nanoseconds);
 
-    context.getSubmissionQueueEntry().linkTimeout(asyncWaiter.getSecondTimeSpecification(),
-                                                  setClockSource(clockSource));
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.linkTimeout(asyncWaiter.getSecondTimeSpecification(), setClockSource(clockSource));
+    submissionQueueEntry.setUserData(std::hash<Coroutine>{}(Coroutine{}));
 
     return asyncWaiter;
 }

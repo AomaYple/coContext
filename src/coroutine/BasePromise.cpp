@@ -10,31 +10,37 @@ auto coContext::BasePromise::operator delete(void *const pointer, const std::siz
     allocator.deallocate_bytes(pointer, numberOfBytes);
 }
 
+auto coContext::BasePromise::swap(BasePromise &other) noexcept -> void {
+    std::swap(this->result, other.result);
+    std::swap(this->parentCoroutineIdentity, other.parentCoroutineIdentity);
+    std::swap(this->childCoroutine, other.childCoroutine);
+}
+
+auto coContext::BasePromise::getResult() -> std::future<std::int32_t> { return this->result.get_future(); }
+
+auto coContext::BasePromise::setResult(const std::int32_t result) -> void {
+    this->result = std::promise<std::int32_t>{};
+    this->result.set_value(result);
+}
+
+auto coContext::BasePromise::getParentCoroutineIdentity() const noexcept -> std::uint64_t {
+    return this->parentCoroutineIdentity;
+}
+
+auto coContext::BasePromise::setParentCoroutineIdentity(const std::uint64_t identity) noexcept -> void {
+    this->parentCoroutineIdentity = identity;
+}
+
+auto coContext::BasePromise::getChildCoroutine() noexcept -> Coroutine & { return this->childCoroutine; }
+
+auto coContext::BasePromise::setChildCoroutine(Coroutine &&coroutine) noexcept -> void {
+    this->childCoroutine = std::move(coroutine);
+}
+
 auto coContext::BasePromise::initial_suspend() const noexcept -> std::suspend_always { return {}; }
 
 auto coContext::BasePromise::final_suspend() const noexcept -> std::suspend_always { return {}; }
 
 auto coContext::BasePromise::unhandled_exception() const -> void { throw; }
-
-auto coContext::BasePromise::getResult() const noexcept -> std::int32_t { return this->result; }
-
-auto coContext::BasePromise::setResult(const std::int32_t result) noexcept -> void { this->result = result; }
-
-auto coContext::BasePromise::getParentCoroutine() const noexcept -> Coroutine { return this->parentCoroutine; }
-
-auto coContext::BasePromise::setParentCoroutine(const Coroutine parentCoroutine) noexcept -> void {
-    this->parentCoroutine = parentCoroutine;
-}
-
-auto coContext::BasePromise::getChildCoroutine() const noexcept -> Coroutine { return this->childCoroutine; }
-
-auto coContext::BasePromise::setChildCoroutine(const Coroutine childCoroutine) noexcept -> void {
-    this->childCoroutine = childCoroutine;
-}
-
-auto coContext::operator==(const BasePromise &lhs, const BasePromise &rhs) noexcept -> bool {
-    return lhs.getResult() == rhs.getResult() && lhs.getParentCoroutine() == rhs.getParentCoroutine() &&
-           lhs.getChildCoroutine() == rhs.getChildCoroutine();
-}
 
 thread_local std::pmr::polymorphic_allocator<> coContext::BasePromise::allocator{getMemoryResource()};

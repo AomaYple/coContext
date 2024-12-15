@@ -3,8 +3,6 @@
 #include "BasePromise.hpp"
 #include "BaseTask.hpp"
 
-#include <future>
-
 namespace coContext {
     template<typename T = void>
         requires std::movable<T> || std::is_lvalue_reference_v<T> || std::is_void_v<T>
@@ -13,7 +11,7 @@ namespace coContext {
         class Promise;
 
         using promise_type = Promise;
-        using Coroutine = std::coroutine_handle<Promise>;
+        using CoroutineHandle = std::coroutine_handle<Promise>;
 
         class Promise : public BasePromise {
         public:
@@ -34,7 +32,7 @@ namespace coContext {
                 std::swap(this->returnValue, other.returnValue);
             }
 
-            [[nodiscard]] constexpr auto get_return_object() { return Task{Task::Coroutine::from_promise(*this)}; }
+            [[nodiscard]] constexpr auto get_return_object() { return Task{CoroutineHandle::from_promise(*this)}; }
 
             constexpr auto return_value(T &&returnValue) { this->returnValue.set_value(std::move(returnValue)); }
 
@@ -50,9 +48,9 @@ namespace coContext {
             std::promise<T> returnValue;
         };
 
-        explicit constexpr Task(const Coroutine coroutine) :
-            BaseTask{BaseTask::Coroutine::from_address(coroutine.address())},
-            returnValue{coroutine.promise().getReturnValue()} {}
+        explicit constexpr Task(const CoroutineHandle coroutineHandle) :
+            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
+            returnValue{coroutineHandle.promise().getReturnValue()} {}
 
         Task(const Task &) = delete;
 
@@ -83,7 +81,7 @@ namespace coContext {
         class Promise;
 
         using promise_type = Promise;
-        using Coroutine = std::coroutine_handle<Promise>;
+        using CoroutineHandle = std::coroutine_handle<Promise>;
 
         class Promise : public BasePromise {
         public:
@@ -104,7 +102,7 @@ namespace coContext {
                 std::swap(this->returnValue, other.returnValue);
             }
 
-            [[nodiscard]] constexpr auto get_return_object() { return Task{Task::Coroutine::from_promise(*this)}; }
+            [[nodiscard]] constexpr auto get_return_object() { return Task{CoroutineHandle::from_promise(*this)}; }
 
             constexpr auto return_value(T &returnValue) { this->returnValue.set_value(returnValue); }
 
@@ -114,9 +112,9 @@ namespace coContext {
             std::promise<T &> returnValue;
         };
 
-        explicit constexpr Task(const Coroutine coroutine) :
-            BaseTask{BaseTask::Coroutine::from_address(coroutine.address())},
-            returnValue{coroutine.promise().getReturnValue()} {}
+        explicit constexpr Task(const CoroutineHandle coroutineHandle) :
+            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
+            returnValue{coroutineHandle.promise().getReturnValue()} {}
 
         Task(const Task &) = delete;
 
@@ -147,34 +145,50 @@ namespace coContext {
         class Promise;
 
         using promise_type = Promise;
-        using Coroutine = std::coroutine_handle<Promise>;
+        using CoroutineHandle = std::coroutine_handle<Promise>;
 
         class Promise : public BasePromise {
         public:
-            [[nodiscard]] constexpr auto get_return_object() { return Task{Task::Coroutine::from_promise(*this)}; }
+            Promise() = default;
+
+            Promise(const Promise &) = delete;
+
+            auto operator=(const Promise &) -> Promise & = delete;
+
+            Promise(Promise &&) noexcept = default;
+
+            auto operator=(Promise &&) noexcept -> Promise & = default;
+
+            ~Promise() = default;
+
+            constexpr auto swap(Promise &other) noexcept {
+                std::swap(static_cast<BasePromise &>(*this), static_cast<BasePromise &>(other));
+            }
+
+            [[nodiscard]] constexpr auto get_return_object() { return Task{CoroutineHandle::from_promise(*this)}; }
 
             constexpr auto return_void() const noexcept {}
         };
 
-        explicit constexpr Task(const Coroutine coroutine = Coroutine::from_address(std::noop_coroutine().address()))
-            noexcept : BaseTask{BaseTask::Coroutine::from_address(coroutine.address())} {}
+        explicit constexpr Task(const CoroutineHandle coroutineHandle) noexcept :
+            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}} {}
 
-        constexpr Task(const Task &) noexcept = default;
+        Task(const Task &) = delete;
 
-        constexpr auto operator=(const Task &) noexcept -> Task & = default;
+        auto operator=(const Task &) -> Task & = delete;
 
-        constexpr Task(Task &&) noexcept = default;
+        Task(Task &&) noexcept = default;
 
-        constexpr auto operator=(Task &&) noexcept -> Task & = default;
+        auto operator=(Task &&) noexcept -> Task & = default;
 
-        constexpr ~Task() = default;
+        ~Task() = default;
+
+        constexpr auto swap(Task &other) noexcept {
+            std::swap(static_cast<BaseTask &>(*this), static_cast<BaseTask &>(other));
+        }
 
         constexpr auto await_resume() const noexcept {}
     };
-
-    [[nodiscard]] auto operator==(const Task<>::Promise &lhs, const Task<>::Promise &rhs) noexcept -> bool;
-
-    [[nodiscard]] auto operator==(Task<> lhs, Task<> rhs) noexcept -> bool;
 }    // namespace coContext
 
 namespace std {
@@ -202,3 +216,13 @@ namespace std {
         lhs.swap(rhs);
     }
 }    // namespace std
+
+template<>
+constexpr auto std::swap(coContext::Task<>::Promise &lhs, coContext::Task<>::Promise &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}
+
+template<>
+constexpr auto std::swap(coContext::Task<> &lhs, coContext::Task<> &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}

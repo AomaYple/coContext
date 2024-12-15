@@ -2,20 +2,17 @@
 
 #include "coContext/coroutine/BasePromise.hpp"
 
-coContext::BaseTask::BaseTask(const Coroutine coroutine) noexcept : coroutine{coroutine} {}
+coContext::BaseTask::BaseTask(Coroutine &&coroutine) noexcept : coroutine{std::move(coroutine)} {}
 
-auto coContext::BaseTask::getCoroutine() const noexcept -> Coroutine { return this->coroutine; }
+auto coContext::BaseTask::swap(BaseTask &other) noexcept -> void { std::swap(this->coroutine, other.coroutine); }
+
+auto coContext::BaseTask::getCoroutine() noexcept -> Coroutine & { return this->coroutine; }
 
 auto coContext::BaseTask::await_ready() const noexcept -> bool { return {}; }
 
-auto coContext::BaseTask::await_suspend(const std::coroutine_handle<> coroutine) const -> void {
-    const Coroutine parentCoroutine{Coroutine::from_address(coroutine.address())};
+auto coContext::BaseTask::await_suspend(const std::coroutine_handle<> genericCoroutineHandle) -> void {
+    const auto parentCoroutineHandle{Coroutine::Handle::from_address(genericCoroutineHandle.address())};
 
-    this->coroutine.promise().setParentCoroutine(parentCoroutine);
-    parentCoroutine.promise().setChildCoroutine(this->coroutine);
+    this->coroutine.promise().setParentCoroutineIdentity(std::hash<Coroutine::Handle>{}(parentCoroutineHandle));
+    parentCoroutineHandle.promise().setChildCoroutine(std::move(this->coroutine));
 }
-
-auto coContext::operator==(const BaseTask lhs, const BaseTask rhs) noexcept -> bool {
-    return lhs.getCoroutine() == rhs.getCoroutine();
-}
-

@@ -1,25 +1,36 @@
 #pragma once
 
-#include <coroutine>
+#include "Coroutine.hpp"
 
 namespace coContext {
-    class BasePromise;
-
     class BaseTask {
     public:
-        using Coroutine = std::coroutine_handle<BasePromise>;
+        explicit BaseTask(Coroutine &&coroutine) noexcept;
 
-        explicit BaseTask(Coroutine coroutine = Coroutine::from_address(std::noop_coroutine().address())) noexcept;
+        BaseTask(const BaseTask &) = delete;
 
-        [[nodiscard]] auto getCoroutine() const noexcept -> Coroutine;
+        auto operator=(const BaseTask &) -> BaseTask & = delete;
+
+        BaseTask(BaseTask &&) noexcept = default;
+
+        auto operator=(BaseTask &&) noexcept -> BaseTask & = default;
+
+        ~BaseTask() = default;
+
+        auto swap(BaseTask &other) noexcept -> void;
+
+        [[nodiscard]] auto getCoroutine() noexcept -> Coroutine &;
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
-        auto await_suspend(std::coroutine_handle<> coroutine) const -> void;
+        auto await_suspend(std::coroutine_handle<> genericCoroutineHandle) -> void;
 
     private:
         Coroutine coroutine;
     };
-
-    [[nodiscard]] auto operator==(BaseTask lhs, BaseTask rhs) noexcept -> bool;
 }    // namespace coContext
+
+template<>
+constexpr auto std::swap(coContext::BaseTask &lhs, coContext::BaseTask &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}

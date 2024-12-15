@@ -1,16 +1,42 @@
 #pragma once
 
-#include <coroutine>
+#include "Coroutine.hpp"
+
+#include <future>
 #include <memory_resource>
 
 namespace coContext {
     class BasePromise {
-        using Coroutine = std::coroutine_handle<BasePromise>;
-
     public:
         [[nodiscard]] auto operator new(std::size_t numberOfBytes) -> void *;
 
         auto operator delete(void *pointer, std::size_t numberOfBytes) noexcept -> void;
+
+        BasePromise() = default;
+
+        BasePromise(const BasePromise &) = delete;
+
+        auto operator=(const BasePromise &) -> BasePromise & = delete;
+
+        BasePromise(BasePromise &&) noexcept = default;
+
+        auto operator=(BasePromise &&) noexcept -> BasePromise & = default;
+
+        ~BasePromise() = default;
+
+        auto swap(BasePromise &other) noexcept -> void;
+
+        [[nodiscard]] auto getResult() -> std::future<std::int32_t>;
+
+        auto setResult(std::int32_t result) -> void;
+
+        [[nodiscard]] auto getParentCoroutineIdentity() const noexcept -> std::uint64_t;
+
+        auto setParentCoroutineIdentity(std::uint64_t identity) noexcept -> void;
+
+        [[nodiscard]] auto getChildCoroutine() noexcept -> Coroutine &;
+
+        auto setChildCoroutine(Coroutine &&coroutine) noexcept -> void;
 
         [[nodiscard]] auto initial_suspend() const noexcept -> std::suspend_always;
 
@@ -18,25 +44,16 @@ namespace coContext {
 
         auto unhandled_exception() const -> void;
 
-        [[nodiscard]] auto getResult() const noexcept -> std::int32_t;
-
-        auto setResult(std::int32_t result) noexcept -> void;
-
-        [[nodiscard]] auto getParentCoroutine() const noexcept -> Coroutine;
-
-        auto setParentCoroutine(Coroutine parentCoroutine) noexcept -> void;
-
-        [[nodiscard]] auto getChildCoroutine() const noexcept -> Coroutine;
-
-        auto setChildCoroutine(Coroutine childCoroutine) noexcept -> void;
-
     private:
         static thread_local std::pmr::polymorphic_allocator<> allocator;
 
-        std::int32_t result{};
-        Coroutine parentCoroutine{Coroutine::from_address(std::noop_coroutine().address())},
-            childCoroutine{Coroutine::from_address(std::noop_coroutine().address())};
+        std::promise<std::int32_t> result;
+        std::uint64_t parentCoroutineIdentity{std::hash<Coroutine>{}(Coroutine{})};
+        Coroutine childCoroutine;
     };
-
-    [[nodiscard]] auto operator==(const BasePromise &lhs, const BasePromise &rhs) noexcept -> bool;
 }    // namespace coContext
+
+template<>
+constexpr auto std::swap(coContext::BasePromise &lhs, coContext::BasePromise &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}
