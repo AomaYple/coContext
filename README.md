@@ -148,7 +148,7 @@ auto main() -> int {
 [[nodiscard]] auto funcB() -> coContext::Task<std::int32_t> {
     std::int32_t result{co_await coContext::close(-1)};    // 发起close请求
 
-    result += co_await funcA() + co_await funcA();    // 将result加上两次funcA的返回值
+    result += co_await funcA();    // 将result加上funcA的返回值
 
     co_return result;    // 返回result
 }
