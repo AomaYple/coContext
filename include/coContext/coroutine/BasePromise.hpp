@@ -48,7 +48,7 @@ namespace coContext {
         static thread_local std::pmr::polymorphic_allocator<> allocator;
 
         std::shared_ptr<std::int32_t> result{std::allocate_shared_for_overwrite<std::int32_t>(
-            std::pmr::polymorphic_allocator<std::int32_t>(getMemoryResource()))};
+            std::pmr::polymorphic_allocator<std::int32_t>{getMemoryResource()})};
         std::uint64_t parentCoroutineIdentity{std::hash<Coroutine>{}(Coroutine{nullptr})};
         Coroutine childCoroutine{nullptr};
     };
