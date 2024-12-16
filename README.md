@@ -170,7 +170,7 @@ auto main() -> int {
 auto main() -> int {
     coContext::SpawnResult result{spawn<std::int32_t>(func)};    // 添加func，并以SpawnResult类型保存返回值
 
-    const std::jthread worker{[&result] { std::println("{}", result.result.get()); }};    // 在新线程中输出result的值
+    const std::jthread worker{[&result] { std::println("{}", *result.result); }};    // 在新线程中输出result的值
 
     coContext::run();
 }
