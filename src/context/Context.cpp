@@ -92,7 +92,8 @@ auto coContext::Context::getFileDescriptorLimit(const std::source_location sourc
         throw Exception{
             Log{Log::Level::fatal,
                 std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 

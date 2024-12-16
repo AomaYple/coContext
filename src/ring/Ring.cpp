@@ -15,7 +15,8 @@ coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) 
                 Log{Log::Level::fatal,
                     std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                      getMemoryResource()},
-                    sourceLocation}
+                    sourceLocation},
+                getMemoryResource()
             };
         }
 
@@ -47,7 +48,8 @@ auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sour
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                  getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 }
@@ -59,7 +61,8 @@ auto coContext::Ring::registerSparseFileDescriptor(const std::uint32_t count, co
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                  getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 }
@@ -74,7 +77,8 @@ auto coContext::Ring::updateFileDescriptors(const std::uint32_t offset,
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                  getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 }
@@ -87,7 +91,8 @@ auto coContext::Ring::allocateFileDescriptorRange(const std::uint32_t offset, co
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                  getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 }
@@ -100,7 +105,8 @@ auto coContext::Ring::registerCpuAffinity(const std::size_t cpuSetSize, const cp
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                  getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 }
@@ -115,7 +121,8 @@ auto coContext::Ring::setupRingBuffer(const std::uint32_t entries, const std::in
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(error), std::generic_category()}.message(),
                                  getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 
@@ -130,7 +137,8 @@ auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const 
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                  getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 }
@@ -140,7 +148,8 @@ auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceL
     if (submissionQueueEntry == nullptr) {
         throw Exception{
             Log{Log::Level::error, std::pmr::string{"no submission queue entry available"sv, getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 
@@ -153,7 +162,8 @@ auto coContext::Ring::submitAndWait(const std::uint32_t count, const std::source
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                  getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 }
@@ -189,7 +199,8 @@ auto coContext::Ring::syncCancel(io_uring_sync_cancel_reg &parameters, const std
             Log{Log::Level::warn,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                  getMemoryResource()},
-                sourceLocation}
+                sourceLocation},
+            getMemoryResource()
         };
     }
 
