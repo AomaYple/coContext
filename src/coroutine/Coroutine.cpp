@@ -22,7 +22,7 @@ coContext::Coroutine::~Coroutine() { this->destroy(); }
 
 auto coContext::Coroutine::swap(Coroutine &other) noexcept -> void { std::swap(this->handle, other.handle); }
 
-auto coContext::Coroutine::getHandle() const noexcept -> Handle { return this->handle; }
+auto coContext::Coroutine::get() const noexcept -> Handle { return this->handle; }
 
 coContext::Coroutine::operator bool() const noexcept { return static_cast<bool>(this->handle); }
 

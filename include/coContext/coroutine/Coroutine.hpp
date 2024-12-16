@@ -23,7 +23,7 @@ namespace coContext {
 
         auto swap(Coroutine &other) noexcept -> void;
 
-        [[nodiscard]] auto getHandle() const noexcept -> Handle;
+        [[nodiscard]] auto get() const noexcept -> Handle;
 
         explicit operator bool() const noexcept;
 
@@ -48,6 +48,6 @@ constexpr auto std::swap(coContext::Coroutine &lhs, coContext::Coroutine &rhs) n
 template<>
 struct std::hash<coContext::Coroutine> {
     [[nodiscard]] constexpr auto operator()(const coContext::Coroutine &coroutine) const noexcept {
-        return std::hash<coContext::Coroutine::Handle>{}(coroutine.getHandle());
+        return std::hash<coContext::Coroutine::Handle>{}(coroutine.get());
     }
 };

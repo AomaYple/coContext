@@ -1,7 +1,5 @@
 #include "coContext/coroutine/BasePromise.hpp"
 
-#include "coContext/memory/memoryResource.hpp"
-
 auto coContext::BasePromise::operator new(const std::size_t numberOfBytes) -> void * {
     return allocator.allocate_bytes(numberOfBytes);
 }
@@ -9,9 +7,6 @@ auto coContext::BasePromise::operator new(const std::size_t numberOfBytes) -> vo
 auto coContext::BasePromise::operator delete(void *const pointer, const std::size_t numberOfBytes) noexcept -> void {
     allocator.deallocate_bytes(pointer, numberOfBytes);
 }
-
-coContext::BasePromise::BasePromise(const std::pmr::polymorphic_allocator<std::int32_t> allocator) :
-    result{std::allocate_shared_for_overwrite<std::int32_t>(allocator)} {}
 
 auto coContext::BasePromise::swap(BasePromise &other) noexcept -> void {
     std::swap(this->result, other.result);

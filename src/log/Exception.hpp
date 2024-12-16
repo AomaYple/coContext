@@ -5,7 +5,7 @@
 namespace coContext {
     class Exception final : public std::exception {
     public:
-        explicit Exception(Log &&log = Log{}, std::pmr::polymorphic_allocator<char> allocator = {});
+        explicit Exception(Log &&log = Log{});
 
         auto swap(Exception &other) noexcept -> void;
 

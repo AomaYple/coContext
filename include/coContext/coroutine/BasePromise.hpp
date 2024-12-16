@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../memory/memoryResource.hpp"
 #include "Coroutine.hpp"
 
 #include <memory>
-#include <memory_resource>
 
 namespace coContext {
     class BasePromise {
@@ -12,7 +12,7 @@ namespace coContext {
 
         auto operator delete(void *, std::size_t) noexcept -> void;
 
-        explicit BasePromise(std::pmr::polymorphic_allocator<std::int32_t> allocator = {});
+        BasePromise() = default;
 
         BasePromise(const BasePromise &) = delete;
 
@@ -47,7 +47,8 @@ namespace coContext {
     private:
         static thread_local std::pmr::polymorphic_allocator<> allocator;
 
-        std::shared_ptr<std::int32_t> result;
+        std::shared_ptr<std::int32_t> result{std::allocate_shared_for_overwrite<std::int32_t>(
+            std::pmr::polymorphic_allocator<std::int32_t>(getMemoryResource()))};
         std::uint64_t parentCoroutineIdentity{std::hash<Coroutine>{}(Coroutine{nullptr})};
         Coroutine childCoroutine{nullptr};
     };

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../memory/memoryResource.hpp"
 #include "BasePromise.hpp"
 #include "BaseTask.hpp"
 
@@ -18,7 +17,7 @@ namespace coContext {
 
         class Promise : public BasePromise {
         public:
-            constexpr Promise() : BasePromise{getMemoryResource()} {};
+            constexpr Promise() = default;
 
             Promise(const Promise &) = delete;
 
@@ -88,7 +87,7 @@ namespace coContext {
 
         class Promise : public BasePromise {
         public:
-            constexpr Promise() : BasePromise{getMemoryResource()} {}
+            constexpr Promise() = default;
 
             Promise(const Promise &) = delete;
 
@@ -152,7 +151,7 @@ namespace coContext {
 
         class Promise : public BasePromise {
         public:
-            Promise() : BasePromise{getMemoryResource()} {}
+            Promise() = default;
 
             Promise(const Promise &) = delete;
 
