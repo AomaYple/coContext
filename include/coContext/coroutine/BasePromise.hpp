@@ -48,8 +48,8 @@ namespace coContext {
         static thread_local std::pmr::polymorphic_allocator<> allocator;
 
         std::shared_ptr<std::int32_t> result{std::make_shared<std::int32_t>()};
-        std::uint64_t parentCoroutineIdentity{std::hash<Coroutine>{}(Coroutine{})};
-        Coroutine childCoroutine;
+        std::uint64_t parentCoroutineIdentity{std::hash<Coroutine>{}(Coroutine{nullptr})};
+        Coroutine childCoroutine{nullptr};
     };
 }    // namespace coContext
 

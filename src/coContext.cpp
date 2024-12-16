@@ -99,7 +99,7 @@ auto coContext::timeout(AsyncWaiter &&asyncWaiter, const std::chrono::seconds se
 
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.linkTimeout(asyncWaiter.getSecondTimeSpecification(), setClockSource(clockSource));
-    submissionQueueEntry.setUserData(std::hash<Coroutine>{}(Coroutine{}));
+    submissionQueueEntry.setUserData(std::hash<Coroutine>{}(Coroutine{nullptr}));
 
     return asyncWaiter;
 }

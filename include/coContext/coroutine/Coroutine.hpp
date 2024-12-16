@@ -9,7 +9,7 @@ namespace coContext {
     public:
         using Handle = std::coroutine_handle<BasePromise>;
 
-        explicit Coroutine(Handle handle = noOperationCoroutineHandle()) noexcept;
+        explicit Coroutine(Handle handle) noexcept;
 
         Coroutine(const Coroutine &) = delete;
 
@@ -34,7 +34,7 @@ namespace coContext {
         [[nodiscard]] auto done() const noexcept -> bool;
 
     private:
-        [[nodiscard]] static auto noOperationCoroutineHandle() noexcept -> Handle;
+        auto destroy() const -> void;
 
         Handle handle;
     };

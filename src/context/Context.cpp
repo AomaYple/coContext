@@ -34,7 +34,7 @@ coContext::Context::Context() :
 
     this->ring.registerSelfFileDescriptor();
 
-    this->schedulingCoroutines.emplace(std::hash<Coroutine>{}(Coroutine{}), Coroutine{});
+    this->schedulingCoroutines.emplace(std::hash<Coroutine>{}(Coroutine{nullptr}), Coroutine{nullptr});
 }
 
 auto coContext::Context::swap(Context &other) noexcept -> void {
