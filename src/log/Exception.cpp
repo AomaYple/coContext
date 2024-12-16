@@ -1,6 +1,9 @@
 #include "Exception.hpp"
 
-coContext::Exception::Exception(Log &&log) : message{log.toString(), getMemoryResource()}, log{std::move(log)} {}
+#include "../memory/memoryResource.hpp"
+
+coContext::Exception::Exception(Log &&log) :
+    message{log.toString(getMemoryResource()), getMemoryResource()}, log{std::move(log)} {}
 
 auto coContext::Exception::swap(Exception &other) noexcept -> void {
     std::swap(this->message, other.message);

@@ -1,6 +1,7 @@
 #include "Ring.hpp"
 
 #include "../log/Exception.hpp"
+#include "../memory/memoryResource.hpp"
 
 using namespace std::string_view_literals;
 
@@ -40,19 +41,6 @@ auto coContext::Ring::swap(Ring &other) noexcept -> void { std::swap(this->handl
 
 auto coContext::Ring::getFileDescriptor() const noexcept -> std::int32_t { return this->handle.ring_fd; }
 
-auto coContext::Ring::registerCpuAffinity(const std::size_t cpuSetSize, const cpu_set_t *const cpuSet,
-                                          const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{io_uring_register_iowq_aff(std::addressof(this->handle), cpuSetSize, cpuSet)};
-        result != 0) {
-        throw Exception{
-            Log{Log::Level::error,
-                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                 getMemoryResource()},
-                sourceLocation}
-        };
-    }
-}
-
 auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_ring_fd(std::addressof(this->handle))}; result != 1) {
         throw Exception{
@@ -76,6 +64,21 @@ auto coContext::Ring::registerSparseFileDescriptor(const std::uint32_t count, co
     }
 }
 
+auto coContext::Ring::updateFileDescriptors(const std::uint32_t offset,
+                                            const std::span<const std::int32_t> fileDescriptors,
+                                            const std::source_location sourceLocation) -> void {
+    if (const std::int32_t result{io_uring_register_files_update(
+            std::addressof(this->handle), offset, std::data(fileDescriptors), std::size(fileDescriptors))};
+        result < 0) {
+        throw Exception{
+            Log{Log::Level::error,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getMemoryResource()},
+                sourceLocation}
+        };
+    }
+}
+
 auto coContext::Ring::allocateFileDescriptorRange(const std::uint32_t offset, const std::uint32_t length,
                                                   const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_file_alloc_range(std::addressof(this->handle), offset, length)};
@@ -89,12 +92,10 @@ auto coContext::Ring::allocateFileDescriptorRange(const std::uint32_t offset, co
     }
 }
 
-auto coContext::Ring::updateFileDescriptors(const std::uint32_t offset,
-                                            const std::span<const std::int32_t> fileDescriptors,
-                                            const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{io_uring_register_files_update(
-            std::addressof(this->handle), offset, std::data(fileDescriptors), std::size(fileDescriptors))};
-        result < 0) {
+auto coContext::Ring::registerCpuAffinity(const std::size_t cpuSetSize, const cpu_set_t *const cpuSet,
+                                          const std::source_location sourceLocation) -> void {
+    if (const std::int32_t result{io_uring_register_iowq_aff(std::addressof(this->handle), cpuSetSize, cpuSet)};
+        result != 0) {
         throw Exception{
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
@@ -132,21 +133,6 @@ auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const 
                 sourceLocation}
         };
     }
-}
-
-auto coContext::Ring::syncCancel(io_uring_sync_cancel_reg &parameters, const std::source_location sourceLocation)
-    -> std::int32_t {
-    const std::int32_t result{io_uring_register_sync_cancel(std::addressof(this->handle), std::addressof(parameters))};
-    if (result < 0) {
-        throw Exception{
-            Log{Log::Level::warn,
-                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                 getMemoryResource()},
-                sourceLocation}
-        };
-    }
-
-    return result;
 }
 
 auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceLocation) -> io_uring_sqe * {
@@ -193,6 +179,21 @@ auto coContext::Ring::advance(io_uring_buf_ring *const ringBuffer, const std::in
                               const std::int32_t ringBufferBufferCount) noexcept -> void {
     __io_uring_buf_ring_cq_advance(std::addressof(this->handle), ringBuffer, completionQueueEntryCount,
                                    ringBufferBufferCount);
+}
+
+auto coContext::Ring::syncCancel(io_uring_sync_cancel_reg &parameters, const std::source_location sourceLocation)
+    -> std::int32_t {
+    const std::int32_t result{io_uring_register_sync_cancel(std::addressof(this->handle), std::addressof(parameters))};
+    if (result < 0) {
+        throw Exception{
+            Log{Log::Level::warn,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getMemoryResource()},
+                sourceLocation}
+        };
+    }
+
+    return result;
 }
 
 auto coContext::Ring::destroy() noexcept -> void {

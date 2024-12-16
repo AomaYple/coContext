@@ -1,17 +1,15 @@
 #pragma once
 
-#include "../memory/memoryResource.hpp"
-
+#include <memory_resource>
 #include <source_location>
 #include <thread>
-#include <vector>
 
 namespace coContext {
     class Log {
     public:
         enum class Level : std::uint8_t { trace, debug, info, warn, error, fatal };
 
-        explicit Log(Level level = Level::info, std::pmr::string &&message = std::pmr::string{getMemoryResource()},
+        explicit Log(Level level = Level::info, std::pmr::string &&message = {},
                      std::source_location sourceLocation = std::source_location::current(),
                      std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now(),
                      std::thread::id threadId = std::this_thread::get_id());
@@ -20,9 +18,10 @@ namespace coContext {
 
         [[nodiscard]] auto getLevel() const noexcept -> Level;
 
-        [[nodiscard]] auto toString() const -> std::pmr::string;
+        [[nodiscard]] auto toString(std::pmr::polymorphic_allocator<char> allocator = {}) const -> std::pmr::string;
 
-        [[nodiscard]] auto toByte() const -> std::pmr::vector<std::byte>;
+        [[nodiscard]] auto toByte(std::pmr::polymorphic_allocator<> allocator = {}) const
+            -> std::pmr::vector<std::byte>;
 
     private:
         Level level;

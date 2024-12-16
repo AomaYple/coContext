@@ -7,7 +7,7 @@ using namespace std::string_view_literals;
 
 coContext::Log::Log(const Level level, std::pmr::string &&message, const std::source_location sourceLocation,
                     const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) :
-    level{level}, message{std::move(message), getMemoryResource()}, sourceLocation{sourceLocation},
+    level{level}, message{std::move(message), message.get_allocator()}, sourceLocation{sourceLocation},
     timestamp{timestamp}, threadId{threadId} {}
 
 auto coContext::Log::swap(Log &other) noexcept -> void {
@@ -20,7 +20,7 @@ auto coContext::Log::swap(Log &other) noexcept -> void {
 
 auto coContext::Log::getLevel() const noexcept -> Level { return this->level; }
 
-auto coContext::Log::toString() const -> std::pmr::string {
+auto coContext::Log::toString(const std::pmr::polymorphic_allocator<char> allocator) const -> std::pmr::string {
     static constexpr std::array<const std::string_view, 6> levels{"trace"sv, "debug"sv, "info"sv,
                                                                   "warn"sv,  "error"sv, "fatal"sv};
 
@@ -28,12 +28,12 @@ auto coContext::Log::toString() const -> std::pmr::string {
                                         this->timestamp, this->threadId, this->sourceLocation.file_name(),
                                         this->sourceLocation.line(), this->sourceLocation.column(),
                                         this->sourceLocation.function_name(), this->message),
-                            getMemoryResource()};
+                            allocator};
 }
 
-auto coContext::Log::toByte() const -> std::pmr::vector<std::byte> {
+auto coContext::Log::toByte(const std::pmr::polymorphic_allocator<> allocator) const -> std::pmr::vector<std::byte> {
     const auto log{this->toString()};
     const auto bytes{std::as_bytes(std::span{log})};
 
-    return {std::cbegin(bytes), std::cend(bytes), getMemoryResource()};
+    return {std::cbegin(bytes), std::cend(bytes), allocator};
 }

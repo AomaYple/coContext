@@ -24,20 +24,20 @@ namespace coContext {
 
         [[nodiscard]] auto getFileDescriptor() const noexcept -> std::int32_t;
 
-        auto registerCpuAffinity(std::size_t cpuSetSize, const cpu_set_t *cpuSet,
-                                 std::source_location sourceLocation = std::source_location::current()) -> void;
-
         auto registerSelfFileDescriptor(std::source_location sourceLocation = std::source_location::current()) -> void;
 
         auto registerSparseFileDescriptor(std::uint32_t count,
                                           std::source_location sourceLocation = std::source_location::current())
             -> void;
 
+        auto updateFileDescriptors(std::uint32_t offset, std::span<const std::int32_t> fileDescriptors,
+                                   std::source_location sourceLocation = std::source_location::current()) -> void;
+
         auto allocateFileDescriptorRange(std::uint32_t offset, std::uint32_t length,
                                          std::source_location sourceLocation = std::source_location::current()) -> void;
 
-        auto updateFileDescriptors(std::uint32_t offset, std::span<const std::int32_t> fileDescriptors,
-                                   std::source_location sourceLocation = std::source_location::current()) -> void;
+        auto registerCpuAffinity(std::size_t cpuSetSize, const cpu_set_t *cpuSet,
+                                 std::source_location sourceLocation = std::source_location::current()) -> void;
 
         [[nodiscard]] auto setupRingBuffer(std::uint32_t entries, std::int32_t id, std::uint32_t flags,
                                            std::source_location sourceLocation = std::source_location::current())
@@ -45,10 +45,6 @@ namespace coContext {
 
         auto freeRingBuffer(io_uring_buf_ring *ringBuffer, std::uint32_t entries, std::int32_t id,
                             std::source_location sourceLocation = std::source_location::current()) -> void;
-
-        [[nodiscard]] auto syncCancel(io_uring_sync_cancel_reg &parameters,
-                                      std::source_location sourceLocation = std::source_location::current())
-            -> std::int32_t;
 
         [[nodiscard]] auto
             getSubmissionQueueEntry(std::source_location sourceLocation = std::source_location::current())
@@ -64,6 +60,10 @@ namespace coContext {
 
         auto advance(io_uring_buf_ring *ringBuffer, std::int32_t completionQueueEntryCount,
                      std::int32_t ringBufferBufferCount) noexcept -> void;
+
+        [[nodiscard]] auto syncCancel(io_uring_sync_cancel_reg &parameters,
+                                      std::source_location sourceLocation = std::source_location::current())
+            -> std::int32_t;
 
     private:
         auto destroy() noexcept -> void;
