@@ -12,7 +12,7 @@ namespace coContext {
 
         auto operator delete(void *, std::size_t) noexcept -> void;
 
-        BasePromise() = default;
+        explicit BasePromise(std::pmr::polymorphic_allocator<std::int32_t> allocator = {});
 
         BasePromise(const BasePromise &) = delete;
 
@@ -47,7 +47,7 @@ namespace coContext {
     private:
         static thread_local std::pmr::polymorphic_allocator<> allocator;
 
-        std::shared_ptr<std::int32_t> result{std::make_shared<std::int32_t>()};
+        std::shared_ptr<std::int32_t> result;
         std::uint64_t parentCoroutineIdentity{std::hash<Coroutine>{}(Coroutine{nullptr})};
         Coroutine childCoroutine{nullptr};
     };
