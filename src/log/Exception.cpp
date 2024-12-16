@@ -1,7 +1,5 @@
 #include "Exception.hpp"
 
-#include "../memory/memoryResource.hpp"
-
 coContext::Exception::Exception(Log &&log, const std::pmr::polymorphic_allocator<char> allocator) :
     message{log.toString(allocator), allocator}, log{std::move(log)} {}
 

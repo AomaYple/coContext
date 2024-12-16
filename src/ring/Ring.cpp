@@ -1,7 +1,7 @@
 #include "Ring.hpp"
 
 #include "../log/Exception.hpp"
-#include "../memory/memoryResource.hpp"
+#include "coContext/memory/memoryResource.hpp"
 
 using namespace std::string_view_literals;
 
