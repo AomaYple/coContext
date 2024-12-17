@@ -372,6 +372,14 @@ auto coContext::fileAllocate(const std::int32_t fileDescriptor, const std::int32
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::getFileStatus(const std::int32_t directoryFileDescriptor, const std::string_view path,
+                              const std::int32_t flags, const std::uint32_t mask, struct statx &buffer) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.getFileStatus(directoryFileDescriptor, path, flags, mask, buffer);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::getExtendedAttribute(const std::string_view path, const std::string_view name,
                                      const std::span<char> value) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
