@@ -230,6 +230,12 @@ auto coContext::SubmissionQueueEntry::truncate(const std::int32_t fileDescriptor
     io_uring_prep_ftruncate(this->handle, fileDescriptor, length);
 }
 
+auto coContext::SubmissionQueueEntry::fileAllocate(const std::int32_t fileDescriptor, const std::int32_t mode,
+                                                   const std::uint64_t offset,
+                                                   const std::uint64_t length) const noexcept -> void {
+    io_uring_prep_fallocate(this->handle, fileDescriptor, mode, offset, length);
+}
+
 auto coContext::SubmissionQueueEntry::getExtendedAttribute(const std::string_view path, const std::string_view name,
                                                            const std::span<char> value) const noexcept -> void {
     io_uring_prep_getxattr(this->handle, std::data(name), std::data(value), std::data(path), value.size());

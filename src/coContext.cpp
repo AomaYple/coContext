@@ -364,6 +364,14 @@ auto coContext::truncate(const std::int32_t fileDescriptor, const loff_t length)
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::fileAllocate(const std::int32_t fileDescriptor, const std::int32_t mode, const std::uint64_t offset,
+                             const std::uint64_t length) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.fileAllocate(fileDescriptor, mode, offset, length);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::getExtendedAttribute(const std::string_view path, const std::string_view name,
                                      const std::span<char> value) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};

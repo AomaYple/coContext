@@ -180,6 +180,9 @@ namespace coContext {
 
     [[nodiscard]] auto truncate(std::int32_t fileDescriptor, loff_t length) -> AsyncWaiter;
 
+    [[nodiscard]] auto fileAllocate(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
+                                    std::uint64_t length) -> AsyncWaiter;
+
     [[nodiscard]] auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value)
         -> AsyncWaiter;
 
