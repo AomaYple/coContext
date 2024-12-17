@@ -36,7 +36,7 @@ namespace coContext {
 
             template<typename... Args>
                 requires std::constructible_from<T, Args...>
-            constexpr auto return_value(Args &&...args) const {
+            constexpr auto return_value(Args &&...args) const noexcept(noexcept(T{std::declval<Args>()...})) {
                 std::construct_at(this->returnValue.get(), std::forward<Args>(args)...);
             }
 
