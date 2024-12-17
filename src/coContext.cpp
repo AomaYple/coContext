@@ -97,9 +97,8 @@ auto coContext::timeout(AsyncWaiter &&asyncWaiter, const std::chrono::seconds se
     asyncWaiter.getSubmissionQueueEntry().addFlags(IOSQE_IO_LINK);
     asyncWaiter.setSecondTimeSpecification(seconds, nanoseconds);
 
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.linkTimeout(asyncWaiter.getSecondTimeSpecification(), setClockSource(clockSource));
-    submissionQueueEntry.setUserData(std::hash<Coroutine>{}(Coroutine{nullptr}));
+    context.getSubmissionQueueEntry().linkTimeout(asyncWaiter.getSecondTimeSpecification(),
+                                                  setClockSource(clockSource));
 
     return asyncWaiter;
 }

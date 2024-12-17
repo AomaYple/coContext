@@ -44,8 +44,6 @@ namespace coContext {
 
         auto scheduleUnscheduledCoroutines() -> void;
 
-        auto scheduleCoroutine(Coroutine &coroutine, std::int32_t result = {}) -> void;
-
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
         static constinit std::uint32_t cpuCode;
