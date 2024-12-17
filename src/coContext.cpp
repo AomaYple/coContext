@@ -418,3 +418,14 @@ auto coContext::fileAdvise(const std::int32_t fileDescriptor, const std::uint64_
 
     return AsyncWaiter{submissionQueueEntry};
 }
+
+auto coContext::splice(const std::int32_t inFileDescriptor, const std::int64_t inFileDescriptorOffset,
+                       const std::int32_t outFileDescriptor, const std::int64_t outFileDescriptorOffset,
+                       const std::uint32_t numberOfBytes, const std::uint32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.splice(inFileDescriptor, inFileDescriptorOffset, outFileDescriptor, outFileDescriptorOffset,
+                                numberOfBytes, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+

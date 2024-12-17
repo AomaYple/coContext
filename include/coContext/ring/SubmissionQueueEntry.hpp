@@ -150,6 +150,10 @@ namespace coContext {
         auto fileAdvise(std::int32_t fileDescriptor, std::uint64_t offset, off_t length,
                         std::int32_t advice) const noexcept -> void;
 
+        auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset, std::int32_t outFileDescriptor,
+                    std::int64_t outFileDescriptorOffset, std::uint32_t numberOfBytes,
+                    std::uint32_t flags) const noexcept -> void;
+
     private:
         io_uring_sqe *handle;
     };

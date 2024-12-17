@@ -199,4 +199,8 @@ namespace coContext {
 
     [[nodiscard]] auto fileAdvise(std::int32_t fileDescriptor, std::uint64_t offset, off_t length, std::int32_t advice)
         -> AsyncWaiter;
+
+    [[nodiscard]] auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset,
+                              std::int32_t outFileDescriptor, std::int64_t outFileDescriptorOffset,
+                              std::uint32_t numberOfBytes, std::uint32_t flags) -> AsyncWaiter;
 }    // namespace coContext
