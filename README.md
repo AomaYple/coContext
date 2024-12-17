@@ -143,6 +143,8 @@ auto main() -> int {
 #include <print>
 #include <thread>
 
+using namespace std::chrono_literals;
+
 [[nodiscard]] auto funcA() -> coContext::Task<std::int32_t> { co_return 1; }    // 该协程什么也不做，直接返回1
 
 [[nodiscard]] auto funcB() -> coContext::Task<std::int32_t> {
@@ -170,7 +172,10 @@ auto main() -> int {
 auto main() -> int {
     coContext::SpawnResult result{spawn<std::int32_t>(func)};    // 添加func，并以SpawnResult类型保存返回值
 
-    const std::jthread worker{[&result] { std::println("{}", *result.result); }};    // 在新线程中输出result的值
+    const std::jthread worker{[&result] {
+        std::this_thread::sleep_for(1s);    // 等待1秒
+        std::println("{}", *result.result);    // 在新线程中输出result的值
+    }};
 
     coContext::run();
 }
