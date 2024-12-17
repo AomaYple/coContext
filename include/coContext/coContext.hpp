@@ -62,14 +62,14 @@ namespace coContext {
 
     [[nodiscard]] auto cancelAny() -> AsyncWaiter;
 
-    [[nodiscard]] auto sleep(std::chrono::seconds seconds = {}, std::chrono::nanoseconds nanoseconds = {},
+    [[nodiscard]] auto sleep(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
                              ClockSource clockSource = {}) -> AsyncWaiter;
 
-    [[nodiscard]] auto updateSleep(std::uint64_t taskIdentity, std::chrono::seconds seconds = {},
+    [[nodiscard]] auto updateSleep(std::uint64_t taskIdentity, std::chrono::seconds seconds,
                                    std::chrono::nanoseconds nanoseconds = {}, ClockSource clockSource = {})
         -> AsyncWaiter;
 
-    [[nodiscard]] auto timeout(AsyncWaiter &&asyncWaiter, std::chrono::seconds seconds = {},
+    [[nodiscard]] auto timeout(AsyncWaiter &&asyncWaiter, std::chrono::seconds seconds,
                                std::chrono::nanoseconds nanoseconds = {}, ClockSource clockSource = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
