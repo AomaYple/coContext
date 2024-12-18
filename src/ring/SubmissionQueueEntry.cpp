@@ -281,11 +281,10 @@ auto coContext::SubmissionQueueEntry::adviseFile(const std::int32_t fileDescript
 auto coContext::SubmissionQueueEntry::splice(const std::int32_t inFileDescriptor,
                                              const std::int64_t inFileDescriptorOffset,
                                              const std::int32_t outFileDescriptor,
-                                             const std::int64_t outFileDescriptorOffset,
-                                             const std::uint32_t numberOfBytes,
+                                             const std::int64_t outFileDescriptorOffset, const std::uint32_t length,
                                              const std::uint32_t flags) const noexcept -> void {
     io_uring_prep_splice(this->handle, inFileDescriptor, inFileDescriptorOffset, outFileDescriptor,
-                         outFileDescriptorOffset, numberOfBytes, flags);
+                         outFileDescriptorOffset, length, flags);
 }
 
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
