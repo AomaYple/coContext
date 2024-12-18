@@ -109,19 +109,19 @@ auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescript
     io_uring_prep_sendmsg(this->handle, socketFileDescriptor, std::addressof(message), flags);
 }
 
-auto coContext::SubmissionQueueEntry::open(const std::string_view pathname, const std::int32_t flags,
+auto coContext::SubmissionQueueEntry::open(const std::string_view path, const std::int32_t flags,
                                            const mode_t mode) const noexcept -> void {
-    io_uring_prep_open(this->handle, std::data(pathname), flags, mode);
+    io_uring_prep_open(this->handle, std::data(path), flags, mode);
 }
 
-auto coContext::SubmissionQueueEntry::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
+auto coContext::SubmissionQueueEntry::open(const std::int32_t directoryFileDescriptor, const std::string_view path,
                                            const std::int32_t flags, const mode_t mode) const noexcept -> void {
-    io_uring_prep_openat(this->handle, directoryFileDescriptor, std::data(pathname), flags, mode);
+    io_uring_prep_openat(this->handle, directoryFileDescriptor, std::data(path), flags, mode);
 }
 
-auto coContext::SubmissionQueueEntry::open(const std::int32_t directoryFileDescriptor, const std::string_view pathname,
+auto coContext::SubmissionQueueEntry::open(const std::int32_t directoryFileDescriptor, const std::string_view path,
                                            open_how &how) const noexcept -> void {
-    io_uring_prep_openat2(this->handle, directoryFileDescriptor, std::data(pathname), std::addressof(how));
+    io_uring_prep_openat2(this->handle, directoryFileDescriptor, std::data(path), std::addressof(how));
 }
 
 auto coContext::SubmissionQueueEntry::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer,
