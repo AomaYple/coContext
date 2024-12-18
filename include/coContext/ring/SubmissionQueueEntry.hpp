@@ -1,13 +1,8 @@
 #pragma once
 
-#include <cstdint>
 #include <liburing.h>
-#include <linux/openat2.h>
 #include <span>
 #include <string_view>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
 
 namespace coContext {
     class SubmissionQueueEntry {
