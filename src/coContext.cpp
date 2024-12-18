@@ -137,6 +137,20 @@ auto coContext::setSocketOption(const std::int32_t socketFileDescriptor, const s
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::getSocketReceiveBufferUnreadDataSize(const std::int32_t socketFileDescriptor) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.commandSocket(SOCKET_URING_OP_SIOCINQ, socketFileDescriptor, 0, 0, nullptr, 0);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::getSocketSendBufferUnsentDataSize(const std::int32_t socketFileDescriptor) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.commandSocket(SOCKET_URING_OP_SIOCOUTQ, socketFileDescriptor, 0, 0, nullptr, 0);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::bind(const std::int32_t socketFileDescriptor, sockaddr &address, const socklen_t addressLength)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
