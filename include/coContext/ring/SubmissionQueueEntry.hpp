@@ -131,7 +131,7 @@ namespace coContext {
 
         auto truncate(std::int32_t fileDescriptor, loff_t length) const noexcept -> void;
 
-        auto fileAllocate(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
+        auto allocateFile(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
                           std::uint64_t length) const noexcept -> void;
 
         auto getFileStatus(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
