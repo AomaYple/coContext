@@ -256,8 +256,8 @@ auto coContext::SubmissionQueueEntry::getExtendedAttribute(const std::int32_t fi
     io_uring_prep_fgetxattr(this->handle, fileDescriptor, std::data(name), std::data(value), value.size());
 }
 
-auto coContext::SubmissionQueueEntry::setExtendedAttribute(const std::string_view name, const std::span<char> value,
-                                                           const std::string_view path,
+auto coContext::SubmissionQueueEntry::setExtendedAttribute(const std::string_view path, const std::string_view name,
+                                                           const std::span<char> value,
                                                            const std::int32_t flags) const noexcept -> void {
     io_uring_prep_setxattr(this->handle, std::data(name), std::data(value), std::data(path), flags, value.size());
 }
