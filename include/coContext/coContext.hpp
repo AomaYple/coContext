@@ -212,5 +212,5 @@ namespace coContext {
 
     [[nodiscard]] auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset,
                               std::int32_t outFileDescriptor, std::int64_t outFileDescriptorOffset,
-                              std::uint32_t numberOfBytes, std::uint32_t flags) -> AsyncWaiter;
+                              std::uint32_t length, std::uint32_t flags) -> AsyncWaiter;
 }    // namespace coContext
