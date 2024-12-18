@@ -101,7 +101,7 @@ namespace coContext {
 
         auto syncFile(std::int32_t fileDescriptor, std::uint32_t flags) const noexcept -> void;
 
-        auto syncFile(std::int32_t fileDescriptor, std::uint32_t length, std::uint64_t offset,
+        auto syncFile(std::int32_t fileDescriptor, std::uint64_t offset, std::uint32_t length,
                       std::int32_t flags) const noexcept -> void;
 
         auto link(std::string_view oldPath, std::string_view newPath, std::int32_t flags) const noexcept -> void;
