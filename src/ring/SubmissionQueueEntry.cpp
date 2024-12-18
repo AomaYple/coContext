@@ -43,11 +43,6 @@ auto coContext::SubmissionQueueEntry::linkTimeout(__kernel_timespec &timeSpecifi
     io_uring_prep_link_timeout(this->handle, std::addressof(timeSpecification), flags);
 }
 
-auto coContext::SubmissionQueueEntry::poll(const std::int32_t fileDescriptor, const std::uint32_t mask) const noexcept
-    -> void {
-    io_uring_prep_poll_add(this->handle, fileDescriptor, mask);
-}
-
 auto coContext::SubmissionQueueEntry::close(const std::int32_t fileDescriptor) const noexcept -> void {
     io_uring_prep_close(this->handle, fileDescriptor);
 }
