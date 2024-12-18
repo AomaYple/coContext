@@ -127,6 +127,16 @@ auto coContext::getSocketOption(const std::int32_t socketFileDescriptor, const s
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::setSocketOption(const std::int32_t socketFileDescriptor, const std::int32_t level,
+                                const std::int32_t optionName, void *const optionValue, const std::int32_t optionLength)
+    -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.commandSocket(SOCKET_URING_OP_SETSOCKOPT, socketFileDescriptor, level, optionName, optionValue,
+                                       optionLength);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::bind(const std::int32_t socketFileDescriptor, sockaddr &address, const socklen_t addressLength)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
