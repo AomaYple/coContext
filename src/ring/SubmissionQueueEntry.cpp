@@ -85,9 +85,9 @@ auto coContext::SubmissionQueueEntry::receive(const std::int32_t socketFileDescr
     io_uring_prep_recv(this->handle, socketFileDescriptor, std::data(buffer), std::size(buffer), flags);
 }
 
-auto coContext::SubmissionQueueEntry::receive(const std::int32_t fileDescriptor, msghdr &message,
+auto coContext::SubmissionQueueEntry::receive(const std::int32_t socketFileDescriptor, msghdr &message,
                                               const std::uint32_t flags) const noexcept -> void {
-    io_uring_prep_recvmsg(this->handle, fileDescriptor, std::addressof(message), flags);
+    io_uring_prep_recvmsg(this->handle, socketFileDescriptor, std::addressof(message), flags);
 }
 
 auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescriptor,
