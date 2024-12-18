@@ -135,7 +135,7 @@ auto coContext::getSocketOption(const std::int32_t socketFileDescriptor, const s
                                 const std::int32_t optionName, void *const optionValue, const std::int32_t optionLength)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.commandSocket(SOCKET_URING_OP_GETSOCKOPT, socketFileDescriptor, level, optionName, optionValue,
+    submissionQueueEntry.socketCommand(SOCKET_URING_OP_GETSOCKOPT, socketFileDescriptor, level, optionName, optionValue,
                                        optionLength);
 
     return AsyncWaiter{submissionQueueEntry};
@@ -145,7 +145,7 @@ auto coContext::setSocketOption(const std::int32_t socketFileDescriptor, const s
                                 const std::int32_t optionName, void *const optionValue, const std::int32_t optionLength)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.commandSocket(SOCKET_URING_OP_SETSOCKOPT, socketFileDescriptor, level, optionName, optionValue,
+    submissionQueueEntry.socketCommand(SOCKET_URING_OP_SETSOCKOPT, socketFileDescriptor, level, optionName, optionValue,
                                        optionLength);
 
     return AsyncWaiter{submissionQueueEntry};
@@ -153,14 +153,14 @@ auto coContext::setSocketOption(const std::int32_t socketFileDescriptor, const s
 
 auto coContext::getSocketReceiveBufferUnreadDataSize(const std::int32_t socketFileDescriptor) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.commandSocket(SOCKET_URING_OP_SIOCINQ, socketFileDescriptor, 0, 0, nullptr, 0);
+    submissionQueueEntry.socketCommand(SOCKET_URING_OP_SIOCINQ, socketFileDescriptor, 0, 0, nullptr, 0);
 
     return AsyncWaiter{submissionQueueEntry};
 }
 
 auto coContext::getSocketSendBufferUnsentDataSize(const std::int32_t socketFileDescriptor) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.commandSocket(SOCKET_URING_OP_SIOCOUTQ, socketFileDescriptor, 0, 0, nullptr, 0);
+    submissionQueueEntry.socketCommand(SOCKET_URING_OP_SIOCOUTQ, socketFileDescriptor, 0, 0, nullptr, 0);
 
     return AsyncWaiter{submissionQueueEntry};
 }

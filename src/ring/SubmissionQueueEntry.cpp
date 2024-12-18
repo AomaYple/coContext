@@ -64,7 +64,7 @@ auto coContext::SubmissionQueueEntry::socket(const std::int32_t domain, const st
     io_uring_prep_socket(this->handle, domain, type, protocol, flags);
 }
 
-auto coContext::SubmissionQueueEntry::commandSocket(const std::int32_t operation,
+auto coContext::SubmissionQueueEntry::socketCommand(const std::int32_t operation,
                                                     const std::int32_t socketFileDescriptor, const std::int32_t level,
                                                     const std::int32_t optionName, void *const optionValue,
                                                     const std::int32_t optionLength) const noexcept -> void {
