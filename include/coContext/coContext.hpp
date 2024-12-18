@@ -219,4 +219,7 @@ namespace coContext {
 
     [[nodiscard]] auto wait(idtype_t idType, id_t id, siginfo_t *signalInformation, std::int32_t options)
         -> AsyncWaiter;
+
+    [[nodiscard]] auto waitFutex(std::uint32_t &futex, std::uint64_t value, std::uint64_t mask, std::uint32_t flags)
+        -> AsyncWaiter;
 }    // namespace coContext

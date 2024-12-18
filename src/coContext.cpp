@@ -459,3 +459,11 @@ auto coContext::wait(const idtype_t idType, const id_t id, siginfo_t *const sign
 
     return AsyncWaiter{submissionQueueEntry};
 }
+
+auto coContext::waitFutex(std::uint32_t &futex, const std::uint64_t value, const std::uint64_t mask,
+                          const std::uint32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.waitFutex(futex, value, mask, flags, 0);
+
+    return AsyncWaiter{submissionQueueEntry};
+}

@@ -299,6 +299,12 @@ auto coContext::SubmissionQueueEntry::wait(const idtype_t idType, const id_t id,
     io_uring_prep_waitid(this->handle, idType, id, signalInformation, options, flags);
 }
 
+auto coContext::SubmissionQueueEntry::waitFutex(std::uint32_t &futex, const std::uint64_t value,
+                                                const std::uint64_t mask, const std::uint32_t futexFlags,
+                                                const std::uint32_t flags) const noexcept -> void {
+    io_uring_prep_futex_wait(this->handle, std::addressof(futex), value, mask, futexFlags, flags);
+}
+
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
     return lhs.get() == rhs.get();
 }

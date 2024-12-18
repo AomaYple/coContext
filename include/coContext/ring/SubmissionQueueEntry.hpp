@@ -167,6 +167,9 @@ namespace coContext {
         auto wait(idtype_t idType, id_t id, siginfo_t *signalInformation, std::int32_t options,
                   std::uint32_t flags) const noexcept -> void;
 
+        auto waitFutex(std::uint32_t &futex, std::uint64_t value, std::uint64_t mask, std::uint32_t futexFlags,
+                       std::uint32_t flags) const noexcept -> void;
+
     private:
         io_uring_sqe *handle;
     };
