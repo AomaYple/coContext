@@ -71,6 +71,11 @@ auto coContext::SubmissionQueueEntry::socketCommand(const std::int32_t operation
     io_uring_prep_cmd_sock(this->handle, operation, socketFileDescriptor, level, optionName, optionValue, optionLength);
 }
 
+auto coContext::SubmissionQueueEntry::discardCommand(const std::int32_t fileDescriptor, const std::uint64_t offset,
+                                                     const std::uint64_t length) const noexcept -> void {
+    io_uring_prep_cmd_discard(this->handle, fileDescriptor, offset, length);
+}
+
 auto coContext::SubmissionQueueEntry::bind(const std::int32_t socketFileDescriptor, sockaddr &address,
                                            const socklen_t addressLength) const noexcept -> void {
     io_uring_prep_bind(this->handle, socketFileDescriptor, std::addressof(address), addressLength);

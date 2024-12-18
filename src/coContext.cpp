@@ -165,6 +165,14 @@ auto coContext::getSocketSendBufferUnsentDataSize(const std::int32_t socketFileD
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::discardData(const std::int32_t fileDescriptor, const std::uint64_t offset, const std::uint64_t length)
+    -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.discardCommand(fileDescriptor, offset, length);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::bind(const std::int32_t socketFileDescriptor, sockaddr &address, const socklen_t addressLength)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};

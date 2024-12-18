@@ -114,6 +114,9 @@ namespace coContext {
 
     [[nodiscard]] auto getSocketSendBufferUnsentDataSize(std::int32_t socketFileDescriptor) -> AsyncWaiter;
 
+    [[nodiscard]] auto discardData(std::int32_t fileDescriptor, std::uint64_t offset, std::uint64_t length)
+        -> AsyncWaiter;
+
     [[nodiscard]] auto bind(std::int32_t socketFileDescriptor, sockaddr &address, socklen_t addressLength)
         -> AsyncWaiter;
 

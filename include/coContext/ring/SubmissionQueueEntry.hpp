@@ -58,6 +58,9 @@ namespace coContext {
                            std::int32_t optionName, void *optionValue, std::int32_t optionLength) const noexcept
             -> void;
 
+        auto discardCommand(std::int32_t fileDescriptor, std::uint64_t offset, std::uint64_t length) const noexcept
+            -> void;
+
         auto bind(std::int32_t socketFileDescriptor, sockaddr &address, socklen_t addressLength) const noexcept -> void;
 
         auto listen(std::int32_t socketFileDescriptor, std::int32_t backlog) const noexcept -> void;
