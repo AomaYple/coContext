@@ -1,8 +1,13 @@
 #pragma once
 
-#include <liburing.h>
+#include <cstdint>
+#include <liburing/io_uring.h>
+#include <linux/openat2.h>
 #include <span>
 #include <string_view>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 
 namespace coContext {
     class SubmissionQueueEntry {
@@ -164,8 +169,6 @@ namespace coContext {
 
         auto waitFutex(std::uint32_t &futex, std::uint64_t value, std::uint64_t mask, std::uint32_t futexFlags,
                        std::uint32_t flags) const noexcept -> void;
-
-        auto waitFutex(std::span<futex_waitv> futex, std::uint32_t flags) const noexcept -> void;
 
         auto wakeFutex(std::uint32_t &futex, std::uint64_t value, std::uint64_t mask, std::uint32_t futexFlags,
                        std::uint32_t flags) const noexcept -> void;
