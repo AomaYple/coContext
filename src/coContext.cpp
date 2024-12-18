@@ -445,8 +445,8 @@ auto coContext::adviseMemory(const std::span<std::byte> buffer, const std::int32
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::wait(const idtype_t idType, const id_t id, siginfo_t &signalInformation, const std::int32_t options)
-    -> AsyncWaiter {
+auto coContext::wait(const idtype_t idType, const id_t id, siginfo_t *const signalInformation,
+                     const std::int32_t options) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.wait(idType, id, signalInformation, options, 0);
 

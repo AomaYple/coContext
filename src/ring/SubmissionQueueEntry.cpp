@@ -287,10 +287,10 @@ auto coContext::SubmissionQueueEntry::adviseMemory(const std::span<std::byte> bu
     io_uring_prep_madvise64(this->handle, std::data(buffer), static_cast<off_t>(std::size(buffer)), advice);
 }
 
-auto coContext::SubmissionQueueEntry::wait(const idtype_t idType, const id_t id, siginfo_t &signalInformation,
+auto coContext::SubmissionQueueEntry::wait(const idtype_t idType, const id_t id, siginfo_t *const signalInformation,
                                            const std::int32_t options, const std::uint32_t flags) const noexcept
     -> void {
-    io_uring_prep_waitid(this->handle, idType, id, std::addressof(signalInformation), options, flags);
+    io_uring_prep_waitid(this->handle, idType, id, signalInformation, options, flags);
 }
 
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {

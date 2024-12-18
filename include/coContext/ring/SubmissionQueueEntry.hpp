@@ -161,7 +161,7 @@ namespace coContext {
 
         auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) const noexcept -> void;
 
-        auto wait(idtype_t idType, id_t id, siginfo_t &signalInformation, std::int32_t options,
+        auto wait(idtype_t idType, id_t id, siginfo_t *signalInformation, std::int32_t options,
                   std::uint32_t flags) const noexcept -> void;
 
     private:
