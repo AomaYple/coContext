@@ -412,9 +412,9 @@ auto coContext::setExtendedAttribute(const std::int32_t fileDescriptor, const st
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::memoryAdvise(const std::span<std::byte> buffer, const std::int32_t advice) -> AsyncWaiter {
+auto coContext::adviseMemory(const std::span<std::byte> buffer, const std::int32_t advice) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.memoryAdvise(buffer, advice);
+    submissionQueueEntry.adviseMemory(buffer, advice);
 
     return AsyncWaiter{submissionQueueEntry};
 }
