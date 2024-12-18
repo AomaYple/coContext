@@ -78,7 +78,8 @@ namespace coContext {
         auto open(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
                   mode_t mode) const noexcept -> void;
 
-        auto open(std::int32_t directoryFileDescriptor, std::string_view path, open_how &how) const noexcept -> void;
+        auto open(std::int32_t directoryFileDescriptor, std::string_view path, open_how &openHow) const noexcept
+            -> void;
 
         auto read(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::uint64_t offset) const noexcept
             -> void;

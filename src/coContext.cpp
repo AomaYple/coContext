@@ -216,10 +216,10 @@ auto coContext::open(const std::int32_t directoryFileDescriptor, const std::stri
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::open(const std::int32_t directoryFileDescriptor, const std::string_view path, open_how &how)
+auto coContext::open(const std::int32_t directoryFileDescriptor, const std::string_view path, open_how &openHow)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.open(directoryFileDescriptor, path, how);
+    submissionQueueEntry.open(directoryFileDescriptor, path, openHow);
 
     return AsyncWaiter{submissionQueueEntry};
 }

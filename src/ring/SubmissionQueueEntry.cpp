@@ -120,8 +120,8 @@ auto coContext::SubmissionQueueEntry::open(const std::int32_t directoryFileDescr
 }
 
 auto coContext::SubmissionQueueEntry::open(const std::int32_t directoryFileDescriptor, const std::string_view path,
-                                           open_how &how) const noexcept -> void {
-    io_uring_prep_openat2(this->handle, directoryFileDescriptor, std::data(path), std::addressof(how));
+                                           open_how &openHow) const noexcept -> void {
+    io_uring_prep_openat2(this->handle, directoryFileDescriptor, std::data(path), std::addressof(openHow));
 }
 
 auto coContext::SubmissionQueueEntry::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer,
