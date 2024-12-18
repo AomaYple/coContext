@@ -99,8 +99,10 @@ namespace coContext {
         auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
                    std::int32_t flags) const noexcept -> void;
 
-        auto syncFile(std::int32_t fileDescriptor, std::uint32_t flags, std::uint64_t offset,
-                      std::uint32_t length) const noexcept -> void;
+        auto syncFile(std::int32_t fileDescriptor, std::uint32_t flags) const noexcept -> void;
+
+        auto syncFile(std::int32_t fileDescriptor, std::uint32_t length, std::uint64_t offset,
+                      std::int32_t flags) const noexcept -> void;
 
         auto link(std::string_view oldPath, std::string_view newPath, std::int32_t flags) const noexcept -> void;
 

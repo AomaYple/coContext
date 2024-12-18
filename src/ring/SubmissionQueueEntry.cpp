@@ -156,13 +156,15 @@ auto coContext::SubmissionQueueEntry::write(const std::int32_t fileDescriptor, c
     io_uring_prep_writev2(this->handle, fileDescriptor, std::data(buffer), std::size(buffer), offset, flags);
 }
 
-auto coContext::SubmissionQueueEntry::syncFile(const std::int32_t fileDescriptor, const std::uint32_t flags,
-                                               const std::uint64_t offset, const std::uint32_t length) const noexcept
-    -> void {
+auto coContext::SubmissionQueueEntry::syncFile(const std::int32_t fileDescriptor,
+                                               const std::uint32_t flags) const noexcept -> void {
     io_uring_prep_fsync(this->handle, fileDescriptor, flags);
+}
 
-    this->handle->off = offset;
-    this->handle->len = length;
+auto coContext::SubmissionQueueEntry::syncFile(const std::int32_t fileDescriptor, const std::uint32_t length,
+                                               const std::uint64_t offset, const std::int32_t flags) const noexcept
+    -> void {
+    io_uring_prep_sync_file_range(this->handle, fileDescriptor, length, offset, flags);
 }
 
 auto coContext::SubmissionQueueEntry::link(const std::string_view oldPath, const std::string_view newPath,

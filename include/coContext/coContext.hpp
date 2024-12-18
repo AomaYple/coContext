@@ -153,8 +153,10 @@ namespace coContext {
     [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
                              std::int32_t flags) -> AsyncWaiter;
 
-    [[nodiscard]] auto syncFile(std::int32_t fileDescriptor, bool isSyncMetadata = true, std::uint64_t offset = {},
-                                std::uint32_t length = {}) -> AsyncWaiter;
+    [[nodiscard]] auto syncFile(std::int32_t fileDescriptor, bool isSyncMetadata = true) -> AsyncWaiter;
+
+    [[nodiscard]] auto syncFile(std::int32_t fileDescriptor, std::uint32_t length, std::uint64_t offset,
+                                std::int32_t flags) -> AsyncWaiter;
 
     [[nodiscard]] auto link(std::string_view oldPath, std::string_view newPath) -> AsyncWaiter;
 
