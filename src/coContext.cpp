@@ -279,10 +279,10 @@ auto coContext::syncFile(const std::int32_t fileDescriptor, const bool isSyncMet
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::syncFile(const std::int32_t fileDescriptor, const std::uint32_t length, const std::uint64_t offset,
-                         const std::int32_t flags) -> AsyncWaiter {
+auto coContext::syncFile(const std::int32_t fileDescriptor, const std::uint64_t offset,
+                         const std::uint32_t numberOfBytes, const std::int32_t flags) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.syncFile(fileDescriptor, length, offset, flags);
+    submissionQueueEntry.syncFile(fileDescriptor, numberOfBytes, offset, flags);
 
     return AsyncWaiter{submissionQueueEntry};
 }

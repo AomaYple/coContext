@@ -155,7 +155,7 @@ namespace coContext {
 
     [[nodiscard]] auto syncFile(std::int32_t fileDescriptor, bool isSyncMetadata = true) -> AsyncWaiter;
 
-    [[nodiscard]] auto syncFile(std::int32_t fileDescriptor, std::uint32_t length, std::uint64_t offset,
+    [[nodiscard]] auto syncFile(std::int32_t fileDescriptor, std::uint64_t offset, std::uint32_t numberOfBytes,
                                 std::int32_t flags) -> AsyncWaiter;
 
     [[nodiscard]] auto link(std::string_view oldPath, std::string_view newPath) -> AsyncWaiter;
