@@ -145,7 +145,7 @@ namespace coContext {
         auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name,
                                   std::span<char> value) const noexcept -> void;
 
-        auto setExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value,
+        auto setExtendedAttribute(std::string_view name, std::span<char> value, std::string_view path,
                                   std::int32_t flags) const noexcept -> void;
 
         auto setExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value,
