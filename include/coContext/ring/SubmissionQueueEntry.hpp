@@ -49,6 +49,10 @@ namespace coContext {
         auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol, std::uint32_t flags) const noexcept
             -> void;
 
+        auto commandSocket(std::int32_t operation, std::int32_t socketFileDescriptor, std::int32_t level,
+                           std::int32_t optionName, void *optionValue, std::int32_t optionLength) const noexcept
+            -> void;
+
         auto bind(std::int32_t socketFileDescriptor, sockaddr &address, socklen_t addressLength) const noexcept -> void;
 
         auto listen(std::int32_t socketFileDescriptor, std::int32_t backlog) const noexcept -> void;
