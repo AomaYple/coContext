@@ -170,6 +170,21 @@ namespace coContext {
     [[nodiscard]] auto allocateFile(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
                                     std::uint64_t length) -> AsyncWaiter;
 
+    [[nodiscard]] auto getFileStatus(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
+                                     std::uint32_t mask, struct statx &buffer) -> AsyncWaiter;
+
+    [[nodiscard]] auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value)
+        -> AsyncWaiter;
+
+    [[nodiscard]] auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value)
+        -> AsyncWaiter;
+
+    [[nodiscard]] auto setExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value,
+                                            std::int32_t flags) -> AsyncWaiter;
+
+    [[nodiscard]] auto setExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value,
+                                            std::int32_t flags) -> AsyncWaiter;
+
     [[nodiscard]] auto makeDirectory(std::string_view path, mode_t mode) -> AsyncWaiter;
 
     [[nodiscard]] auto makeDirectory(std::int32_t directoryFileDescriptor, std::string_view path, mode_t mode)
@@ -196,21 +211,6 @@ namespace coContext {
 
     [[nodiscard]] auto unlink(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags)
         -> AsyncWaiter;
-
-    [[nodiscard]] auto getFileStatus(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
-                                     std::uint32_t mask, struct statx &buffer) -> AsyncWaiter;
-
-    [[nodiscard]] auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value)
-        -> AsyncWaiter;
-
-    [[nodiscard]] auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value)
-        -> AsyncWaiter;
-
-    [[nodiscard]] auto setExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value,
-                                            std::int32_t flags) -> AsyncWaiter;
-
-    [[nodiscard]] auto setExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value,
-                                            std::int32_t flags) -> AsyncWaiter;
 
     [[nodiscard]] auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) -> AsyncWaiter;
 }    // namespace coContext

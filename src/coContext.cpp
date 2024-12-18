@@ -320,6 +320,46 @@ auto coContext::allocateFile(const std::int32_t fileDescriptor, const std::int32
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::getFileStatus(const std::int32_t directoryFileDescriptor, const std::string_view path,
+                              const std::int32_t flags, const std::uint32_t mask, struct statx &buffer) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.getFileStatus(directoryFileDescriptor, path, flags, mask, buffer);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::getExtendedAttribute(const std::string_view path, const std::string_view name,
+                                     const std::span<char> value) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.getExtendedAttribute(path, name, value);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::getExtendedAttribute(const std::int32_t fileDescriptor, const std::string_view name,
+                                     const std::span<char> value) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.getExtendedAttribute(fileDescriptor, name, value);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::setExtendedAttribute(const std::string_view path, const std::string_view name,
+                                     const std::span<char> value, const std::int32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.setExtendedAttribute(path, name, value, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::setExtendedAttribute(const std::int32_t fileDescriptor, const std::string_view name,
+                                     const std::span<char> value, const std::int32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.setExtendedAttribute(fileDescriptor, name, value, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::makeDirectory(const std::string_view path, const mode_t mode) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.makeDirectory(path, mode);
@@ -393,46 +433,6 @@ auto coContext::unlink(const std::int32_t directoryFileDescriptor, const std::st
                        const std::int32_t flags) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.unlink(directoryFileDescriptor, path, flags);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::getFileStatus(const std::int32_t directoryFileDescriptor, const std::string_view path,
-                              const std::int32_t flags, const std::uint32_t mask, struct statx &buffer) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.getFileStatus(directoryFileDescriptor, path, flags, mask, buffer);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::getExtendedAttribute(const std::string_view path, const std::string_view name,
-                                     const std::span<char> value) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.getExtendedAttribute(path, name, value);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::getExtendedAttribute(const std::int32_t fileDescriptor, const std::string_view name,
-                                     const std::span<char> value) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.getExtendedAttribute(fileDescriptor, name, value);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::setExtendedAttribute(const std::string_view path, const std::string_view name,
-                                     const std::span<char> value, const std::int32_t flags) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.setExtendedAttribute(path, name, value, flags);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::setExtendedAttribute(const std::int32_t fileDescriptor, const std::string_view name,
-                                     const std::span<char> value, const std::int32_t flags) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.setExtendedAttribute(fileDescriptor, name, value, flags);
 
     return AsyncWaiter{submissionQueueEntry};
 }

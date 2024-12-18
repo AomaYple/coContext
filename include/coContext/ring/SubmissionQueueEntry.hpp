@@ -116,6 +116,21 @@ namespace coContext {
         auto allocateFile(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
                           std::uint64_t length) const noexcept -> void;
 
+        auto getFileStatus(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
+                           std::uint32_t mask, struct statx &buffer) const noexcept -> void;
+
+        auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value) const noexcept
+            -> void;
+
+        auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name,
+                                  std::span<char> value) const noexcept -> void;
+
+        auto setExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value,
+                                  std::int32_t flags) const noexcept -> void;
+
+        auto setExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value,
+                                  std::int32_t flags) const noexcept -> void;
+
         auto makeDirectory(std::string_view path, mode_t mode) const noexcept -> void;
 
         auto makeDirectory(std::int32_t directoryFileDescriptor, std::string_view path, mode_t mode) const noexcept
@@ -142,21 +157,6 @@ namespace coContext {
 
         auto unlink(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags) const noexcept
             -> void;
-
-        auto getFileStatus(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
-                           std::uint32_t mask, struct statx &buffer) const noexcept -> void;
-
-        auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value) const noexcept
-            -> void;
-
-        auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name,
-                                  std::span<char> value) const noexcept -> void;
-
-        auto setExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value,
-                                  std::int32_t flags) const noexcept -> void;
-
-        auto setExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value,
-                                  std::int32_t flags) const noexcept -> void;
 
         auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) const noexcept -> void;
 
