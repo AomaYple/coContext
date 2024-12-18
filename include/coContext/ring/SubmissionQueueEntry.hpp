@@ -108,6 +108,8 @@ namespace coContext {
         auto syncFile(std::int32_t fileDescriptor, std::uint64_t offset, std::uint32_t length,
                       std::int32_t flags) const noexcept -> void;
 
+        auto truncate(std::int32_t fileDescriptor, loff_t length) const noexcept -> void;
+
         auto makeDirectory(std::string_view path, mode_t mode) const noexcept -> void;
 
         auto makeDirectory(std::int32_t directoryFileDescriptor, std::string_view path, mode_t mode) const noexcept
@@ -134,8 +136,6 @@ namespace coContext {
 
         auto unlink(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags) const noexcept
             -> void;
-
-        auto truncate(std::int32_t fileDescriptor, loff_t length) const noexcept -> void;
 
         auto allocateFile(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
                           std::uint64_t length) const noexcept -> void;

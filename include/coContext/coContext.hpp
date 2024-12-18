@@ -162,6 +162,8 @@ namespace coContext {
     [[nodiscard]] auto syncFile(std::int32_t fileDescriptor, std::uint64_t offset, std::uint32_t length,
                                 std::int32_t flags) -> AsyncWaiter;
 
+    [[nodiscard]] auto truncate(std::int32_t fileDescriptor, loff_t length) -> AsyncWaiter;
+
     [[nodiscard]] auto makeDirectory(std::string_view path, mode_t mode) -> AsyncWaiter;
 
     [[nodiscard]] auto makeDirectory(std::int32_t directoryFileDescriptor, std::string_view path, mode_t mode)
@@ -188,8 +190,6 @@ namespace coContext {
 
     [[nodiscard]] auto unlink(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags)
         -> AsyncWaiter;
-
-    [[nodiscard]] auto truncate(std::int32_t fileDescriptor, loff_t length) -> AsyncWaiter;
 
     [[nodiscard]] auto allocateFile(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
                                     std::uint64_t length) -> AsyncWaiter;

@@ -176,6 +176,11 @@ auto coContext::SubmissionQueueEntry::syncFile(const std::int32_t fileDescriptor
     io_uring_prep_sync_file_range(this->handle, fileDescriptor, length, offset, flags);
 }
 
+auto coContext::SubmissionQueueEntry::truncate(const std::int32_t fileDescriptor, const loff_t length) const noexcept
+    -> void {
+    io_uring_prep_ftruncate(this->handle, fileDescriptor, length);
+}
+
 auto coContext::SubmissionQueueEntry::makeDirectory(const std::string_view path, const mode_t mode) const noexcept
     -> void {
     io_uring_prep_mkdir(this->handle, std::data(path), mode);
@@ -234,11 +239,6 @@ auto coContext::SubmissionQueueEntry::unlink(const std::string_view path, const 
 auto coContext::SubmissionQueueEntry::unlink(const std::int32_t directoryFileDescriptor, const std::string_view path,
                                              const std::int32_t flags) const noexcept -> void {
     io_uring_prep_unlinkat(this->handle, directoryFileDescriptor, std::data(path), flags);
-}
-
-auto coContext::SubmissionQueueEntry::truncate(const std::int32_t fileDescriptor, const loff_t length) const noexcept
-    -> void {
-    io_uring_prep_ftruncate(this->handle, fileDescriptor, length);
 }
 
 auto coContext::SubmissionQueueEntry::allocateFile(const std::int32_t fileDescriptor, const std::int32_t mode,
