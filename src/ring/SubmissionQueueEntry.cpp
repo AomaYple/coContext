@@ -98,15 +98,15 @@ auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescript
 
 auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescriptor,
                                            const std::span<const std::byte> buffer, const std::int32_t flags,
-                                           const sockaddr *const address, const socklen_t addressLength) const noexcept
-    -> void {
-    io_uring_prep_sendto(this->handle, socketFileDescriptor, std::data(buffer), std::size(buffer), flags, address,
-                         addressLength);
+                                           const sockaddr *const destinationAddress,
+                                           const socklen_t destinationAddressLength) const noexcept -> void {
+    io_uring_prep_sendto(this->handle, socketFileDescriptor, std::data(buffer), std::size(buffer), flags,
+                         destinationAddress, destinationAddressLength);
 }
 
-auto coContext::SubmissionQueueEntry::send(const std::int32_t fileDescriptor, const msghdr &message,
+auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescriptor, const msghdr &message,
                                            const std::uint32_t flags) const noexcept -> void {
-    io_uring_prep_sendmsg(this->handle, fileDescriptor, std::addressof(message), flags);
+    io_uring_prep_sendmsg(this->handle, socketFileDescriptor, std::addressof(message), flags);
 }
 
 auto coContext::SubmissionQueueEntry::open(const std::string_view path, const std::int32_t flags,
