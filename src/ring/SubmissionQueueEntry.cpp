@@ -74,9 +74,9 @@ auto coContext::SubmissionQueueEntry::connect(const std::int32_t socketFileDescr
     io_uring_prep_connect(this->handle, socketFileDescriptor, address, addressLength);
 }
 
-auto coContext::SubmissionQueueEntry::shutdown(const std::int32_t fileDescriptor, const std::int32_t how) const noexcept
-    -> void {
-    io_uring_prep_shutdown(this->handle, fileDescriptor, how);
+auto coContext::SubmissionQueueEntry::shutdown(const std::int32_t socketFileDescriptor,
+                                               const std::int32_t how) const noexcept -> void {
+    io_uring_prep_shutdown(this->handle, socketFileDescriptor, how);
 }
 
 auto coContext::SubmissionQueueEntry::receive(const std::int32_t socketFileDescriptor,
