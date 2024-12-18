@@ -139,7 +139,7 @@ namespace coContext {
         auto getFileStatus(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
                            std::uint32_t mask, struct statx &buffer) const noexcept -> void;
 
-        auto getExtendedAttribute(std::string_view name, std::span<char> value, std::string_view path) const noexcept
+        auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value) const noexcept
             -> void;
 
         auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name,
