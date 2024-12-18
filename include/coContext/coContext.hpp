@@ -224,4 +224,7 @@ namespace coContext {
         -> AsyncWaiter;
 
     [[nodiscard]] auto waitFutex(std::span<futex_waitv> futex) -> AsyncWaiter;
+
+    [[nodiscard]] auto wakeFutex(std::uint32_t &futex, std::uint64_t value, std::uint64_t mask, std::uint32_t flags)
+        -> AsyncWaiter;
 }    // namespace coContext
