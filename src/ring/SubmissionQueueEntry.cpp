@@ -118,6 +118,12 @@ auto coContext::SubmissionQueueEntry::splice(const std::int32_t inFileDescriptor
                          outFileDescriptorOffset, length, flags);
 }
 
+auto coContext::SubmissionQueueEntry::tee(const std::int32_t inFileDescriptor, const std::int32_t outFileDescriptor,
+                                          const std::uint32_t length, const std::uint32_t flags) const noexcept
+    -> void {
+    io_uring_prep_tee(this->handle, inFileDescriptor, outFileDescriptor, length, flags);
+}
+
 auto coContext::SubmissionQueueEntry::open(const std::string_view path, const std::int32_t flags,
                                            const mode_t mode) const noexcept -> void {
     io_uring_prep_open(this->handle, std::data(path), flags, mode);

@@ -131,6 +131,9 @@ namespace coContext {
                               std::int32_t outFileDescriptor, std::int64_t outFileDescriptorOffset,
                               std::uint32_t length, std::uint32_t flags) -> AsyncWaiter;
 
+    [[nodiscard]] auto tee(std::int32_t inFileDescriptor, std::int32_t outFileDescriptor, std::uint32_t length,
+                           std::uint32_t flags) -> AsyncWaiter;
+
     [[nodiscard]] auto open(std::string_view path, std::int32_t flags, mode_t mode = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,

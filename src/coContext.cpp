@@ -211,6 +211,14 @@ auto coContext::splice(const std::int32_t inFileDescriptor, const std::int64_t i
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::tee(const std::int32_t inFileDescriptor, const std::int32_t outFileDescriptor,
+                    const std::uint32_t length, const std::uint32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.tee(inFileDescriptor, outFileDescriptor, length, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::open(const std::string_view path, const std::int32_t flags, const mode_t mode) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.open(path, flags, mode);
