@@ -43,6 +43,7 @@ auto main() -> int {
 - [CMake](https://cmake.org) >= 3.30
 - [Ninja](https://ninja-build.org) >= 1.8.2
 - [liburing](https://github.com/axboe/liburing) >= 2.7
+- [mimalloc](https://github.com/microsoft/mimalloc)
 
 ## 构建
 
