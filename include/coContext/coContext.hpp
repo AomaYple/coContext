@@ -98,6 +98,8 @@ namespace coContext {
 
     [[nodiscard]] auto poll(std::int32_t fileDescriptor, std::uint32_t mask) -> AsyncWaiter;
 
+    [[nodiscard]] auto updatePoll(std::uint64_t taskIdentity, std::uint32_t mask) -> AsyncWaiter;
+
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 
     [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol) -> AsyncWaiter;

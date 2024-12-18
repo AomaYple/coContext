@@ -110,6 +110,13 @@ auto coContext::poll(const std::int32_t fileDescriptor, const std::uint32_t mask
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::updatePoll(const std::uint64_t taskIdentity, const std::uint32_t mask) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.updatePoll(taskIdentity, 0, mask, IORING_POLL_UPDATE_EVENTS);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.close(fileDescriptor);

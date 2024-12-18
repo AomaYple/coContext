@@ -48,6 +48,12 @@ auto coContext::SubmissionQueueEntry::poll(const std::int32_t fileDescriptor, co
     io_uring_prep_poll_add(this->handle, fileDescriptor, mask);
 }
 
+auto coContext::SubmissionQueueEntry::updatePoll(const std::uint64_t oldUserData, const std::uint64_t newUserData,
+                                                 const std::uint32_t mask, const std::uint32_t flags) const noexcept
+    -> void {
+    io_uring_prep_poll_update(this->handle, oldUserData, newUserData, mask, flags);
+}
+
 auto coContext::SubmissionQueueEntry::close(const std::int32_t fileDescriptor) const noexcept -> void {
     io_uring_prep_close(this->handle, fileDescriptor);
 }
