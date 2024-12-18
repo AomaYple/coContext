@@ -117,7 +117,7 @@ auto coContext::socket(const std::int32_t domain, const std::int32_t type, const
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::bind(const std::int32_t socketFileDescriptor, sockaddr *const address, const socklen_t addressLength)
+auto coContext::bind(const std::int32_t socketFileDescriptor, sockaddr &address, const socklen_t addressLength)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.bind(socketFileDescriptor, address, addressLength);
