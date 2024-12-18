@@ -56,7 +56,7 @@ namespace coContext {
         auto accept(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
                     std::int32_t flags) const noexcept -> void;
 
-        auto connect(std::int32_t socketFileDescriptor, const sockaddr *address, socklen_t addressLength) const noexcept
+        auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength) const noexcept
             -> void;
 
         auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) const noexcept -> void;

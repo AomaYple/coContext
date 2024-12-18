@@ -141,8 +141,8 @@ auto coContext::accept(const std::int32_t socketFileDescriptor, sockaddr *const 
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr *const address,
-                        const socklen_t addressLength) -> AsyncWaiter {
+auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr &address, const socklen_t addressLength)
+    -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.connect(socketFileDescriptor, address, addressLength);
 

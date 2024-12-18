@@ -108,7 +108,7 @@ namespace coContext {
     [[nodiscard]] auto accept(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
                               std::int32_t flags = {}) -> AsyncWaiter;
 
-    [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr *address, socklen_t addressLength)
+    [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength)
         -> AsyncWaiter;
 
     [[nodiscard]] auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) -> AsyncWaiter;
