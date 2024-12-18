@@ -390,7 +390,7 @@ auto coContext::getFileStatus(const std::int32_t directoryFileDescriptor, const 
 auto coContext::getExtendedAttribute(const std::string_view path, const std::string_view name,
                                      const std::span<char> value) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.getExtendedAttribute(path, name, value);
+    submissionQueueEntry.getExtendedAttribute(name, value, path);
 
     return AsyncWaiter{submissionQueueEntry};
 }

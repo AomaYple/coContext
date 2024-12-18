@@ -245,8 +245,8 @@ auto coContext::SubmissionQueueEntry::getFileStatus(const std::int32_t directory
     io_uring_prep_statx(this->handle, directoryFileDescriptor, std::data(path), flags, mask, std::addressof(buffer));
 }
 
-auto coContext::SubmissionQueueEntry::getExtendedAttribute(const std::string_view path, const std::string_view name,
-                                                           const std::span<char> value) const noexcept -> void {
+auto coContext::SubmissionQueueEntry::getExtendedAttribute(const std::string_view name, const std::span<char> value,
+                                                           const std::string_view path) const noexcept -> void {
     io_uring_prep_getxattr(this->handle, std::data(name), std::data(value), std::data(path), value.size());
 }
 
