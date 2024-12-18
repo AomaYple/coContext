@@ -7,6 +7,7 @@
 #include <string_view>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 
 namespace coContext {
     class SubmissionQueueEntry {
@@ -159,6 +160,9 @@ namespace coContext {
             -> void;
 
         auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) const noexcept -> void;
+
+        auto wait(idtype_t idType, id_t id, siginfo_t &signalInformation, std::int32_t options,
+                  std::uint32_t flags) const noexcept -> void;
 
     private:
         io_uring_sqe *handle;

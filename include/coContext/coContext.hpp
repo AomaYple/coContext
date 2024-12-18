@@ -213,4 +213,7 @@ namespace coContext {
         -> AsyncWaiter;
 
     [[nodiscard]] auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) -> AsyncWaiter;
+
+    [[nodiscard]] auto wait(idtype_t idType, id_t id, siginfo_t &signalInformation, std::int32_t options)
+        -> AsyncWaiter;
 }    // namespace coContext
