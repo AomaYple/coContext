@@ -201,7 +201,7 @@ namespace coContext {
 
         [[nodiscard]] constexpr auto getReturnValue() noexcept -> std::future<void> & { return this->returnValue; }
 
-        constexpr auto await_resume() { this->returnValue.get(); }
+        constexpr auto await_resume() const noexcept {}
 
     private:
         std::future<void> returnValue;
