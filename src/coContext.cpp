@@ -184,10 +184,10 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<co
 }
 
 auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
-                     const std::int32_t flags, const sockaddr *const address, const socklen_t addressLength)
-    -> AsyncWaiter {
+                     const std::int32_t flags, const sockaddr *const destinationAddress,
+                     const socklen_t destinationAddressLength) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.send(socketFileDescriptor, buffer, flags, address, addressLength);
+    submissionQueueEntry.send(socketFileDescriptor, buffer, flags, destinationAddress, destinationAddressLength);
 
     return AsyncWaiter{submissionQueueEntry};
 }

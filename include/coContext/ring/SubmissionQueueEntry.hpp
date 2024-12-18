@@ -71,7 +71,7 @@ namespace coContext {
         auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
                   const sockaddr *address, socklen_t addressLength) const noexcept -> void;
 
-        auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags) const noexcept -> void;
+        auto send(std::int32_t fileDescriptor, const msghdr &message, std::uint32_t flags) const noexcept -> void;
 
         auto open(std::string_view path, std::int32_t flags, mode_t mode) const noexcept -> void;
 

@@ -104,9 +104,9 @@ auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescript
                          addressLength);
 }
 
-auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescriptor, const msghdr &message,
+auto coContext::SubmissionQueueEntry::send(const std::int32_t fileDescriptor, const msghdr &message,
                                            const std::uint32_t flags) const noexcept -> void {
-    io_uring_prep_sendmsg(this->handle, socketFileDescriptor, std::addressof(message), flags);
+    io_uring_prep_sendmsg(this->handle, fileDescriptor, std::addressof(message), flags);
 }
 
 auto coContext::SubmissionQueueEntry::open(const std::string_view path, const std::int32_t flags,
