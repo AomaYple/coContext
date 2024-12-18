@@ -312,6 +312,14 @@ auto coContext::truncate(const std::int32_t fileDescriptor, const loff_t length)
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::allocateFile(const std::int32_t fileDescriptor, const std::int32_t mode, const std::uint64_t offset,
+                             const std::uint64_t length) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.allocateFile(fileDescriptor, mode, offset, length);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::makeDirectory(const std::string_view path, const mode_t mode) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.makeDirectory(path, mode);
@@ -385,14 +393,6 @@ auto coContext::unlink(const std::int32_t directoryFileDescriptor, const std::st
                        const std::int32_t flags) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.unlink(directoryFileDescriptor, path, flags);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::allocateFile(const std::int32_t fileDescriptor, const std::int32_t mode, const std::uint64_t offset,
-                             const std::uint64_t length) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.allocateFile(fileDescriptor, mode, offset, length);
 
     return AsyncWaiter{submissionQueueEntry};
 }
