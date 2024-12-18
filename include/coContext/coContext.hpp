@@ -38,11 +38,11 @@ namespace coContext {
         Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
 
         Coroutine &coroutine{task.getCoroutine()};
-        const std::uint64_t taskIdentity{std::hash<Coroutine>{}(coroutine)};
+        const std::uint64_t identity{std::hash<Coroutine>{}(coroutine)};
 
         spawn(std::move(coroutine));
 
-        return SpawnResult{taskIdentity, std::move(task.getReturnValue())};
+        return SpawnResult{identity, std::move(task.getReturnValue())};
     }
 
     template<typename T, typename F, typename... Args>
@@ -51,11 +51,11 @@ namespace coContext {
         Task<T &> task{std::invoke(func, std::forward<Args>(args)...)};
 
         Coroutine &coroutine{task.getCoroutine()};
-        const std::uint64_t taskIdentity{std::hash<Coroutine>{}(coroutine)};
+        const std::uint64_t identity{std::hash<Coroutine>{}(coroutine)};
 
         spawn(std::move(coroutine));
 
-        return SpawnResult{taskIdentity, std::move(task.getReturnValue())};
+        return SpawnResult{identity, std::move(task.getReturnValue())};
     }
 
     template<typename F, typename... Args>
@@ -64,11 +64,11 @@ namespace coContext {
         Task<> task{std::invoke(func, std::forward<Args>(args)...)};
 
         Coroutine &coroutine{task.getCoroutine()};
-        const std::uint64_t taskIdentity{std::hash<Coroutine>{}(coroutine)};
+        const std::uint64_t identity{std::hash<Coroutine>{}(coroutine)};
 
         spawn(std::move(coroutine));
 
-        return SpawnResult{taskIdentity, std::move(task.getReturnValue())};
+        return SpawnResult{identity, std::move(task.getReturnValue())};
     }
 
     [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, std::chrono::seconds seconds = {},
