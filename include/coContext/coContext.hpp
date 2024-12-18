@@ -162,6 +162,9 @@ namespace coContext {
     [[nodiscard]] auto syncFile(std::int32_t fileDescriptor, std::uint64_t offset, std::uint32_t length,
                                 std::int32_t flags) -> AsyncWaiter;
 
+    [[nodiscard]] auto adviseFile(std::int32_t fileDescriptor, std::uint64_t offset, off_t length, std::int32_t advice)
+        -> AsyncWaiter;
+
     [[nodiscard]] auto truncate(std::int32_t fileDescriptor, loff_t length) -> AsyncWaiter;
 
     [[nodiscard]] auto makeDirectory(std::string_view path, mode_t mode) -> AsyncWaiter;
@@ -210,7 +213,4 @@ namespace coContext {
                                             std::int32_t flags) -> AsyncWaiter;
 
     [[nodiscard]] auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) -> AsyncWaiter;
-
-    [[nodiscard]] auto adviseFile(std::int32_t fileDescriptor, std::uint64_t offset, off_t length, std::int32_t advice)
-        -> AsyncWaiter;
 }    // namespace coContext

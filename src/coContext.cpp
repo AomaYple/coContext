@@ -297,6 +297,14 @@ auto coContext::syncFile(const std::int32_t fileDescriptor, const std::uint64_t 
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::adviseFile(const std::int32_t fileDescriptor, const std::uint64_t offset, const off_t length,
+                           const std::int32_t advice) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.adviseFile(fileDescriptor, offset, length, advice);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::truncate(const std::int32_t fileDescriptor, const loff_t length) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.truncate(fileDescriptor, length);
@@ -432,14 +440,6 @@ auto coContext::setExtendedAttribute(const std::int32_t fileDescriptor, const st
 auto coContext::adviseMemory(const std::span<std::byte> buffer, const std::int32_t advice) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.adviseMemory(buffer, advice);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::adviseFile(const std::int32_t fileDescriptor, const std::uint64_t offset, const off_t length,
-                           const std::int32_t advice) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.adviseFile(fileDescriptor, offset, length, advice);
 
     return AsyncWaiter{submissionQueueEntry};
 }

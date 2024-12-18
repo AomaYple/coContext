@@ -108,6 +108,9 @@ namespace coContext {
         auto syncFile(std::int32_t fileDescriptor, std::uint64_t offset, std::uint32_t length,
                       std::int32_t flags) const noexcept -> void;
 
+        auto adviseFile(std::int32_t fileDescriptor, std::uint64_t offset, off_t length,
+                        std::int32_t advice) const noexcept -> void;
+
         auto truncate(std::int32_t fileDescriptor, loff_t length) const noexcept -> void;
 
         auto makeDirectory(std::string_view path, mode_t mode) const noexcept -> void;
@@ -156,9 +159,6 @@ namespace coContext {
                                   std::int32_t flags) const noexcept -> void;
 
         auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) const noexcept -> void;
-
-        auto adviseFile(std::int32_t fileDescriptor, std::uint64_t offset, off_t length,
-                        std::int32_t advice) const noexcept -> void;
 
     private:
         io_uring_sqe *handle;

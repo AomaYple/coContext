@@ -176,6 +176,11 @@ auto coContext::SubmissionQueueEntry::syncFile(const std::int32_t fileDescriptor
     io_uring_prep_sync_file_range(this->handle, fileDescriptor, length, offset, flags);
 }
 
+auto coContext::SubmissionQueueEntry::adviseFile(const std::int32_t fileDescriptor, const std::uint64_t offset,
+                                                 const off_t length, const std::int32_t advice) const noexcept -> void {
+    io_uring_prep_fadvise64(this->handle, fileDescriptor, offset, length, advice);
+}
+
 auto coContext::SubmissionQueueEntry::truncate(const std::int32_t fileDescriptor, const loff_t length) const noexcept
     -> void {
     io_uring_prep_ftruncate(this->handle, fileDescriptor, length);
@@ -280,11 +285,6 @@ auto coContext::SubmissionQueueEntry::setExtendedAttribute(const std::int32_t fi
 auto coContext::SubmissionQueueEntry::adviseMemory(const std::span<std::byte> buffer,
                                                    const std::int32_t advice) const noexcept -> void {
     io_uring_prep_madvise64(this->handle, std::data(buffer), static_cast<off_t>(std::size(buffer)), advice);
-}
-
-auto coContext::SubmissionQueueEntry::adviseFile(const std::int32_t fileDescriptor, const std::uint64_t offset,
-                                                 const off_t length, const std::int32_t advice) const noexcept -> void {
-    io_uring_prep_fadvise64(this->handle, fileDescriptor, offset, length, advice);
 }
 
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
