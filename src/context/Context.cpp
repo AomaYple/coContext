@@ -113,8 +113,8 @@ auto coContext::Context::scheduleUnscheduledCoroutines() -> void {
             if (Coroutine & childCoroutine{coroutine.promise().getChildCoroutine()}; static_cast<bool>(childCoroutine))
                 this->unscheduledCoroutines.emplace(std::move(childCoroutine));
 
-            const std::uint64_t coroutineIdentity{std::hash<Coroutine>{}(coroutine)};
-            this->schedulingCoroutines.emplace(coroutineIdentity, std::move(coroutine));
+            const std::uint64_t identity{std::hash<Coroutine>{}(coroutine)};
+            this->schedulingCoroutines.emplace(identity, std::move(coroutine));
         } else if (const auto findResult{
                        this->schedulingCoroutines.find(coroutine.promise().getParentCoroutineIdentity())};
                    findResult != std::cend(this->schedulingCoroutines)) {
