@@ -6,8 +6,10 @@
 #include <future>
 
 namespace coContext {
-    template<typename T = void>
-        requires std::movable<T> || std::is_lvalue_reference_v<T> || std::is_void_v<T>
+    template<typename T>
+    concept TaskReturnType = std::movable<T> || std::is_lvalue_reference_v<T> || std::is_void_v<T>;
+
+    template<TaskReturnType T = void>
     class Task : public BaseTask {
     public:
         class Promise;
@@ -165,15 +167,22 @@ namespace coContext {
 
             constexpr auto swap(Promise &other) noexcept {
                 std::swap(static_cast<BasePromise &>(*this), static_cast<BasePromise &>(other));
+                std::swap(this->returnValue, other.returnValue);
             }
 
             [[nodiscard]] constexpr auto get_return_object() { return Task{CoroutineHandle::from_promise(*this)}; }
 
-            constexpr auto return_void() const noexcept {}
+            constexpr auto return_void() { this->returnValue.set_value(); }
+
+            [[nodiscard]] constexpr auto getReturnValue() { return this->returnValue.get_future(); }
+
+        private:
+            std::promise<void> returnValue;
         };
 
-        explicit constexpr Task(const CoroutineHandle coroutineHandle) noexcept :
-            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}} {}
+        explicit constexpr Task(const CoroutineHandle coroutineHandle) :
+            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
+            returnValue{coroutineHandle.promise().getReturnValue()} {}
 
         Task(const Task &) = delete;
 
@@ -187,9 +196,15 @@ namespace coContext {
 
         constexpr auto swap(Task &other) noexcept {
             std::swap(static_cast<BaseTask &>(*this), static_cast<BaseTask &>(other));
+            std::swap(this->returnValue, other.returnValue);
         }
 
-        constexpr auto await_resume() const noexcept {}
+        [[nodiscard]] constexpr auto getReturnValue() noexcept -> std::future<void> & { return this->returnValue; }
+
+        constexpr auto await_resume() { this->returnValue.get(); }
+
+    private:
+        std::future<void> returnValue;
     };
 }    // namespace coContext
 

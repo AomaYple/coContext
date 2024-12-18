@@ -6,8 +6,7 @@
 #include <functional>
 
 namespace coContext {
-    template<typename T>
-        requires std::movable<T> || std::is_lvalue_reference_v<T>
+    template<TaskReturnType T = void>
     struct SpawnResult {
         std::uint64_t taskIdentity;
         std::future<T> result;
@@ -17,6 +16,12 @@ namespace coContext {
     struct SpawnResult<T &> {
         std::uint64_t taskIdentity;
         std::future<T &> result;
+    };
+
+    template<>
+    struct SpawnResult<> {
+        std::uint64_t taskIdentity;
+        std::future<void> result;
     };
 
     enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
@@ -63,7 +68,7 @@ namespace coContext {
 
         spawn(std::move(coroutine));
 
-        return taskIdentity;
+        return SpawnResult{taskIdentity, std::move(task.getReturnValue())};
     }
 
     [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, std::chrono::seconds seconds = {},
