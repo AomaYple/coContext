@@ -38,7 +38,7 @@ auto main() -> int {
 
 ## 依赖
 
-- [Linux内核](https://www.kernel.org) >= 6.11
+- [Linux内核](https://www.kernel.org) >= 6.12
 - [GCC](https://gcc.gnu.org) >= 14
 - [CMake](https://cmake.org) >= 3.30
 - [Ninja](https://ninja-build.org) >= 1.8.2
