@@ -167,6 +167,31 @@ auto coContext::SubmissionQueueEntry::syncFile(const std::int32_t fileDescriptor
     io_uring_prep_sync_file_range(this->handle, fileDescriptor, length, offset, flags);
 }
 
+auto coContext::SubmissionQueueEntry::makeDirectory(const std::string_view path, const mode_t mode) const noexcept
+    -> void {
+    io_uring_prep_mkdir(this->handle, std::data(path), mode);
+}
+
+auto coContext::SubmissionQueueEntry::makeDirectory(const std::int32_t directoryFileDescriptor,
+                                                    const std::string_view path, const mode_t mode) const noexcept
+    -> void {
+    io_uring_prep_mkdirat(this->handle, directoryFileDescriptor, std::data(path), mode);
+}
+
+auto coContext::SubmissionQueueEntry::rename(const std::string_view oldPath,
+                                             const std::string_view newPath) const noexcept -> void {
+    io_uring_prep_rename(this->handle, std::data(oldPath), std::data(newPath));
+}
+
+auto coContext::SubmissionQueueEntry::rename(const std::int32_t oldDirectoryFileDescriptor,
+                                             const std::string_view oldPath,
+                                             const std::int32_t newDirectoryFileDescriptor,
+                                             const std::string_view newPath, const std::uint32_t flags) const noexcept
+    -> void {
+    io_uring_prep_renameat(this->handle, oldDirectoryFileDescriptor, std::data(oldPath), newDirectoryFileDescriptor,
+                           std::data(newPath), flags);
+}
+
 auto coContext::SubmissionQueueEntry::link(const std::string_view oldPath, const std::string_view newPath,
                                            const std::int32_t flags) const noexcept -> void {
     io_uring_prep_link(this->handle, std::data(oldPath), std::data(newPath), flags);
@@ -200,31 +225,6 @@ auto coContext::SubmissionQueueEntry::unlink(const std::string_view path, const 
 auto coContext::SubmissionQueueEntry::unlink(const std::int32_t directoryFileDescriptor, const std::string_view path,
                                              const std::int32_t flags) const noexcept -> void {
     io_uring_prep_unlinkat(this->handle, directoryFileDescriptor, std::data(path), flags);
-}
-
-auto coContext::SubmissionQueueEntry::makeDirectory(const std::string_view path, const mode_t mode) const noexcept
-    -> void {
-    io_uring_prep_mkdir(this->handle, std::data(path), mode);
-}
-
-auto coContext::SubmissionQueueEntry::makeDirectory(const std::int32_t directoryFileDescriptor,
-                                                    const std::string_view path, const mode_t mode) const noexcept
-    -> void {
-    io_uring_prep_mkdirat(this->handle, directoryFileDescriptor, std::data(path), mode);
-}
-
-auto coContext::SubmissionQueueEntry::rename(const std::string_view oldPath,
-                                             const std::string_view newPath) const noexcept -> void {
-    io_uring_prep_rename(this->handle, std::data(oldPath), std::data(newPath));
-}
-
-auto coContext::SubmissionQueueEntry::rename(const std::int32_t oldDirectoryFileDescriptor,
-                                             const std::string_view oldPath,
-                                             const std::int32_t newDirectoryFileDescriptor,
-                                             const std::string_view newPath, const std::uint32_t flags) const noexcept
-    -> void {
-    io_uring_prep_renameat(this->handle, oldDirectoryFileDescriptor, std::data(oldPath), newDirectoryFileDescriptor,
-                           std::data(newPath), flags);
 }
 
 auto coContext::SubmissionQueueEntry::truncate(const std::int32_t fileDescriptor, const loff_t length) const noexcept

@@ -287,6 +287,37 @@ auto coContext::syncFile(const std::int32_t fileDescriptor, const std::uint64_t 
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::makeDirectory(const std::string_view path, const mode_t mode) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.makeDirectory(path, mode);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::makeDirectory(const std::int32_t directoryFileDescriptor, const std::string_view path,
+                              const mode_t mode) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.makeDirectory(directoryFileDescriptor, path, mode);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::rename(const std::string_view oldPath, const std::string_view newPath) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.rename(oldPath, newPath);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::rename(const std::int32_t oldDirectoryFileDescriptor, const std::string_view oldPath,
+                       const std::int32_t newDirectoryFileDescriptor, const std::string_view newPath,
+                       const std::uint32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.rename(oldDirectoryFileDescriptor, oldPath, newDirectoryFileDescriptor, newPath, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::link(const std::string_view oldPath, const std::string_view newPath) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.link(oldPath, newPath, 0);
@@ -329,37 +360,6 @@ auto coContext::unlink(const std::int32_t directoryFileDescriptor, const std::st
                        const std::int32_t flags) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.unlink(directoryFileDescriptor, path, flags);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::makeDirectory(const std::string_view path, const mode_t mode) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.makeDirectory(path, mode);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::makeDirectory(const std::int32_t directoryFileDescriptor, const std::string_view path,
-                              const mode_t mode) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.makeDirectory(directoryFileDescriptor, path, mode);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::rename(const std::string_view oldPath, const std::string_view newPath) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.rename(oldPath, newPath);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-
-auto coContext::rename(const std::int32_t oldDirectoryFileDescriptor, const std::string_view oldPath,
-                       const std::int32_t newDirectoryFileDescriptor, const std::string_view newPath,
-                       const std::uint32_t flags) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.rename(oldDirectoryFileDescriptor, oldPath, newDirectoryFileDescriptor, newPath, flags);
 
     return AsyncWaiter{submissionQueueEntry};
 }
