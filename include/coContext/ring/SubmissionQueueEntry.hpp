@@ -151,7 +151,7 @@ namespace coContext {
 
         auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) const noexcept -> void;
 
-        auto fileAdvise(std::int32_t fileDescriptor, std::uint64_t offset, off_t length,
+        auto adviseFile(std::int32_t fileDescriptor, std::uint64_t offset, off_t length,
                         std::int32_t advice) const noexcept -> void;
 
         auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset, std::int32_t outFileDescriptor,

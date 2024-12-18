@@ -205,7 +205,7 @@ namespace coContext {
 
     [[nodiscard]] auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) -> AsyncWaiter;
 
-    [[nodiscard]] auto fileAdvise(std::int32_t fileDescriptor, std::uint64_t offset, off_t length, std::int32_t advice)
+    [[nodiscard]] auto adviseFile(std::int32_t fileDescriptor, std::uint64_t offset, off_t length, std::int32_t advice)
         -> AsyncWaiter;
 
     [[nodiscard]] auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset,

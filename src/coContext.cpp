@@ -419,10 +419,10 @@ auto coContext::adviseMemory(const std::span<std::byte> buffer, const std::int32
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::fileAdvise(const std::int32_t fileDescriptor, const std::uint64_t offset, const off_t length,
+auto coContext::adviseFile(const std::int32_t fileDescriptor, const std::uint64_t offset, const off_t length,
                            const std::int32_t advice) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.fileAdvise(fileDescriptor, offset, length, advice);
+    submissionQueueEntry.adviseFile(fileDescriptor, offset, length, advice);
 
     return AsyncWaiter{submissionQueueEntry};
 }
