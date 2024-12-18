@@ -194,9 +194,9 @@ auto coContext::SubmissionQueueEntry::allocateFile(const std::int32_t fileDescri
 
 auto coContext::SubmissionQueueEntry::getFileStatus(const std::int32_t directoryFileDescriptor,
                                                     const std::string_view path, const std::int32_t flags,
-                                                    const std::uint32_t mask, struct statx *const buffer) const noexcept
+                                                    const std::uint32_t mask, struct statx &buffer) const noexcept
     -> void {
-    io_uring_prep_statx(this->handle, directoryFileDescriptor, std::data(path), flags, mask, buffer);
+    io_uring_prep_statx(this->handle, directoryFileDescriptor, std::data(path), flags, mask, std::addressof(buffer));
 }
 
 auto coContext::SubmissionQueueEntry::getExtendedAttribute(const std::string_view path, const std::string_view name,
