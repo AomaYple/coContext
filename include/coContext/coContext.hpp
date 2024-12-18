@@ -122,7 +122,7 @@ namespace coContext {
         -> AsyncWaiter;
 
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
-                            const sockaddr *destinationAddress, socklen_t destinationAddressLength) -> AsyncWaiter;
+                            const sockaddr &destinationAddress, socklen_t destinationAddressLength) -> AsyncWaiter;
 
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags)
         -> AsyncWaiter;
