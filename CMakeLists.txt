@@ -38,9 +38,11 @@ target_link_options(${PROJECT_NAME}
         $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=leak -fsanitize=undefined>
 )
 
+find_package(mimalloc REQUIRED)
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
         uring
+        mimalloc
 )
 
 set(installTargets ${PROJECT_NAME}Targets)
