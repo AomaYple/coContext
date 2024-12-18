@@ -467,3 +467,10 @@ auto coContext::waitFutex(std::uint32_t &futex, const std::uint64_t value, const
 
     return AsyncWaiter{submissionQueueEntry};
 }
+
+auto coContext::waitFutex(const std::span<futex_waitv> futex) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.waitFutex(futex, 0);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
