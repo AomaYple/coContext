@@ -201,6 +201,16 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr &mess
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::splice(const std::int32_t inFileDescriptor, const std::int64_t inFileDescriptorOffset,
+                       const std::int32_t outFileDescriptor, const std::int64_t outFileDescriptorOffset,
+                       const std::uint32_t length, const std::uint32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.splice(inFileDescriptor, inFileDescriptorOffset, outFileDescriptor, outFileDescriptorOffset,
+                                length, flags);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::open(const std::string_view path, const std::int32_t flags, const mode_t mode) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.open(path, flags, mode);
@@ -433,14 +443,3 @@ auto coContext::adviseFile(const std::int32_t fileDescriptor, const std::uint64_
 
     return AsyncWaiter{submissionQueueEntry};
 }
-
-auto coContext::splice(const std::int32_t inFileDescriptor, const std::int64_t inFileDescriptorOffset,
-                       const std::int32_t outFileDescriptor, const std::int64_t outFileDescriptorOffset,
-                       const std::uint32_t length, const std::uint32_t flags) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.splice(inFileDescriptor, inFileDescriptorOffset, outFileDescriptor, outFileDescriptorOffset,
-                                length, flags);
-
-    return AsyncWaiter{submissionQueueEntry};
-}
-

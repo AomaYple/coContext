@@ -127,6 +127,10 @@ namespace coContext {
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags)
         -> AsyncWaiter;
 
+    [[nodiscard]] auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset,
+                              std::int32_t outFileDescriptor, std::int64_t outFileDescriptorOffset,
+                              std::uint32_t length, std::uint32_t flags) -> AsyncWaiter;
+
     [[nodiscard]] auto open(std::string_view path, std::int32_t flags, mode_t mode = {}) -> AsyncWaiter;
 
     [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
@@ -209,8 +213,4 @@ namespace coContext {
 
     [[nodiscard]] auto adviseFile(std::int32_t fileDescriptor, std::uint64_t offset, off_t length, std::int32_t advice)
         -> AsyncWaiter;
-
-    [[nodiscard]] auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset,
-                              std::int32_t outFileDescriptor, std::int64_t outFileDescriptorOffset,
-                              std::uint32_t length, std::uint32_t flags) -> AsyncWaiter;
 }    // namespace coContext

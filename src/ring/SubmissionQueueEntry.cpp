@@ -109,6 +109,15 @@ auto coContext::SubmissionQueueEntry::send(const std::int32_t socketFileDescript
     io_uring_prep_sendmsg(this->handle, socketFileDescriptor, std::addressof(message), flags);
 }
 
+auto coContext::SubmissionQueueEntry::splice(const std::int32_t inFileDescriptor,
+                                             const std::int64_t inFileDescriptorOffset,
+                                             const std::int32_t outFileDescriptor,
+                                             const std::int64_t outFileDescriptorOffset, const std::uint32_t length,
+                                             const std::uint32_t flags) const noexcept -> void {
+    io_uring_prep_splice(this->handle, inFileDescriptor, inFileDescriptorOffset, outFileDescriptor,
+                         outFileDescriptorOffset, length, flags);
+}
+
 auto coContext::SubmissionQueueEntry::open(const std::string_view path, const std::int32_t flags,
                                            const mode_t mode) const noexcept -> void {
     io_uring_prep_open(this->handle, std::data(path), flags, mode);
@@ -276,15 +285,6 @@ auto coContext::SubmissionQueueEntry::adviseMemory(const std::span<std::byte> bu
 auto coContext::SubmissionQueueEntry::adviseFile(const std::int32_t fileDescriptor, const std::uint64_t offset,
                                                  const off_t length, const std::int32_t advice) const noexcept -> void {
     io_uring_prep_fadvise64(this->handle, fileDescriptor, offset, length, advice);
-}
-
-auto coContext::SubmissionQueueEntry::splice(const std::int32_t inFileDescriptor,
-                                             const std::int64_t inFileDescriptorOffset,
-                                             const std::int32_t outFileDescriptor,
-                                             const std::int64_t outFileDescriptorOffset, const std::uint32_t length,
-                                             const std::uint32_t flags) const noexcept -> void {
-    io_uring_prep_splice(this->handle, inFileDescriptor, inFileDescriptorOffset, outFileDescriptor,
-                         outFileDescriptorOffset, length, flags);
 }
 
 auto coContext::operator==(const SubmissionQueueEntry lhs, const SubmissionQueueEntry rhs) noexcept -> bool {
