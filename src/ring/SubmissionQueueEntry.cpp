@@ -68,6 +68,12 @@ auto coContext::SubmissionQueueEntry::socket(const std::int32_t domain, const st
     io_uring_prep_socket(this->handle, domain, type, protocol, flags);
 }
 
+auto coContext::SubmissionQueueEntry::directSocket(const std::int32_t domain, const std::int32_t type,
+                                                   const std::int32_t protocol,
+                                                   const std::uint32_t flags) const noexcept -> void {
+    io_uring_prep_socket_direct_alloc(this->handle, domain, type, protocol, flags);
+}
+
 auto coContext::SubmissionQueueEntry::socketCommand(const std::int32_t operation,
                                                     const std::int32_t socketFileDescriptor, const std::int32_t level,
                                                     const std::int32_t optionName, void *const optionValue,

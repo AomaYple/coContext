@@ -143,6 +143,14 @@ auto coContext::socket(const std::int32_t domain, const std::int32_t type, const
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::directSocket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol)
+    -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.directSocket(domain, type, protocol, 0);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::getSocketOption(const std::int32_t socketFileDescriptor, const std::int32_t level,
                                 const std::int32_t optionName, void *const optionValue, const std::int32_t optionLength)
     -> AsyncWaiter {
