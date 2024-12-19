@@ -48,6 +48,17 @@ auto coContext::syncCancelAny(const std::chrono::seconds seconds, const std::chr
                               __kernel_timespec{seconds.count(), nanoseconds.count()});
 }
 
+auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
+                        const ClockSource clockSource) -> Marker {
+    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
+    context.getSubmissionQueueEntry().linkTimeout(*timeSpecification, setClockSource(clockSource));
+
+    Marker marker{IOSQE_IO_LINK};
+    marker.setTimeSpecification(std::move(timeSpecification));
+
+    return marker;
+}
+
 auto coContext::cancel(const std::uint64_t taskIdentity) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.cancel(taskIdentity, 0);
@@ -93,17 +104,6 @@ auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono:
     asyncWaiter.getTimeSpecifications().first = std::move(timeSpecification);
 
     return asyncWaiter;
-}
-
-auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
-                        const ClockSource clockSource) -> Marker {
-    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
-    context.getSubmissionQueueEntry().linkTimeout(*timeSpecification, setClockSource(clockSource));
-
-    Marker marker{IOSQE_IO_LINK};
-    marker.setTimeSpecification(std::move(timeSpecification));
-
-    return marker;
 }
 
 auto coContext::poll(const std::int32_t fileDescriptor, const std::uint32_t mask) -> AsyncWaiter {

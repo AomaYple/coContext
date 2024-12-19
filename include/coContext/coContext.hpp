@@ -81,6 +81,9 @@ namespace coContext {
     [[nodiscard]] auto syncCancelAny(std::chrono::seconds seconds = {}, std::chrono::nanoseconds nanoseconds = {})
         -> std::int32_t;
 
+    [[nodiscard]] auto timeout(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
+                               ClockSource clockSource = {}) -> Marker;
+
     [[nodiscard]] auto cancel(std::uint64_t taskIdentity) -> AsyncWaiter;
 
     [[nodiscard]] auto cancel(std::int32_t fileDescriptor, bool isMatchAll = {}) -> AsyncWaiter;
@@ -93,9 +96,6 @@ namespace coContext {
     [[nodiscard]] auto updateSleep(std::uint64_t taskIdentity, std::chrono::seconds seconds,
                                    std::chrono::nanoseconds nanoseconds = {}, ClockSource clockSource = {})
         -> AsyncWaiter;
-
-    [[nodiscard]] auto timeout(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
-                               ClockSource clockSource = {}) -> Marker;
 
     [[nodiscard]] auto poll(std::int32_t fileDescriptor, std::uint32_t mask) -> AsyncWaiter;
 
