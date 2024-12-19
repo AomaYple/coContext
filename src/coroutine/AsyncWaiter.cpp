@@ -9,9 +9,7 @@ auto coContext::AsyncWaiter::getSubmissionQueueEntry() const noexcept -> Submiss
     return this->submissionQueueEntry;
 }
 
-auto coContext::AsyncWaiter::getResult() const noexcept -> const std::shared_ptr<std::int32_t> & {
-    return this->result;
-}
+auto coContext::AsyncWaiter::getCoroutineHandle() const noexcept -> Coroutine::Handle { return this->coroutineHandle; }
 
 auto coContext::AsyncWaiter::getFirstTimeSpecification() const noexcept -> __kernel_timespec {
     return this->timeSpecifications.first;
@@ -43,14 +41,14 @@ auto coContext::AsyncWaiter::setSecondTimeSpecification(const std::chrono::secon
 
 auto coContext::AsyncWaiter::await_ready() const noexcept -> bool { return {}; }
 
-auto coContext::AsyncWaiter::await_suspend(const std::coroutine_handle<> genericCoroutineHandle) -> void {
-    const auto coroutineHandle{Coroutine::Handle::from_address(genericCoroutineHandle.address())};
-
-    this->submissionQueueEntry.setUserData(std::hash<Coroutine::Handle>{}(coroutineHandle));
-    this->result = coroutineHandle.promise().getResult();
+auto coContext::AsyncWaiter::await_suspend(const std::coroutine_handle<> genericCoroutineHandle) noexcept -> void {
+    this->coroutineHandle = Coroutine::Handle::from_address(genericCoroutineHandle.address());
+    this->submissionQueueEntry.setUserData(std::hash<Coroutine::Handle>{}(this->coroutineHandle));
 }
 
-auto coContext::AsyncWaiter::await_resume() const noexcept -> std::int32_t { return *this->result; }
+auto coContext::AsyncWaiter::await_resume() const -> std::int32_t {
+    return this->coroutineHandle.promise().getResult();
+}
 
 auto coContext::operator==(const AsyncWaiter &lhs, const AsyncWaiter &rhs) noexcept -> bool {
     const __kernel_timespec lhsFirstTimeSpecification{lhs.getFirstTimeSpecification()},
@@ -58,7 +56,8 @@ auto coContext::operator==(const AsyncWaiter &lhs, const AsyncWaiter &rhs) noexc
         rhsFirstTimeSpecification{rhs.getFirstTimeSpecification()},
         rhsSecondTimeSpecification{rhs.getSecondTimeSpecification()};
 
-    return lhs.getSubmissionQueueEntry() == rhs.getSubmissionQueueEntry() && lhs.getResult() == rhs.getResult() &&
+    return lhs.getSubmissionQueueEntry() == rhs.getSubmissionQueueEntry() &&
+           lhs.getCoroutineHandle() == rhs.getCoroutineHandle() &&
            lhsFirstTimeSpecification.tv_sec == rhsFirstTimeSpecification.tv_sec &&
            lhsFirstTimeSpecification.tv_nsec == rhsFirstTimeSpecification.tv_nsec &&
            lhsSecondTimeSpecification.tv_sec == rhsSecondTimeSpecification.tv_sec &&

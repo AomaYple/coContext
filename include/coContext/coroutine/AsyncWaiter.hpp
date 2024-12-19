@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../ring/SubmissionQueueEntry.hpp"
+#include "Coroutine.hpp"
 
 #include <chrono>
-#include <coroutine>
 
 namespace coContext {
     class AsyncWaiter {
@@ -22,7 +22,7 @@ namespace coContext {
 
         [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry;
 
-        [[nodiscard]] auto getResult() const noexcept -> const std::shared_ptr<std::int32_t> &;
+        [[nodiscard]] auto getCoroutineHandle() const noexcept -> Coroutine::Handle;
 
         [[nodiscard]] auto getFirstTimeSpecification() const noexcept -> __kernel_timespec;
 
@@ -38,13 +38,13 @@ namespace coContext {
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
-        auto await_suspend(std::coroutine_handle<> genericCoroutineHandle) -> void;
+        auto await_suspend(std::coroutine_handle<> genericCoroutineHandle) noexcept -> void;
 
-        [[nodiscard]] auto await_resume() const noexcept -> std::int32_t;
+        [[nodiscard]] auto await_resume() const -> std::int32_t;
 
     private:
         SubmissionQueueEntry submissionQueueEntry;
-        std::shared_ptr<std::int32_t> result;
+        Coroutine::Handle coroutineHandle;
         std::pair<__kernel_timespec, __kernel_timespec> timeSpecifications;
     };
 

@@ -1,5 +1,7 @@
 #include "coContext/coroutine/BasePromise.hpp"
 
+#include "coContext/memory/memoryResource.hpp"
+
 auto coContext::BasePromise::operator new(const std::size_t numberOfBytes) -> void * {
     return allocator.allocate_bytes(numberOfBytes);
 }
@@ -14,9 +16,9 @@ auto coContext::BasePromise::swap(BasePromise &other) noexcept -> void {
     std::swap(this->childCoroutine, other.childCoroutine);
 }
 
-auto coContext::BasePromise::getResult() const noexcept -> std::shared_ptr<std::int32_t> { return this->result; }
+auto coContext::BasePromise::getResult() const noexcept -> std::int32_t { return this->result; }
 
-auto coContext::BasePromise::setResult(const std::int32_t result) const noexcept -> void { *this->result = result; }
+auto coContext::BasePromise::setResult(const std::int32_t result) noexcept -> void { this->result = result; }
 
 auto coContext::BasePromise::getParentCoroutineIdentity() const noexcept -> std::uint64_t {
     return this->parentCoroutineIdentity;
