@@ -2,7 +2,6 @@
 
 #include "Coroutine.hpp"
 
-#include <memory>
 #include <memory_resource>
 
 namespace coContext {
@@ -12,7 +11,7 @@ namespace coContext {
 
         auto operator delete(void *, std::size_t) noexcept -> void;
 
-        BasePromise() = default;
+        constexpr BasePromise() noexcept = default;
 
         BasePromise(const BasePromise &) = delete;
 
