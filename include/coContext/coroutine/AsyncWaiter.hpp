@@ -3,38 +3,30 @@
 #include "../ring/SubmissionQueueEntry.hpp"
 #include "Coroutine.hpp"
 
-#include <chrono>
+#include <memory>
 
 namespace coContext {
     class AsyncWaiter {
+        using TimeSpecification = std::pair<std::unique_ptr<__kernel_timespec>, std::unique_ptr<__kernel_timespec>>;
+
     public:
-        explicit AsyncWaiter(SubmissionQueueEntry submissionQueueEntry = SubmissionQueueEntry{}) noexcept;
+        explicit AsyncWaiter(SubmissionQueueEntry submissionQueueEntry) noexcept;
 
-        AsyncWaiter(const AsyncWaiter &) noexcept = default;
+        AsyncWaiter(const AsyncWaiter &) = delete;
 
-        auto operator=(const AsyncWaiter &) noexcept -> AsyncWaiter & = default;
+        auto operator=(const AsyncWaiter &) -> AsyncWaiter & = delete;
 
-        AsyncWaiter(AsyncWaiter &&) noexcept = default;
+        constexpr AsyncWaiter(AsyncWaiter &&) noexcept = default;
 
-        auto operator=(AsyncWaiter &&) noexcept -> AsyncWaiter & = default;
+        constexpr auto operator=(AsyncWaiter &&) noexcept -> AsyncWaiter & = default;
 
-        ~AsyncWaiter() = default;
+        constexpr ~AsyncWaiter() = default;
+
+        auto swap(AsyncWaiter &other) noexcept -> void;
 
         [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry;
 
-        [[nodiscard]] auto getCoroutineHandle() const noexcept -> Coroutine::Handle;
-
-        [[nodiscard]] auto getFirstTimeSpecification() const noexcept -> __kernel_timespec;
-
-        [[nodiscard]] auto getFirstTimeSpecification() noexcept -> __kernel_timespec &;
-
-        auto setFirstTimeSpecification(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds) -> void;
-
-        [[nodiscard]] auto getSecondTimeSpecification() const noexcept -> __kernel_timespec;
-
-        [[nodiscard]] auto getSecondTimeSpecification() noexcept -> __kernel_timespec &;
-
-        auto setSecondTimeSpecification(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds) -> void;
+        [[nodiscard]] auto getTimeSpecifications() noexcept -> TimeSpecification &;
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
@@ -45,8 +37,11 @@ namespace coContext {
     private:
         SubmissionQueueEntry submissionQueueEntry;
         Coroutine::Handle coroutineHandle;
-        std::pair<__kernel_timespec, __kernel_timespec> timeSpecifications;
+        TimeSpecification timeSpecifications;
     };
-
-    [[nodiscard]] auto operator==(const AsyncWaiter &, const AsyncWaiter &) noexcept -> bool;
 }    // namespace coContext
+
+template<>
+constexpr auto std::swap(coContext::AsyncWaiter &lhs, coContext::AsyncWaiter &rhs) noexcept -> void {
+    lhs.swap(rhs);
+}

@@ -72,10 +72,12 @@ auto coContext::cancelAny() -> AsyncWaiter {
 auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                       const ClockSource clockSource) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    AsyncWaiter asyncWaiter{submissionQueueEntry};
 
-    asyncWaiter.setFirstTimeSpecification(seconds, nanoseconds);
-    submissionQueueEntry.timeout(asyncWaiter.getFirstTimeSpecification(), 0, setClockSource(clockSource));
+    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
+    submissionQueueEntry.timeout(*timeSpecification, 0, setClockSource(clockSource));
+
+    AsyncWaiter asyncWaiter{submissionQueueEntry};
+    asyncWaiter.getTimeSpecifications().first = std::move(timeSpecification);
 
     return asyncWaiter;
 }
@@ -83,24 +85,25 @@ auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nan
 auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,
                             const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    AsyncWaiter asyncWaiter{submissionQueueEntry};
 
-    asyncWaiter.setFirstTimeSpecification(seconds, nanoseconds);
-    submissionQueueEntry.updateTimeout(asyncWaiter.getFirstTimeSpecification(), taskIdentity,
-                                       setClockSource(clockSource));
+    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
+    submissionQueueEntry.updateTimeout(*timeSpecification, taskIdentity, setClockSource(clockSource));
+
+    AsyncWaiter asyncWaiter{submissionQueueEntry};
+    asyncWaiter.getTimeSpecifications().first = std::move(timeSpecification);
 
     return asyncWaiter;
 }
 
-auto coContext::timeout(AsyncWaiter &&asyncWaiter, const std::chrono::seconds seconds,
-                        const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource) -> AsyncWaiter {
-    asyncWaiter.getSubmissionQueueEntry().addFlags(IOSQE_IO_LINK);
-    asyncWaiter.setSecondTimeSpecification(seconds, nanoseconds);
+auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
+                        const ClockSource clockSource) -> Marker {
+    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
+    context.getSubmissionQueueEntry().linkTimeout(*timeSpecification, setClockSource(clockSource));
 
-    context.getSubmissionQueueEntry().linkTimeout(asyncWaiter.getSecondTimeSpecification(),
-                                                  setClockSource(clockSource));
+    Marker marker{IOSQE_IO_LINK};
+    marker.setTimeSpecification(std::move(timeSpecification));
 
-    return asyncWaiter;
+    return marker;
 }
 
 auto coContext::poll(const std::int32_t fileDescriptor, const std::uint32_t mask) -> AsyncWaiter {

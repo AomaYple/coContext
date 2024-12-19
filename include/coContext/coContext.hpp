@@ -1,6 +1,7 @@
 #pragma once
 
 #include "coroutine/AsyncWaiter.hpp"
+#include "coroutine/Marker.hpp"
 #include "coroutine/Task.hpp"
 
 #include <functional>
@@ -93,8 +94,8 @@ namespace coContext {
                                    std::chrono::nanoseconds nanoseconds = {}, ClockSource clockSource = {})
         -> AsyncWaiter;
 
-    [[nodiscard]] auto timeout(AsyncWaiter &&asyncWaiter, std::chrono::seconds seconds,
-                               std::chrono::nanoseconds nanoseconds = {}, ClockSource clockSource = {}) -> AsyncWaiter;
+    [[nodiscard]] auto timeout(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
+                               ClockSource clockSource = {}) -> Marker;
 
     [[nodiscard]] auto poll(std::int32_t fileDescriptor, std::uint32_t mask) -> AsyncWaiter;
 
