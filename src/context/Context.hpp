@@ -39,14 +39,12 @@ namespace coContext {
                                       __kernel_timespec timeSpecification) -> std::int32_t;
 
     private:
-        [[nodiscard]] static auto
-            getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current()) -> rlim_t;
-
         auto scheduleUnscheduledCoroutines() -> void;
 
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
         static constinit std::uint32_t cpuCode;
+        static rlim_t fileDescriptorLimit;
 
         bool isRunning{};
         Ring ring;

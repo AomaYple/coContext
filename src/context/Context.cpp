@@ -17,7 +17,7 @@ coContext::Context::Context() :
             parameters.wq_fd = sharedRingFileDescriptor;
         }
 
-        Ring ring{static_cast<std::uint32_t>(getFileDescriptorLimit()) * 2, parameters};
+        Ring ring{static_cast<std::uint32_t>(fileDescriptorLimit) * 2, parameters};
 
         if (sharedRingFileDescriptor == -1) sharedRingFileDescriptor = ring.getFileDescriptor();
 
@@ -95,19 +95,6 @@ auto coContext::Context::syncCancel(const std::variant<std::uint64_t, std::int32
     return this->ring.syncCancel(parameters);
 }
 
-auto coContext::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> rlim_t {
-    rlimit limit{};
-    if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
-        throw Exception{
-            Log{Log::Level::fatal,
-                std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getMemoryResource()},
-                sourceLocation}
-        };
-    }
-
-    return limit.rlim_cur;
-}
-
 auto coContext::Context::scheduleUnscheduledCoroutines() -> void {
     while (!std::empty(this->unscheduledCoroutines)) {
         Coroutine coroutine{std::move(this->unscheduledCoroutines.front())};
@@ -133,3 +120,16 @@ auto coContext::Context::scheduleUnscheduledCoroutines() -> void {
 constinit std::mutex coContext::Context::mutex;
 constinit std::int32_t coContext::Context::sharedRingFileDescriptor{-1};
 constinit std::uint32_t coContext::Context::cpuCode;
+rlim_t coContext::Context::fileDescriptorLimit{
+    [](const std::source_location sourceLocation = std::source_location::current()) {
+        rlimit limit{};
+        if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
+            throw Exception{
+                Log{Log::Level::fatal,
+                    std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getMemoryResource()},
+                    sourceLocation}
+            };
+        }
+
+        return limit.rlim_cur;
+    }()};
