@@ -6,7 +6,7 @@
 
 - 支持io_uring支持的所有系统调用`read` `write` `send` `recv` `accept`等
 - 支持纳秒级别的定时器`sleep(1s, 1ns)`
-- 支持IO超时`timeout(operation, 1s)`
+- 支持IO超时`recv(socketFileDescriptor, buffer, 0) | timeout(1s)`
 - 支持IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
 - 支持嵌套**任意数量**的**任意返回值**的协程
 - 支持多线程
@@ -88,7 +88,8 @@ target_link_libraries(your_target
 ```c++
 [[nodiscard]] auto func(const std::int32_t socketFileDescriptor) -> coContext::Task<> {
     std::vector<std::byte> buffer{1024};
-    const std::int32_t result{co_await timeout(coContext::receive(socketFileDescriptor, buffer, 0), 3s)};    // 限时3秒
+    const std::int32_t result{
+        co_await (coContext::receive(socketFileDescriptor, buffer, 0) | coContext::timeout(3s))};    // 限时3秒
 
     std::println("received: {}", result);
 }
