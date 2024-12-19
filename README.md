@@ -45,6 +45,8 @@ auto main() -> int {
 - [liburing](https://github.com/axboe/liburing) >= 2.7
 - [mimalloc](https://github.com/microsoft/mimalloc)
 
+建议使用[Arch Linux](https://archlinux.org)
+
 ## 构建
 
 ```shell
