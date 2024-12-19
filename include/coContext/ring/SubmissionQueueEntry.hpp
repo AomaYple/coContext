@@ -32,6 +32,8 @@ namespace coContext {
 
         auto setUserData(std::uint64_t userData) const noexcept -> void;
 
+        auto linkTimeout(__kernel_timespec &timeSpecification, std::uint32_t flags) const noexcept -> void;
+
         auto cancel(std::uint64_t userData, std::int32_t flags) const noexcept -> void;
 
         auto cancel(std::int32_t fileDescriptor, std::uint32_t flags) const noexcept -> void;
@@ -41,8 +43,6 @@ namespace coContext {
 
         auto updateTimeout(__kernel_timespec &timeSpecification, std::uint64_t userData,
                            std::uint32_t flags) const noexcept -> void;
-
-        auto linkTimeout(__kernel_timespec &timeSpecification, std::uint32_t flags) const noexcept -> void;
 
         auto poll(std::int32_t fileDescriptor, std::uint32_t mask) const noexcept -> void;
 

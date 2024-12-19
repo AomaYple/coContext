@@ -18,6 +18,11 @@ auto coContext::SubmissionQueueEntry::setUserData(const std::uint64_t userData) 
     io_uring_sqe_set_data64(this->handle, userData);
 }
 
+auto coContext::SubmissionQueueEntry::linkTimeout(__kernel_timespec &timeSpecification,
+                                                  const std::uint32_t flags) const noexcept -> void {
+    io_uring_prep_link_timeout(this->handle, std::addressof(timeSpecification), flags);
+}
+
 auto coContext::SubmissionQueueEntry::cancel(const std::uint64_t userData, const std::int32_t flags) const noexcept
     -> void {
     io_uring_prep_cancel64(this->handle, userData, flags);
@@ -36,11 +41,6 @@ auto coContext::SubmissionQueueEntry::timeout(__kernel_timespec &timeSpecificati
 auto coContext::SubmissionQueueEntry::updateTimeout(__kernel_timespec &timeSpecification, const std::uint64_t userData,
                                                     const std::uint32_t flags) const noexcept -> void {
     io_uring_prep_timeout_update(this->handle, std::addressof(timeSpecification), userData, flags);
-}
-
-auto coContext::SubmissionQueueEntry::linkTimeout(__kernel_timespec &timeSpecification,
-                                                  const std::uint32_t flags) const noexcept -> void {
-    io_uring_prep_link_timeout(this->handle, std::addressof(timeSpecification), flags);
 }
 
 auto coContext::SubmissionQueueEntry::poll(const std::int32_t fileDescriptor, const std::uint32_t mask) const noexcept
