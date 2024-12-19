@@ -4,6 +4,8 @@
 #include "coContext/coroutine/BasePromise.hpp"
 #include "coContext/ring/SubmissionQueueEntry.hpp"
 
+#include <sys/resource.h>
+
 coContext::Context::Context() :
     ring{[] {
         io_uring_params parameters{};
@@ -17,7 +19,7 @@ coContext::Context::Context() :
             parameters.wq_fd = sharedRingFileDescriptor;
         }
 
-        Ring ring{static_cast<std::uint32_t>(fileDescriptorLimit) * 2, parameters};
+        Ring ring{fileDescriptorLimit * 2, parameters};
 
         if (sharedRingFileDescriptor == -1) sharedRingFileDescriptor = ring.getFileDescriptor();
 
@@ -122,7 +124,7 @@ auto coContext::Context::scheduleUnscheduledCoroutines() -> void {
 constinit std::mutex coContext::Context::mutex;
 constinit std::int32_t coContext::Context::sharedRingFileDescriptor{-1};
 constinit std::uint32_t coContext::Context::cpuCode;
-rlim_t coContext::Context::fileDescriptorLimit{
+std::uint32_t coContext::Context::fileDescriptorLimit{
     [](const std::source_location sourceLocation = std::source_location::current()) {
         rlimit limit{};
         if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
@@ -133,5 +135,5 @@ rlim_t coContext::Context::fileDescriptorLimit{
             };
         }
 
-        return limit.rlim_cur;
+        return static_cast<std::uint32_t>(limit.rlim_cur);
     }()};

@@ -5,7 +5,6 @@
 #include "coContext/memory/memoryResource.hpp"
 
 #include <queue>
-#include <sys/resource.h>
 #include <variant>
 
 namespace coContext {
@@ -44,7 +43,7 @@ namespace coContext {
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
         static constinit std::uint32_t cpuCode;
-        static rlim_t fileDescriptorLimit;
+        static std::uint32_t fileDescriptorLimit;
 
         bool isRunning{};
         Ring ring;
