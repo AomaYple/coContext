@@ -3,7 +3,6 @@
 #include <functional>
 #include <liburing.h>
 #include <source_location>
-#include <span>
 
 namespace coContext {
     class Ring {
