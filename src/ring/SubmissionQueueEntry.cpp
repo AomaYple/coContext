@@ -102,6 +102,12 @@ auto coContext::SubmissionQueueEntry::accept(const std::int32_t socketFileDescri
     io_uring_prep_accept(this->handle, socketFileDescriptor, address, addressLength, flags);
 }
 
+auto coContext::SubmissionQueueEntry::acceptDirect(const std::int32_t socketFileDescriptor, sockaddr *const address,
+                                                   socklen_t *const addressLength, const std::int32_t flags,
+                                                   const std::uint32_t fileDescriptorIndex) const noexcept -> void {
+    io_uring_prep_accept_direct(this->handle, socketFileDescriptor, address, addressLength, flags, fileDescriptorIndex);
+}
+
 auto coContext::SubmissionQueueEntry::connect(const std::int32_t socketFileDescriptor, const sockaddr &address,
                                               const socklen_t addressLength) const noexcept -> void {
     io_uring_prep_connect(this->handle, socketFileDescriptor, std::addressof(address), addressLength);

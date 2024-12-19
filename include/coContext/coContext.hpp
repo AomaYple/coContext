@@ -132,6 +132,9 @@ namespace coContext {
     [[nodiscard]] auto accept(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
                               std::int32_t flags = {}) -> AsyncWaiter;
 
+    [[nodiscard]] auto acceptDirect(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
+                                    std::int32_t flags = {}) -> AsyncWaiter;
+
     [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength)
         -> AsyncWaiter;
 

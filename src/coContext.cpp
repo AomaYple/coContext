@@ -217,6 +217,15 @@ auto coContext::accept(const std::int32_t socketFileDescriptor, sockaddr *const 
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::acceptDirect(const std::int32_t socketFileDescriptor, sockaddr *const address,
+                             socklen_t *const addressLength, const std::int32_t flags) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.acceptDirect(socketFileDescriptor, address, addressLength, flags, IORING_FILE_INDEX_ALLOC);
+    submissionQueueEntry.addIoPriority(IORING_ACCEPT_POLL_FIRST);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr &address, const socklen_t addressLength)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
