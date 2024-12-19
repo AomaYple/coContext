@@ -51,6 +51,8 @@ namespace coContext {
 
         auto close(std::int32_t fileDescriptor) const noexcept -> void;
 
+        auto closeDirect(std::int32_t directFileDescriptor) const noexcept -> void;
+
         auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol, std::uint32_t flags) const noexcept
             -> void;
 

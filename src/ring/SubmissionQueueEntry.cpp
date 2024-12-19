@@ -58,6 +58,10 @@ auto coContext::SubmissionQueueEntry::close(const std::int32_t fileDescriptor) c
     io_uring_prep_close(this->handle, fileDescriptor);
 }
 
+auto coContext::SubmissionQueueEntry::closeDirect(const std::int32_t directFileDescriptor) const noexcept -> void {
+    io_uring_prep_close_direct(this->handle, directFileDescriptor);
+}
+
 auto coContext::SubmissionQueueEntry::socket(const std::int32_t domain, const std::int32_t type,
                                              const std::int32_t protocol, const std::uint32_t flags) const noexcept
     -> void {
