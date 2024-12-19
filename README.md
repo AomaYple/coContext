@@ -55,7 +55,7 @@ ninja
 
 额外CMake选项
 
-- `-DCO_CONTEXT_NATIVE=ON` #启用本机指令集（`-march=native`）
+- `-DCO_CONTEXT_NATIVE=ON` 启用本机指令集（`-march=native`）
 
 ## 安装
 
