@@ -35,6 +35,12 @@ coContext::Context::Context() :
     this->ring.registerSelfFileDescriptor();
 }
 
+coContext::Context::~Context() {
+    const std::lock_guard lock{mutex};
+
+    if (this->ring.getFileDescriptor() == sharedRingFileDescriptor) sharedRingFileDescriptor = -1;
+}
+
 auto coContext::Context::swap(Context &other) noexcept -> void {
     std::swap(this->isRunning, other.isRunning);
     std::swap(this->ring, other.ring);

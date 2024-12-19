@@ -23,7 +23,7 @@ namespace coContext {
 
         auto operator=(Context &&) noexcept -> Context & = default;
 
-        ~Context() = default;
+        ~Context();
 
         auto swap(Context &other) noexcept -> void;
 
