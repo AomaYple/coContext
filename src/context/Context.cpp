@@ -130,6 +130,6 @@ auto coContext::Context::scheduleUnscheduledCoroutines() -> void {
     }
 }
 
-std::mutex coContext::Context::mutex;
-std::int32_t coContext::Context::sharedRingFileDescriptor{-1};
-std::uint32_t coContext::Context::cpuCode;
+constinit std::mutex coContext::Context::mutex;
+constinit std::int32_t coContext::Context::sharedRingFileDescriptor{-1};
+constinit std::uint32_t coContext::Context::cpuCode;
