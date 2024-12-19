@@ -30,12 +30,6 @@ namespace coContext {
                                           std::source_location sourceLocation = std::source_location::current())
             -> void;
 
-        auto updateFileDescriptors(std::uint32_t offset, std::span<const std::int32_t> fileDescriptors,
-                                   std::source_location sourceLocation = std::source_location::current()) -> void;
-
-        auto allocateFileDescriptorRange(std::uint32_t offset, std::uint32_t length,
-                                         std::source_location sourceLocation = std::source_location::current()) -> void;
-
         auto registerCpuAffinity(std::size_t cpuSetSize, const cpu_set_t *cpuSet,
                                  std::source_location sourceLocation = std::source_location::current()) -> void;
 
