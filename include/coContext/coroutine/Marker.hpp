@@ -33,7 +33,7 @@ namespace coContext {
         std::unique_ptr<__kernel_timespec> timeSpecification;
     };
 
-    [[nodiscard]] auto operator|(AsyncWaiter &&asyncWaiter, Marker &&marker) noexcept -> AsyncWaiter;
+    [[nodiscard]] auto operator|(AsyncWaiter &&, Marker &&) noexcept -> AsyncWaiter;
 }    // namespace coContext
 
 template<>
