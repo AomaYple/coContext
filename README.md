@@ -71,7 +71,8 @@ target_link_libraries(your_target
 
 ## 更多示例
 
-### 每秒触发的定时器
+<details>
+<summary>每秒触发的定时器</summary>
 
 ```c++
 [[nodiscard]] auto func() -> coContext::Task<> {
@@ -83,7 +84,9 @@ target_link_libraries(your_target
 }
 ```
 
-### IO超时控制
+</details>
+<details>
+<summary>IO超时控制</summary>
 
 ```c++
 [[nodiscard]] auto func(const std::int32_t socketFileDescriptor) -> coContext::Task<> {
@@ -95,7 +98,9 @@ target_link_libraries(your_target
 }
 ```
 
-### IO取消
+</details>
+<details>
+<summary>IO取消</summary>
 
 - 基于taskIdentity取消任务中正在运行的io
 
@@ -137,8 +142,9 @@ auto main() -> int {
 ```
 
 并且，支持同步取消版本`syncCancel`，用法与`cancel`相同
-
-### 任意嵌套任意返回值的协程
+</details>
+<details>
+<summary>任意嵌套任意返回值的协程</summary>
 
 ```c++
 #include <coContext/coContext.hpp>
@@ -182,7 +188,9 @@ auto main() -> int {
 }
 ```
 
-### 多线程
+</details>
+<details>
+<summary>多线程</summary>
 
 ```c++
 #include <coContext/coContext.hpp>
@@ -203,3 +211,5 @@ auto main() -> int {
     coContext::run();
 }
 ```
+
+</details>
