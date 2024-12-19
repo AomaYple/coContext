@@ -169,6 +169,14 @@ namespace coContext {
     [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view path, open_how &openHow)
         -> AsyncWaiter;
 
+    [[nodiscard]] auto openDirect(std::string_view path, std::int32_t flags, mode_t mode = {}) -> AsyncWaiter;
+
+    [[nodiscard]] auto openDirect(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
+                                  mode_t mode = {}) -> AsyncWaiter;
+
+    [[nodiscard]] auto openDirect(std::int32_t directoryFileDescriptor, std::string_view path, open_how &openHow)
+        -> AsyncWaiter;
+
     [[nodiscard]] auto read(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::uint64_t offset = -1)
         -> AsyncWaiter;
 

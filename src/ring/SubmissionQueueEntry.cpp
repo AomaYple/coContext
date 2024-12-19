@@ -178,6 +178,27 @@ auto coContext::SubmissionQueueEntry::open(const std::int32_t directoryFileDescr
     io_uring_prep_openat2(this->handle, directoryFileDescriptor, std::data(path), std::addressof(openHow));
 }
 
+auto coContext::SubmissionQueueEntry::openDirect(const std::string_view path, const std::int32_t flags,
+                                                 const mode_t mode,
+                                                 const std::uint32_t fileDescriptorIndex) const noexcept -> void {
+    io_uring_prep_open_direct(this->handle, std::data(path), flags, mode, fileDescriptorIndex);
+}
+
+auto coContext::SubmissionQueueEntry::openDirect(const std::int32_t directoryFileDescriptor,
+                                                 const std::string_view path, const std::int32_t flags,
+                                                 const mode_t mode,
+                                                 const std::uint32_t fileDescriptorIndex) const noexcept -> void {
+    io_uring_prep_openat_direct(this->handle, directoryFileDescriptor, std::data(path), flags, mode,
+                                fileDescriptorIndex);
+}
+
+auto coContext::SubmissionQueueEntry::openDirect(const std::int32_t directoryFileDescriptor,
+                                                 const std::string_view path, open_how &openHow,
+                                                 const std::uint32_t fileDescriptorIndex) const noexcept -> void {
+    io_uring_prep_openat2_direct(this->handle, directoryFileDescriptor, std::data(path), std::addressof(openHow),
+                                 fileDescriptorIndex);
+}
+
 auto coContext::SubmissionQueueEntry::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer,
                                            const std::uint64_t offset) const noexcept -> void {
     io_uring_prep_read(this->handle, fileDescriptor, std::data(buffer), std::size(buffer), offset);

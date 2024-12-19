@@ -327,6 +327,29 @@ auto coContext::open(const std::int32_t directoryFileDescriptor, const std::stri
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::openDirect(const std::string_view path, const std::int32_t flags, const mode_t mode) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.openDirect(path, flags, mode, IORING_FILE_INDEX_ALLOC);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std::string_view path,
+                           const std::int32_t flags, const mode_t mode) -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.openDirect(directoryFileDescriptor, path, flags, mode, IORING_FILE_INDEX_ALLOC);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std::string_view path, open_how &openHow)
+    -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.openDirect(directoryFileDescriptor, path, openHow, IORING_FILE_INDEX_ALLOC);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer, const std::uint64_t offset)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
