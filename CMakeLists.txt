@@ -33,6 +33,13 @@ target_compile_options(${PROJECT_NAME}
         $<$<CONFIG:Release>:-Ofast>
 )
 
+if (DEFINED CO_CONTEXT_NATIVE AND CO_CONTEXT_NATIVE)
+    target_compile_options(${PROJECT_NAME}
+            PRIVATE
+            $<$<CONFIG:Release>:-march=native>
+    )
+endif ()
+
 target_link_options(${PROJECT_NAME}
         PRIVATE
         $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=leak -fsanitize=undefined>
