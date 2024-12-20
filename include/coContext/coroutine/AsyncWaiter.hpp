@@ -34,6 +34,8 @@ namespace coContext {
 
         [[nodiscard]] auto await_resume() const -> std::int32_t;
 
+        [[nodiscard]] auto getAsyncWaitResumeFlags() const -> std::uint32_t;
+
     private:
         SubmissionQueueEntry submissionQueueEntry;
         Coroutine::Handle coroutineHandle;

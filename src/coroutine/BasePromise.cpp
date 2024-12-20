@@ -20,6 +20,10 @@ auto coContext::BasePromise::getResult() const noexcept -> std::int32_t { return
 
 auto coContext::BasePromise::setResult(const std::int32_t result) noexcept -> void { this->result = result; }
 
+auto coContext::BasePromise::getFlags() const noexcept -> std::uint32_t { return this->flags; }
+
+auto coContext::BasePromise::setFlags(const std::uint32_t flags) noexcept -> void { this->flags = flags; }
+
 auto coContext::BasePromise::getParentCoroutineIdentity() const noexcept -> std::uint64_t {
     return this->parentCoroutineIdentity;
 }

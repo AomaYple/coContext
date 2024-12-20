@@ -70,6 +70,7 @@ auto coContext::Context::run() -> void {
             if (const auto findResult{this->schedulingCoroutines.find(completionQueueEntry->user_data)};
                 findResult != std::cend(this->schedulingCoroutines)) {
                 findResult->second.promise().setResult(completionQueueEntry->res);
+                findResult->second.promise().setFlags(completionQueueEntry->flags);
 
                 this->unscheduledCoroutines.emplace(std::move(findResult->second));
                 this->schedulingCoroutines.erase(findResult);

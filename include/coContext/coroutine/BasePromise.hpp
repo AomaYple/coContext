@@ -27,6 +27,10 @@ namespace coContext {
 
         auto setResult(std::int32_t result) noexcept -> void;
 
+        [[nodiscard]] auto getFlags() const noexcept -> std::uint32_t;
+
+        auto setFlags(std::uint32_t flags) noexcept -> void;
+
         [[nodiscard]] auto getParentCoroutineIdentity() const noexcept -> std::uint64_t;
 
         auto setParentCoroutineIdentity(std::uint64_t identity) noexcept -> void;
@@ -48,6 +52,7 @@ namespace coContext {
         static thread_local std::pmr::polymorphic_allocator<> allocator;
 
         std::int32_t result{};
+        std::uint32_t flags{};
         std::uint64_t parentCoroutineIdentity{std::hash<Coroutine>{}(Coroutine{nullptr})};
         Coroutine childCoroutine{nullptr};
     };

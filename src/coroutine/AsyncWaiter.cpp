@@ -29,3 +29,7 @@ auto coContext::AsyncWaiter::await_suspend(const std::coroutine_handle<> generic
 auto coContext::AsyncWaiter::await_resume() const -> std::int32_t {
     return this->coroutineHandle.promise().getResult();
 }
+
+auto coContext::AsyncWaiter::getAsyncWaitResumeFlags() const -> std::uint32_t {
+    return this->coroutineHandle.promise().getFlags();
+}
