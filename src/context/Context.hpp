@@ -40,13 +40,14 @@ namespace coContext {
     private:
         auto scheduleUnscheduledCoroutines() -> void;
 
+        static std::uint32_t fileDescriptorLimit;
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
-        static constinit std::uint32_t cpuCode;
-        static std::uint32_t fileDescriptorLimit;
+        static std::vector<std::uint32_t> cpuCodes;
 
-        bool isRunning{};
         Ring ring;
+        std::uint32_t cpuCode;
+        bool isRunning{};
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
     };

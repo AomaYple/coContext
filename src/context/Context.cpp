@@ -4,6 +4,7 @@
 #include "coContext/coroutine/BasePromise.hpp"
 #include "coContext/ring/SubmissionQueueEntry.hpp"
 
+#include <algorithm>
 #include <sys/resource.h>
 
 coContext::Context::Context() :
@@ -24,18 +25,21 @@ coContext::Context::Context() :
         if (sharedRingFileDescriptor == -1) sharedRingFileDescriptor = ring.getFileDescriptor();
 
         return ring;
+    }()},
+    cpuCode{[] {
+        const std::lock_guard lock{mutex};
+
+        const auto minElement{std::ranges::min_element(cpuCodes)};
+        ++*minElement;
+
+        return static_cast<std::uint32_t>(std::distance(std::begin(cpuCodes), minElement));
     }()} {
     this->ring.registerSelfFileDescriptor();
 
     this->ring.registerSparseFileDescriptor(fileDescriptorLimit);
 
     constexpr cpu_set_t cpuSet{};
-    {
-        const std::lock_guard lock{mutex};
-
-        CPU_SET(cpuCode++, std::addressof(cpuSet));
-        cpuCode %= std::thread::hardware_concurrency();
-    }
+    CPU_SET(this->cpuCode, std::addressof(cpuSet));
     this->ring.registerCpuAffinity(sizeof(cpuSet), std::addressof(cpuSet));
 }
 
@@ -43,6 +47,8 @@ coContext::Context::~Context() {
     const std::lock_guard lock{mutex};
 
     if (this->ring.getFileDescriptor() == sharedRingFileDescriptor) sharedRingFileDescriptor = -1;
+
+    --cpuCodes[this->cpuCode];
 }
 
 auto coContext::Context::swap(Context &other) noexcept -> void {
@@ -121,9 +127,6 @@ auto coContext::Context::scheduleUnscheduledCoroutines() -> void {
     }
 }
 
-constinit std::mutex coContext::Context::mutex;
-constinit std::int32_t coContext::Context::sharedRingFileDescriptor{-1};
-constinit std::uint32_t coContext::Context::cpuCode;
 std::uint32_t coContext::Context::fileDescriptorLimit{
     [](const std::source_location sourceLocation = std::source_location::current()) {
         rlimit limit{};
@@ -137,3 +140,7 @@ std::uint32_t coContext::Context::fileDescriptorLimit{
 
         return static_cast<std::uint32_t>(limit.rlim_cur);
     }()};
+constinit std::mutex coContext::Context::mutex;
+constinit std::int32_t coContext::Context::sharedRingFileDescriptor{-1};
+std::vector<std::uint32_t> coContext::Context::cpuCodes{
+    std::vector<std::uint32_t>(std::thread::hardware_concurrency())};
