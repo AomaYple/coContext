@@ -110,8 +110,8 @@ auto main() -> int {
         func)};    // SpawnResult类型有两个成员，一个为std::uint64_t类型的任务标识符，一个为std::future<T>类型的任务返回值，这里T为std::int32_t
 
     const std::jthread worker{[&result] {
-        std::println("{}", result.taskIdentity);    // 输出任务标识符
-        std::println("{}", result.result.get());    // 阻塞地等待任务结束，并输出任务返回值
+        std::println("{}"sv, result.taskIdentity);    // 输出任务标识符
+        std::println("{}"sv, result.result.get());    // 阻塞地等待任务结束，并输出任务返回值
     }};
 
     coContext::run();
@@ -126,7 +126,7 @@ auto main() -> int {
     while (true) {    // 无限循环
         co_await coContext::sleep(1s);    // 等待1秒
 
-        std::println("Hello, coContext!");    // 输出
+        std::println("Hello, coContext!"sv);    // 输出
     }
 }
 ```
@@ -141,7 +141,7 @@ auto main() -> int {
     const std::int32_t result{
         co_await (coContext::receive(socketFileDescriptor, buffer, 0) | coContext::timeout(3s))};    // 限时3秒
 
-    std::println("received: {}", result);
+    std::println("received: {}"sv, result);
 }
 ```
 
@@ -191,7 +191,7 @@ auto main() -> int {
     std::int32_t result{co_await funcA()};    // 调用funcA并等待返回值
     result += co_await funcA();    // 再次调用funcA并等待返回值
 
-    std::println("{}", result);    // 打印result
+    std::println("{}"sv, result);    // 打印result
 }
 ```
 
