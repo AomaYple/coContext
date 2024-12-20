@@ -232,19 +232,19 @@ auto main() -> int {
 [[nodiscard]] auto func() -> coContext::Task<> {
     const std::int32_t directFileDescriptor{
         co_await coContext::openDirect("file"sv, O_RDONLY)};    // 以只读方式打开"file"文件, 并返回直接文件描述符
-    std::println("open direct result: {}", directFileDescriptor);
+    std::println("open direct result: {}"sv, directFileDescriptor);
 
     std::vector<std::byte> buffer{1024};
     const std::int32_t result{
         co_await (coContext::read(directFileDescriptor, buffer) |
-                  coContext::useDirectFileDescriptor())};    // 使用"coContext::useDirectFileDescriptor()"标记
-                                                             // 以直接文件描述符方式读取文件
-    std::println("read result: {}", result);
+                  coContext::direct())};    // 使用"coContext::direct()"标记以直接文件描述符方式读取文件
+
+    std::println("read result: {}"sv, result);
 }
 ```
 
 - 直接文件描述符必须以`coContext::closeDirect()`关闭
-- 直接文件描述的IO操作必须以`coContext::useDirectFileDescriptor()`标记
+- 直接文件描述的IO操作必须以`coContext::direct()`标记
 - 直接文件描述符可以通过`coContext::installDirectFileDescriptor()`转换为普通文件描述符
 - 转换后的直接文件描述符和普通文件描述符**相互独立**
 - 暂不支持普通文件描述符转换为直接文件描述符

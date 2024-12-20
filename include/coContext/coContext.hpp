@@ -81,7 +81,7 @@ namespace coContext {
     [[nodiscard]] auto syncCancelAny(std::chrono::seconds seconds = {}, std::chrono::nanoseconds nanoseconds = {})
         -> std::int32_t;
 
-    [[nodiscard]] auto useDirectFileDescriptor() noexcept -> Marker;
+    [[nodiscard]] auto direct() noexcept -> Marker;
 
     [[nodiscard]] auto timeout(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
                                ClockSource clockSource = {}) -> Marker;

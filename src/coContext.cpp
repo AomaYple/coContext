@@ -48,7 +48,7 @@ auto coContext::syncCancelAny(const std::chrono::seconds seconds, const std::chr
                               __kernel_timespec{seconds.count(), nanoseconds.count()});
 }
 
-auto coContext::useDirectFileDescriptor() noexcept -> Marker { return Marker{IOSQE_FIXED_FILE}; }
+auto coContext::direct() noexcept -> Marker { return Marker{IOSQE_FIXED_FILE}; }
 
 auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                         const ClockSource clockSource) -> Marker {
