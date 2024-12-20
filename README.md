@@ -116,28 +116,15 @@ target_link_libraries(your_target
 [[nodiscard]] auto cancelFunc(const std::uint64_t taskIdentity) -> coContext::Task<> {
     co_await coContext::cancel(taskIdentity);    // 基于任务标识符取消任务中正在运行的io
 }
-
-auto main() -> int {
-    const std::uint64_t taskIdentity{spawn(func)};
-    spawn(cancelFunc, taskIdentity);
-
-    coContext::run();
-}
 ```
 
 - 基于文件描述符取消io
 
 ```c++
 [[nodiscard]] auto cancelFunc(const std::int32_t socketFileDescriptor) -> coContext::Task<> {
-    co_await coContext::cancel(socketFileDescriptor,
-                               true);    // 第二个参数为 true 时，会取消该文件描述符上的所有io，否则只取消第一个io
-}
-
-[[nodiscard]] auto func(const std::int32_t socketFileDescriptor) -> coContext::Task<> {
-    spawn(cancelFunc, socketFileDescriptor);
-
-    std::vector<std::byte> buffer{1024};
-    co_await coContext::receive(socketFileDescriptor, buffer, 0);
+    co_await coContext::cancel(
+        socketFileDescriptor,
+        true);    // 第二个参数为默认为false，为true时，会取消该文件描述符上的所有io，否则只取消第一个io
 }
 ```
 
