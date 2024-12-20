@@ -77,6 +77,10 @@ target_link_libraries(your_target
 
 ## 更多示例
 
+### 启动和停止
+
+`coContext::run()`启动当前线程的调度器，`coContext::stop()`停止当前线程的调度器
+
 ### 如何使用`spawn`的返回值
 
 ```c++
