@@ -10,7 +10,7 @@
 - 支持IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
 - 支持嵌套**任意数量**的**任意返回值**的协程
 - 支持多线程
-- 支持直接文件描述符，支持以`socket` `accept` `open`方式获得直接文件描述符
+- 支持直接文件描述符，支持以`directSocket` `acceptDirect` `openDirect`方式获得直接文件描述符
 
 ## 基础用法
 
