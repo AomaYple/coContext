@@ -78,11 +78,12 @@ target_link_libraries(your_target
 
 ## 性能
 
-- 考虑到多线程之间数据共享的开销，调度器实例都是`thread_local`的，也就是说每个线程都有自己的调度器实例，且不能跨线程使用
-- 本项目的内存池都是`thread_local`的`std::pmr::unsynchronized_pool_resource`， 使内存分布更紧凑，减少内存碎片
+- 考虑到多线程之间数据共享的开销，调度器实例都是`thread_local`的，也就是说每个线程都有自己的调度器实例，且**不能跨线程**使用
+- 本框架的内存池都是`thread_local`的`std::pmr::unsynchronized_pool_resource`， 使内存分布更紧凑，减少内存碎片
 - 内存池的上游是`mimalloc`，如果内存池内存不足，会向`mimalloc`申请内存
 - 标准库`coroutine`默认使用全局`operator new`，本项目在类范围重载了`operator new`和`operator delete`，使用内存池分配内存
-- 由于本项目的协程和所有STL容器都使用内存池，所以极大地提升了缓存友好性，加快了内存分配和释放
+- 由于本框架的协程和所有STL容器都使用内存池，所以极大地提升了**缓存友好性**，加快了内存分配和释放
+- 内存分配不是侵入式的，不会影响到除了本框架之外的其他代码
 
 ## 更多示例
 
