@@ -2,8 +2,6 @@
 
 #include "coContext/coroutine/BasePromise.hpp"
 
-coContext::BaseTask::BaseTask(Coroutine &&coroutine) noexcept : coroutine{std::move(coroutine)} {}
-
 auto coContext::BaseTask::swap(BaseTask &other) noexcept -> void { std::swap(this->coroutine, other.coroutine); }
 
 auto coContext::BaseTask::getCoroutine() noexcept -> Coroutine & { return this->coroutine; }
@@ -16,3 +14,5 @@ auto coContext::BaseTask::await_suspend(const std::coroutine_handle<> genericCor
     this->coroutine.promise().setParentCoroutineIdentity(std::hash<Coroutine::Handle>{}(parentCoroutineHandle));
     parentCoroutineHandle.promise().setChildCoroutine(std::move(this->coroutine));
 }
+
+coContext::BaseTask::BaseTask(Coroutine &&coroutine) noexcept : coroutine{std::move(coroutine)} {}

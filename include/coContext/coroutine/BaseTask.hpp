@@ -5,8 +5,6 @@
 namespace coContext {
     class BaseTask {
     public:
-        explicit BaseTask(Coroutine &&coroutine) noexcept;
-
         BaseTask(const BaseTask &) = delete;
 
         auto operator=(const BaseTask &) -> BaseTask & = delete;
@@ -24,6 +22,9 @@ namespace coContext {
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
         auto await_suspend(std::coroutine_handle<> genericCoroutineHandle) -> void;
+
+    protected:
+        explicit BaseTask(Coroutine &&coroutine) noexcept;
 
     private:
         Coroutine coroutine;
