@@ -4,13 +4,13 @@
 
 ## 特性
 
-- 支持io_uring支持的所有系统调用`read` `write` `send` `recv` `accept`等
-- 支持纳秒级别的定时器`sleep(1s, 1ns)`
-- 支持IO超时`recv(socketFileDescriptor, buffer, 0) | timeout(1s)`
-- 支持IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
-- 支持嵌套**任意数量**的**任意返回值**的协程
-- 支持多线程
-- 支持直接文件描述符，支持以`directSocket` `acceptDirect` `openDirect`方式获得直接文件描述符
+- io_uring支持的所有系统调用`read` `write` `send` `recv` `accept`等
+- 纳秒级别的定时器`sleep(1s, 1ns)`
+- IO超时`recv(socketFileDescriptor, buffer, 0) | timeout(1s)`
+- IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
+- 嵌套**任意数量**的**任意返回值**的协程
+- 多线程
+- 直接文件描述符，以`directSocket` `acceptDirect` `openDirect`方式获得
 
 ## 基础用法
 
@@ -20,7 +20,7 @@
 #include <coContext/coContext.hpp> 
 ```
 
-简单示例，异步发起close系统调用
+简单示例，同步地执行异步的close系统调用
 
 ```c++
 #include <coContext/coContext.hpp>
