@@ -141,7 +141,7 @@ auto main() -> int {
     const std::int32_t result{
         co_await (coContext::receive(socketFileDescriptor, buffer, 0) | coContext::timeout(3s))};    // 限时3秒
 
-    std::println("received: {}"sv, result);
+    std::println("received: {}"sv, result);    // 打印接收到的字节数
 }
 ```
 
@@ -200,14 +200,11 @@ auto main() -> int {
 <summary>多线程</summary>
 
 ```c++
-#include <coContext/coContext.hpp>
-#include <thread>
-
-[[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::close(-1); }
+[[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::close(-1); }    // 简短的协程函数
 
 auto main() -> int {
     std::vector<std::jthread> workers;
-    for (std::uint8_t i{}; i != std::thread::hardware_concurrency() - 1; ++i) {
+    for (std::uint8_t i{}; i != std::thread::hardware_concurrency() - 1; ++i) {    // 循环创建线程
         workers.emplace_back([] {
             spawn(func);
             coContext::run();
@@ -232,14 +229,14 @@ auto main() -> int {
 [[nodiscard]] auto func() -> coContext::Task<> {
     const std::int32_t directFileDescriptor{
         co_await coContext::openDirect("file"sv, O_RDONLY)};    // 以只读方式打开"file"文件, 并返回直接文件描述符
-    std::println("open direct result: {}"sv, directFileDescriptor);
+    std::println("open direct result: {}"sv, directFileDescriptor);    // 输出打开文件结果
 
     std::vector<std::byte> buffer{1024};
     const std::int32_t result{
         co_await (coContext::read(directFileDescriptor, buffer) |
                   coContext::direct())};    // 使用"coContext::direct()"标记以直接文件描述符方式读取文件
 
-    std::println("read result: {}"sv, result);
+    std::println("read result: {}"sv, result);    // 输出读取结果
 }
 ```
 
