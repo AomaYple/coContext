@@ -52,10 +52,6 @@ namespace coContext {
             std::promise<T> returnValue;
         };
 
-        explicit constexpr Task(const CoroutineHandle coroutineHandle) :
-            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
-            returnValue{coroutineHandle.promise().getReturnValue()} {}
-
         Task(const Task &) = delete;
 
         auto operator=(const Task &) -> Task & = delete;
@@ -76,6 +72,10 @@ namespace coContext {
         [[nodiscard]] constexpr auto await_resume() { return this->returnValue.get(); }
 
     private:
+        explicit constexpr Task(const CoroutineHandle coroutineHandle) :
+            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
+            returnValue{coroutineHandle.promise().getReturnValue()} {}
+
         std::future<T> returnValue;
     };
 
@@ -116,10 +116,6 @@ namespace coContext {
             std::promise<T &> returnValue;
         };
 
-        explicit constexpr Task(const CoroutineHandle coroutineHandle) :
-            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
-            returnValue{coroutineHandle.promise().getReturnValue()} {}
-
         Task(const Task &) = delete;
 
         auto operator=(const Task &) -> Task & = delete;
@@ -140,6 +136,10 @@ namespace coContext {
         [[nodiscard]] constexpr auto await_resume() -> T & { return this->returnValue.get(); }
 
     private:
+        explicit constexpr Task(const CoroutineHandle coroutineHandle) :
+            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
+            returnValue{coroutineHandle.promise().getReturnValue()} {}
+
         std::future<T &> returnValue;
     };
 
@@ -180,10 +180,6 @@ namespace coContext {
             std::promise<void> returnValue;
         };
 
-        explicit constexpr Task(const CoroutineHandle coroutineHandle) :
-            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
-            returnValue{coroutineHandle.promise().getReturnValue()} {}
-
         Task(const Task &) = delete;
 
         auto operator=(const Task &) -> Task & = delete;
@@ -204,6 +200,10 @@ namespace coContext {
         constexpr auto await_resume() const noexcept {}
 
     private:
+        explicit constexpr Task(const CoroutineHandle coroutineHandle) :
+            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
+            returnValue{coroutineHandle.promise().getReturnValue()} {}
+
         std::future<void> returnValue;
     };
 }    // namespace coContext
