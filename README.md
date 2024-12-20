@@ -10,6 +10,7 @@
 - 支持IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
 - 支持嵌套**任意数量**的**任意返回值**的协程
 - 支持多线程
+- 支持直接文件描述符，支持以`socket` `accept` `open`方式获得直接文件描述符
 
 ## 基础用法
 
@@ -205,5 +206,32 @@ auto main() -> int {
     coContext::run();
 }
 ```
+
+</details>
+
+<details>
+<summary>直接文件描述符</summary>
+
+- 直接文件描述符的操作开销较普通文件描述符更低，因为内核在操作开始时抓取文件描述符引用计数，并在操作完成后丢弃它
+- 如果进程文件表是共享的（例如多线程程序），开销会更大
+- 使用直接文件描述符可以减少文件描述符操作中引用管理的开销
+
+```c++
+[[nodiscard]] auto func() -> coContext::Task<> {
+    const std::int32_t directFileDescriptor{
+        co_await coContext::openDirect("file"sv, O_RDONLY)};    // 以只读方式打开"file"文件, 返回直接文件描述符
+    std::println("open direct result: {}", directFileDescriptor);
+
+    std::vector<std::byte> buffer{1024};
+    const std::int32_t result{
+        co_await (coContext::read(directFileDescriptor, buffer) |
+                  coContext::useDirectFileDescriptor())};    // 使用"coContext::useDirectFileDescriptor()"标记,
+                                                             // 以直接文件描述符方式读取文件
+    std::println("read result: {}", result);
+}
+```
+
+- 直接文件描述符必须以`coContext::closeDirect()`关闭
+- 直接文件描述符可以通过`coContext::installDirectFileDescriptor()`转换为普通文件描述符
 
 </details>
