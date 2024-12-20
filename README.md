@@ -90,7 +90,7 @@ target_link_libraries(your_target
 
 ### 启动和停止
 
-`coContext::run()`启动当前线程的调度器，`coContext::stop()`停止当前线程的调度器
+`run()`启动当前线程的调度器，`stop()`停止当前线程的调度器
 
 ### 如何使用`spawn`的返回值
 
@@ -105,11 +105,11 @@ target_link_libraries(your_target
 
 auto main() -> int {
     coContext::SpawnResult result{coContext::spawn<std::int32_t>(
-        func)};    // SpawnResult类型有两个成员，一个为std::uint64_t类型的任务标识符，一个为std::future<T>类型的任务返回值，这里T为std::int32_t
+        func)};    // SpawnResult类型有两个成员，一个为std::future<T>类型的任务返回值，这里T为std::int32_t，另一个为std::uint64_t类型的任务标识符
 
     const std::jthread worker{[&result] {
+        std::println("{}"sv, result.value.get());    // 阻塞地等待任务结束，并输出任务返回值
         std::println("{}"sv, result.taskIdentity);    // 输出任务标识符
-        std::println("{}"sv, result.result.get());    // 阻塞地等待任务结束，并输出任务返回值
     }};
 
     coContext::run();
@@ -145,9 +145,9 @@ auto main() -> int {
 
 </details>
 <details>
-<summary>IO取消</summary>
+<summary>取消IO</summary>
 
-- 基于taskIdentity取消任务中正在运行的io
+- 基于`taskIdentity`取消任务中正在运行的io
 
 ```c++
 [[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::sleep(4s); }    // 发起一个4s的定时
@@ -238,9 +238,9 @@ auto main() -> int {
 }
 ```
 
-- 直接文件描述符必须以`coContext::closeDirect()`关闭
-- 直接文件描述的IO操作必须以`coContext::direct()`标记
-- 直接文件描述符可以通过`coContext::installDirectFileDescriptor()`转换为普通文件描述符
+- 直接文件描述符必须以`closeDirect()`关闭
+- 直接文件描述的IO操作必须以`direct()`标记
+- 直接文件描述符可以通过`installDirectFileDescriptor()`转换为普通文件描述符
 - 转换后的直接文件描述符和普通文件描述符**相互独立**
 - 暂不支持普通文件描述符转换为直接文件描述符
 
