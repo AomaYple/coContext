@@ -52,8 +52,9 @@ coContext::Context::~Context() {
 }
 
 auto coContext::Context::swap(Context &other) noexcept -> void {
-    std::swap(this->isRunning, other.isRunning);
     std::swap(this->ring, other.ring);
+    std::swap(this->cpuCode, other.cpuCode);
+    std::swap(this->isRunning, other.isRunning);
     std::swap(this->unscheduledCoroutines, other.unscheduledCoroutines);
     std::swap(this->schedulingCoroutines, other.schedulingCoroutines);
 }
