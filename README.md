@@ -140,44 +140,17 @@ target_link_libraries(your_target
 <summary>任意嵌套任意返回值的协程</summary>
 
 ```c++
-#include <coContext/coContext.hpp>
-#include <print>
-#include <thread>
+[[nodiscard]] auto funcA() -> coContext::Task<std::int32_t> {    // 返回值为std::int32_t类型
+    const std::int32_t result{co_await coContext::close(-1)};    // 发起close调用
 
-using namespace std::chrono_literals;
-
-[[nodiscard]] auto funcA() -> coContext::Task<std::int32_t> { co_return 1; }    // 该协程什么也不做，直接返回1
-
-[[nodiscard]] auto funcB() -> coContext::Task<std::int32_t> {
-    std::int32_t result{co_await coContext::close(-1)};    // 发起close请求
-
-    result += co_await funcA();    // 将result加上funcA的返回值
-
-    co_return result;    // 返回result
+    co_return result + 3;    // 返回result + 3
 }
 
-[[nodiscard]] auto funcD() -> coContext::Task<> {
-    co_await coContext::close(-1);
-}    // 该协程发起close请求，但不返回任何值
+[[nodiscard]] auto func() -> coContext::Task<> {
+    std::int32_t result{co_await funcA()};    // 调用funcA并等待返回值
+    result += co_await funcA();    // 再次调用funcA并等待返回值
 
-[[nodiscard]] auto func() -> coContext::Task<std::int32_t> {
-    std::int32_t result{co_await coContext::close(-1)};    // 发起close请求
-
-    result += co_await funcB();    // 将result加上funcB的返回值
-
-    co_await funcD();    // 调用funcD
-
-    co_return result;    // 返回result
-}
-
-auto main() -> int {
-    coContext::SpawnResult result{spawn<std::int32_t>(func)};    // 添加func，并以SpawnResult类型保存返回值
-
-    const std::jthread worker{[&result] {
-        std::println("{}", result.result.get());    // 在新线程中输出result的值
-    }};
-
-    coContext::run();
+    std::println("{}", result);    // 打印result
 }
 ```
 
