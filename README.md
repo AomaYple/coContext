@@ -77,6 +77,30 @@ target_link_libraries(your_target
 
 ## 更多示例
 
+### 如何使用`spawn`的返回值
+
+```c++
+#include <coContext/coContext.hpp>
+#include <print>
+#include <thread>
+
+[[nodiscard]] auto func() -> coContext::Task<std::int32_t> {
+    co_return co_await coContext::close(-1);
+}    // 发起close调用，并返回一个std::int32_t类型的值
+
+auto main() -> int {
+    coContext::SpawnResult result{coContext::spawn<std::int32_t>(
+        func)};    // SpawnResult类型有两个成员，一个为std::uint64_t类型的任务标识符，一个为std::future<T>类型的任务返回值，这里T为std::int32_t
+
+    const std::jthread worker{[&result] {
+        std::println("{}", result.taskIdentity);    // 输出任务标识符
+        std::println("{}", result.result.get());    // 阻塞地等待任务结束，并输出任务返回值
+    }};
+
+    coContext::run();
+}
+```
+
 <details>
 <summary>每秒触发的定时器</summary>
 
