@@ -84,9 +84,9 @@ auto coContext::cancelAny() -> AsyncWaiter {
 
 auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                       const ClockSource clockSource) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-
     auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
+
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.timeout(*timeSpecification, 0, setClockSource(clockSource));
 
     AsyncWaiter asyncWaiter{submissionQueueEntry};
@@ -97,9 +97,9 @@ auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nan
 
 auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,
                             const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource) -> AsyncWaiter {
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-
     auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
+
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.updateTimeout(*timeSpecification, taskIdentity, setClockSource(clockSource));
 
     AsyncWaiter asyncWaiter{submissionQueueEntry};
