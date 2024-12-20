@@ -76,7 +76,7 @@ target_link_libraries(your_target
 )
 ```
 
-## 性能
+## 内存管理
 
 - 考虑到多线程之间数据共享的开销，调度器实例都是`thread_local`的，也就是说每个线程都有自己的调度器实例，且**不能跨线程**使用
 - 本框架使用内存池`std::pmr::unsynchronized_pool_resource`进行内存分配， 使内存分布更紧凑，减少内存碎片
