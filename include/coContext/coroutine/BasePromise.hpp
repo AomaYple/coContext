@@ -11,8 +11,6 @@ namespace coContext {
 
         auto operator delete(void *, std::size_t) noexcept -> void;
 
-        constexpr BasePromise() noexcept = default;
-
         BasePromise(const BasePromise &) = delete;
 
         auto operator=(const BasePromise &) -> BasePromise & = delete;
@@ -42,6 +40,9 @@ namespace coContext {
         [[nodiscard]] auto final_suspend() const noexcept -> std::suspend_always;
 
         auto unhandled_exception() const -> void;
+
+    protected:
+        constexpr BasePromise() noexcept = default;
 
     private:
         static thread_local std::pmr::polymorphic_allocator<> allocator;
