@@ -11,10 +11,8 @@ namespace coContext {
 
     template<TaskReturnType T = void>
     class Task : public BaseTask {
-    public:
         class Promise;
 
-        using promise_type = Promise;
         using CoroutineHandle = std::coroutine_handle<Promise>;
 
         class Promise : public BasePromise {
@@ -52,6 +50,9 @@ namespace coContext {
             std::promise<T> returnValue;
         };
 
+    public:
+        using promise_type = Promise;
+
         Task(const Task &) = delete;
 
         auto operator=(const Task &) -> Task & = delete;
@@ -81,10 +82,8 @@ namespace coContext {
 
     template<typename T>
     class Task<T &> : public BaseTask {
-    public:
         class Promise;
 
-        using promise_type = Promise;
         using CoroutineHandle = std::coroutine_handle<Promise>;
 
         class Promise : public BasePromise {
@@ -116,6 +115,9 @@ namespace coContext {
             std::promise<T &> returnValue;
         };
 
+    public:
+        using promise_type = Promise;
+
         Task(const Task &) = delete;
 
         auto operator=(const Task &) -> Task & = delete;
@@ -145,10 +147,8 @@ namespace coContext {
 
     template<>
     class Task<> : public BaseTask {
-    public:
         class Promise;
 
-        using promise_type = Promise;
         using CoroutineHandle = std::coroutine_handle<Promise>;
 
         class Promise : public BasePromise {
@@ -179,6 +179,9 @@ namespace coContext {
         private:
             std::promise<void> returnValue;
         };
+
+    public:
+        using promise_type = Promise;
 
         Task(const Task &) = delete;
 
@@ -233,11 +236,6 @@ namespace std {
         lhs.swap(rhs);
     }
 }    // namespace std
-
-template<>
-constexpr auto std::swap(coContext::Task<>::Promise &lhs, coContext::Task<>::Promise &rhs) noexcept -> void {
-    lhs.swap(rhs);
-}
 
 template<>
 constexpr auto std::swap(coContext::Task<> &lhs, coContext::Task<> &rhs) noexcept -> void {
