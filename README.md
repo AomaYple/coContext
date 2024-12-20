@@ -106,10 +106,10 @@ auto main() -> int {
 
 ```c++
 [[nodiscard]] auto func() -> coContext::Task<> {
-    while (true) {
-        co_await coContext::sleep(1s);
+    while (true) {    // 无限循环
+        co_await coContext::sleep(1s);    // 等待1秒
 
-        std::println("Hello, coContext!");
+        std::println("Hello, coContext!");    // 输出
     }
 }
 ```
