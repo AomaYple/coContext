@@ -232,6 +232,7 @@ auto main() -> int {
 ```
 
 - 直接文件描述符必须以`coContext::closeDirect()`关闭
+- 直接文件描述的IO操作必须以`coContext::useDirectFileDescriptor()`标记
 - 直接文件描述符可以通过`coContext::installDirectFileDescriptor()`转换为普通文件描述符
 - 转换后的直接文件描述符和普通文件描述**相互独立**
 
