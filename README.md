@@ -4,7 +4,7 @@
 
 ## 特性
 
-- io_uring支持的所有系统调用`read` `write` `send` `recv` `accept`等
+- io_uring支持的所有系统调用`accept` `send` `recv` `read` `write`等
 - 纳秒级别的定时器`sleep(1s, 1ns)`
 - IO超时`recv(socketFileDescriptor, buffer, 0) | timeout(1s)`
 - IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
