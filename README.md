@@ -83,7 +83,7 @@ target_link_libraries(your_target
 - 内存池都是`thread_local`的，减少多线程分配和释放内存时的锁开销
 - 内存池的上游是`mimalloc`，如果内存池内存不足，会向`mimalloc`申请内存
 - 标准库`coroutine`默认使用全局`operator new`，本项目在类范围重载了`operator new`和`operator delete`，使用内存池分配内存
-- 由于本框架的协程和所有STL容器都使用内存池，所以极大地提升了**缓存友好性**，加快了内存分配和释放
+- 由于本框架的协程和所有STL容器都使用内存池，所以极大地提升了**缓存友好性**
 - 内存分配**不是侵入式**的，不会影响到除了本框架之外的其他代码
 
 ## 更多示例
