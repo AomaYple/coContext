@@ -247,5 +247,6 @@ auto main() -> int {
 - 直接文件描述的IO操作必须以`coContext::useDirectFileDescriptor()`标记
 - 直接文件描述符可以通过`coContext::installDirectFileDescriptor()`转换为普通文件描述符
 - 转换后的直接文件描述符和普通文件描述符**相互独立**
+- 暂不支持普通文件描述符转换为直接文件描述符
 
 </details>
