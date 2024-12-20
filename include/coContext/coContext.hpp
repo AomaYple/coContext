@@ -103,6 +103,9 @@ namespace coContext {
 
     [[nodiscard]] auto updatePoll(std::uint64_t taskIdentity, std::uint32_t mask) -> AsyncWaiter;
 
+    [[nodiscard]] auto installDirectFileDescriptor(std::int32_t directFileDescriptor, bool isSetCloseOnExec = true)
+        -> AsyncWaiter;
+
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> AsyncWaiter;
 
     [[nodiscard]] auto closeDirect(std::int32_t directFileDescriptor) -> AsyncWaiter;

@@ -122,6 +122,15 @@ auto coContext::updatePoll(const std::uint64_t taskIdentity, const std::uint32_t
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::installDirectFileDescriptor(const std::int32_t directFileDescriptor, const bool isSetCloseOnExec)
+    -> AsyncWaiter {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.installDirectFileDescriptor(directFileDescriptor,
+                                                     isSetCloseOnExec ? 0 : IORING_FIXED_FD_NO_CLOEXEC);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
 auto coContext::close(const std::int32_t fileDescriptor) -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.close(fileDescriptor);
