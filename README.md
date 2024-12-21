@@ -80,7 +80,7 @@ target_link_libraries(your_target
 
 - 基于C++17`std::pmr`进行内存管理，各个线程都有自己的内存池，即`thread_local`
 - 内存池实现为`std::pmr::unsynchronized_pool_resource`，内存池内存不足时会向`mimalloc`申请内存
-- 标准库`coroutine`默认使用全局`operator new`，所以在类范围重载了`operator new`和`operator delete`，使用内存池分配内存
+- 标准库`coroutine`使用默认的内存分配方式，所以在类范围重载了`operator new`和`operator delete`，使用内存池分配和释放内存
 - 协程和所有STL容器都使用内存池，减少了内存碎片和使内存分布更加紧凑，极大地提升了**缓存友好性**
 - 内存分配**不是侵入式**的，不会影响到除了本库之外的其他代码
 
