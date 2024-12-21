@@ -82,17 +82,34 @@ auto coContext::cancelAny() -> AsyncWaiter {
     return AsyncWaiter{submissionQueueEntry};
 }
 
-auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
-                      const ClockSource clockSource) -> AsyncWaiter {
+[[nodiscard]] constexpr auto sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
+                                   const std::uint32_t flags) {
     auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
 
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.timeout(*timeSpecification, 0, setClockSource(clockSource));
+    const coContext::SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.timeout(*timeSpecification, 0, flags);
 
-    AsyncWaiter asyncWaiter{submissionQueueEntry};
+    coContext::AsyncWaiter asyncWaiter{submissionQueueEntry};
     asyncWaiter.getTimeSpecifications().first = std::move(timeSpecification);
 
     return asyncWaiter;
+}
+
+auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
+                      const ClockSource clockSource) -> AsyncWaiter {
+    return ::sleep(seconds, nanoseconds, setClockSource(clockSource));
+}
+
+auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> &&action,
+                              const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
+                              const ClockSource clockSource) -> Task<> {
+    AsyncWaiter asyncWaiter{::sleep(seconds, nanoseconds, setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT)};
+
+    std::uint32_t flags{IORING_CQE_F_MORE};
+    while (flags & IORING_CQE_F_MORE) {
+        action(co_await asyncWaiter);
+        flags = asyncWaiter.getAsyncWaitResumeFlags();
+    }
 }
 
 auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,

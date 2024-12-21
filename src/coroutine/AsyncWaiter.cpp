@@ -22,6 +22,8 @@ auto coContext::AsyncWaiter::getTimeSpecifications() noexcept -> TimeSpecificati
 auto coContext::AsyncWaiter::await_ready() const noexcept -> bool { return {}; }
 
 auto coContext::AsyncWaiter::await_suspend(const std::coroutine_handle<> genericCoroutineHandle) noexcept -> void {
+    if (this->coroutineHandle == genericCoroutineHandle) return;
+
     this->coroutineHandle = Coroutine::Handle::from_address(genericCoroutineHandle.address());
     this->submissionQueueEntry.setUserData(std::hash<Coroutine::Handle>{}(this->coroutineHandle));
 }

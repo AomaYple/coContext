@@ -36,7 +36,7 @@ namespace coContext {
     template<std::movable T, typename F, typename... Args>
         requires std::is_invocable_r_v<Task<T>, F, Args...>
     constexpr auto spawn(F &&func, Args &&...args) {
-        Task<T> task{std::invoke(func, std::forward<Args>(args)...)};
+        Task<T> task{std::invoke(std::forward<F>(func), std::forward<Args>(args)...)};
 
         Coroutine &coroutine{task.getCoroutine()};
         const std::uint64_t identity{std::hash<Coroutine>{}(coroutine)};
@@ -49,7 +49,7 @@ namespace coContext {
     template<typename T, typename F, typename... Args>
         requires std::is_lvalue_reference_v<T> && std::is_invocable_r_v<Task<T &>, F, Args...>
     constexpr auto spawn(F &&func, Args &&...args) {
-        Task<T &> task{std::invoke(func, std::forward<Args>(args)...)};
+        Task<T &> task{std::invoke(std::forward<F>(func), std::forward<Args>(args)...)};
 
         Coroutine &coroutine{task.getCoroutine()};
         const std::uint64_t identity{std::hash<Coroutine>{}(coroutine)};
@@ -62,7 +62,7 @@ namespace coContext {
     template<typename F, typename... Args>
         requires std::is_invocable_r_v<Task<>, F, Args...>
     constexpr auto spawn(F &&func, Args &&...args) {
-        Task<> task{std::invoke(func, std::forward<Args>(args)...)};
+        Task<> task{std::invoke(std::forward<F>(func), std::forward<Args>(args)...)};
 
         Coroutine &coroutine{task.getCoroutine()};
         const std::uint64_t identity{std::hash<Coroutine>{}(coroutine)};
@@ -94,6 +94,10 @@ namespace coContext {
 
     [[nodiscard]] auto sleep(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
                              ClockSource clockSource = {}) -> AsyncWaiter;
+
+    [[nodiscard]] auto multipleSleep(std::move_only_function<auto(std::int32_t)->void> &&action,
+                                     std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
+                                     ClockSource clockSource = {}) -> Task<>;
 
     [[nodiscard]] auto updateSleep(std::uint64_t taskIdentity, std::chrono::seconds seconds,
                                    std::chrono::nanoseconds nanoseconds = {}, ClockSource clockSource = {})
