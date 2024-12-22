@@ -99,6 +99,8 @@ target_link_libraries(your_target
 #include <print>
 #include <thread>
 
+using namespace std::string_view_literals;
+
 [[nodiscard]] auto func() -> coContext::Task<std::int32_t> {
     co_return co_await coContext::close(-1);
 }    // 发起close调用，并返回一个std::int32_t类型的值
