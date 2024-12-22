@@ -200,7 +200,7 @@ namespace coContext {
 
         [[nodiscard]] constexpr auto getReturnValue() noexcept -> std::future<void> & { return this->returnValue; }
 
-        constexpr auto await_resume() const noexcept {}
+        constexpr auto await_resume() { this->returnValue.get(); }
 
     private:
         explicit constexpr Task(const CoroutineHandle coroutineHandle) :
