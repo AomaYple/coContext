@@ -104,18 +104,13 @@ auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nan
 
 auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,
                             const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource) -> AsyncWaiter {
-    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
-
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.updateTimeout(taskIdentity, *timeSpecification, setClockSource(clockSource));
+    AsyncWaiter asyncWaiter{submissionQueueEntry};
 
-    spawn(
-        []([[maybe_unused]] std::unique_ptr<__kernel_timespec> updateSleepTimeSpecification) -> Task<> {
-            co_await sleep(1s);
-        },
-        std::move(timeSpecification));
+    asyncWaiter.setTimeSpecification(std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
+    submissionQueueEntry.updateTimeout(taskIdentity, *asyncWaiter.getTimeSpecification(), setClockSource(clockSource));
 
-    return AsyncWaiter{submissionQueueEntry};
+    return asyncWaiter;
 }
 
 auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> action,
