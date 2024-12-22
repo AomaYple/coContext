@@ -40,7 +40,7 @@ coContext::Context::Context() :
 
     constexpr cpu_set_t cpuSet{};
     CPU_SET(this->cpuCode, std::addressof(cpuSet));
-    this->ring.registerCpuAffinity(sizeof(cpuSet), std::addressof(cpuSet));
+    this->ring.registerCpuAffinity(std::addressof(cpuSet), sizeof(cpuSet));
 }
 
 coContext::Context::~Context() {

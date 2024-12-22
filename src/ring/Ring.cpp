@@ -63,7 +63,7 @@ auto coContext::Ring::registerSparseFileDescriptor(const std::uint32_t count, co
     }
 }
 
-auto coContext::Ring::registerCpuAffinity(const std::size_t cpuSetSize, const cpu_set_t *const cpuSet,
+auto coContext::Ring::registerCpuAffinity(const cpu_set_t *const cpuSet, const std::size_t cpuSetSize,
                                           const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_iowq_aff(std::addressof(this->handle), cpuSetSize, cpuSet)};
         result != 0) {
