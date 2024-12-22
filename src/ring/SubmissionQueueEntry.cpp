@@ -38,7 +38,7 @@ auto coContext::SubmissionQueueEntry::timeout(__kernel_timespec &timeSpecificati
     io_uring_prep_timeout(this->handle, std::addressof(timeSpecification), count, flags);
 }
 
-auto coContext::SubmissionQueueEntry::updateTimeout(__kernel_timespec &timeSpecification, const std::uint64_t userData,
+auto coContext::SubmissionQueueEntry::updateTimeout(const std::uint64_t userData, __kernel_timespec &timeSpecification,
                                                     const std::uint32_t flags) const noexcept -> void {
     io_uring_prep_timeout_update(this->handle, std::addressof(timeSpecification), userData, flags);
 }

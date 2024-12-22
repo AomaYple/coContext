@@ -105,7 +105,7 @@ auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono:
     auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
 
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.updateTimeout(*timeSpecification, taskIdentity, setClockSource(clockSource));
+    submissionQueueEntry.updateTimeout(taskIdentity, *timeSpecification, setClockSource(clockSource));
 
     spawn(
         [](std::unique_ptr<__kernel_timespec> updateSleepTimeSpecification,

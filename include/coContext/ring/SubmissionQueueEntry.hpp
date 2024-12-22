@@ -41,7 +41,7 @@ namespace coContext {
         auto timeout(__kernel_timespec &timeSpecification, std::uint32_t count, std::uint32_t flags) const noexcept
             -> void;
 
-        auto updateTimeout(__kernel_timespec &timeSpecification, std::uint64_t userData,
+        auto updateTimeout(std::uint64_t userData, __kernel_timespec &timeSpecification,
                            std::uint32_t flags) const noexcept -> void;
 
         auto poll(std::int32_t fileDescriptor, std::uint32_t mask) const noexcept -> void;
