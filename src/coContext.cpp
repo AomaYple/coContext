@@ -2,6 +2,8 @@
 
 #include "context/Context.hpp"
 
+using namespace std::chrono_literals;
+
 namespace {
     thread_local coContext::Context context;
 
@@ -108,12 +110,10 @@ auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono:
     submissionQueueEntry.updateTimeout(taskIdentity, *timeSpecification, setClockSource(clockSource));
 
     spawn(
-        [](std::unique_ptr<__kernel_timespec> updateSleepTimeSpecification,
-           const ClockSource updateSleepClockSource) -> Task<> {
-            co_await sleep(std::chrono::seconds{updateSleepTimeSpecification->tv_sec},
-                           std::chrono::nanoseconds{updateSleepTimeSpecification->tv_nsec}, updateSleepClockSource);
+        []([[maybe_unused]] std::unique_ptr<__kernel_timespec> updateSleepTimeSpecification) -> Task<> {
+            co_await sleep(1s);
         },
-        std::move(timeSpecification), clockSource);
+        std::move(timeSpecification));
 
     return AsyncWaiter{submissionQueueEntry};
 }
