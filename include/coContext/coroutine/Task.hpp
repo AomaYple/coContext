@@ -36,7 +36,7 @@ namespace coContext {
 
             [[nodiscard]] constexpr auto get_return_object() { return Task{CoroutineHandle::from_promise(*this)}; }
 
-            constexpr auto return_value(T &&returnValue) { this->returnValue.set_value(std::move(returnValue)); }
+            constexpr auto return_value(T returnValue) { this->returnValue.set_value(std::move(returnValue)); }
 
             constexpr auto return_value(const T &returnValue)
                 requires std::copyable<T>

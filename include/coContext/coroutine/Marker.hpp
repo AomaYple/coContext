@@ -1,18 +1,17 @@
 #pragma once
 
-#include <linux/time_types.h>
-#include <memory>
+#include <cstdint>
 
 namespace coContext {
     class AsyncWaiter;
 
     class Marker {
     public:
-        explicit Marker(std::uint32_t flags) noexcept;
+        explicit Marker(std::uint32_t flags = {}) noexcept;
 
-        Marker(const Marker &) = delete;
+        constexpr Marker(const Marker &) noexcept = default;
 
-        auto operator=(const Marker &) -> Marker & = delete;
+        constexpr auto operator=(const Marker &) noexcept -> Marker & = default;
 
         constexpr Marker(Marker &&) noexcept = default;
 
@@ -20,23 +19,13 @@ namespace coContext {
 
         constexpr ~Marker() = default;
 
-        auto swap(Marker &other) noexcept -> void;
-
         [[nodiscard]] auto getFlags() const noexcept -> std::uint32_t;
-
-        [[nodiscard]] auto getTimeSpecification() noexcept -> std::unique_ptr<__kernel_timespec> &;
-
-        auto setTimeSpecification(std::unique_ptr<__kernel_timespec> &&timeSpecification) noexcept -> void;
 
     private:
         std::uint32_t flags;
-        std::unique_ptr<__kernel_timespec> timeSpecification;
     };
 
-    [[nodiscard]] auto operator|(AsyncWaiter &&, Marker &&) noexcept -> AsyncWaiter;
-}    // namespace coContext
+    [[nodiscard]] auto operator==(const Marker &, const Marker &) noexcept -> bool;
 
-template<>
-constexpr auto std::swap(coContext::Marker &lhs, coContext::Marker &rhs) noexcept -> void {
-    lhs.swap(rhs);
-}
+    [[nodiscard]] auto operator|(AsyncWaiter, Marker) noexcept -> AsyncWaiter;
+}    // namespace coContext

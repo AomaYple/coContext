@@ -129,7 +129,7 @@ auto coContext::Ring::submitAndWait(const std::uint32_t count, const std::source
     }
 }
 
-auto coContext::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->void> &&action) const -> std::int32_t {
+auto coContext::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->void> action) const -> std::int32_t {
     std::int32_t count{};
 
     std::uint32_t head;

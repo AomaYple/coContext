@@ -8,15 +8,20 @@ coContext::AsyncWaiter::AsyncWaiter(const SubmissionQueueEntry submissionQueueEn
 auto coContext::AsyncWaiter::swap(AsyncWaiter &other) noexcept -> void {
     std::swap(this->submissionQueueEntry, other.submissionQueueEntry);
     std::swap(this->coroutineHandle, other.coroutineHandle);
-    std::swap(this->timeSpecifications, other.timeSpecifications);
+    std::swap(this->timeSpecification, other.timeSpecification);
 }
 
 auto coContext::AsyncWaiter::getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry {
     return this->submissionQueueEntry;
 }
 
-auto coContext::AsyncWaiter::getTimeSpecifications() noexcept -> TimeSpecification & {
-    return this->timeSpecifications;
+auto coContext::AsyncWaiter::getTimeSpecification() const noexcept -> const std::unique_ptr<__kernel_timespec> & {
+    return this->timeSpecification;
+}
+
+auto coContext::AsyncWaiter::setTimeSpecification(std::unique_ptr<__kernel_timespec> timeSpecification) noexcept
+    -> void {
+    this->timeSpecification = std::move(timeSpecification);
 }
 
 auto coContext::AsyncWaiter::await_ready() const noexcept -> bool { return {}; }

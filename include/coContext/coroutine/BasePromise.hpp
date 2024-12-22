@@ -37,7 +37,7 @@ namespace coContext {
 
         [[nodiscard]] auto getChildCoroutine() noexcept -> Coroutine &;
 
-        auto setChildCoroutine(Coroutine &&coroutine) noexcept -> void;
+        auto setChildCoroutine(Coroutine coroutine) noexcept -> void;
 
         [[nodiscard]] auto initial_suspend() const noexcept -> std::suspend_always;
 

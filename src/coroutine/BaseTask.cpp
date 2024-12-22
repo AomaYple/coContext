@@ -15,4 +15,4 @@ auto coContext::BaseTask::await_suspend(const std::coroutine_handle<> genericCor
     parentCoroutineHandle.promise().setChildCoroutine(std::move(this->coroutine));
 }
 
-coContext::BaseTask::BaseTask(Coroutine &&coroutine) noexcept : coroutine{std::move(coroutine)} {}
+coContext::BaseTask::BaseTask(Coroutine coroutine) noexcept : coroutine{std::move(coroutine)} {}

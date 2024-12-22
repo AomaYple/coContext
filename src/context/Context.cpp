@@ -67,14 +67,13 @@ auto coContext::Context::run() -> void {
     while (this->isRunning) {
         this->ring.submitAndWait(1);
         this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completionQueueEntry) {
-            if (const auto findResult{this->schedulingCoroutines.find(completionQueueEntry->user_data)};
-                findResult != std::cend(this->schedulingCoroutines)) {
-                findResult->second.promise().setResult(completionQueueEntry->res);
-                findResult->second.promise().setFlags(completionQueueEntry->flags);
+            const auto findResult{this->schedulingCoroutines.find(completionQueueEntry->user_data)};
 
-                this->unscheduledCoroutines.emplace(std::move(findResult->second));
-                this->schedulingCoroutines.erase(findResult);
-            }
+            findResult->second.promise().setResult(completionQueueEntry->res);
+            findResult->second.promise().setFlags(completionQueueEntry->flags);
+
+            this->unscheduledCoroutines.emplace(std::move(findResult->second));
+            this->schedulingCoroutines.erase(findResult);
         }));
 
         this->scheduleUnscheduledCoroutines();
@@ -83,7 +82,7 @@ auto coContext::Context::run() -> void {
 
 auto coContext::Context::stop() noexcept -> void { this->isRunning = false; }
 
-auto coContext::Context::spawn(Coroutine &&coroutine) -> void {
+auto coContext::Context::spawn(Coroutine coroutine) -> void {
     this->unscheduledCoroutines.emplace(std::move(coroutine));
 }
 

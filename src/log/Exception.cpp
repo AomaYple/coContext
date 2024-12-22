@@ -1,6 +1,6 @@
 #include "Exception.hpp"
 
-coContext::Exception::Exception(Log &&log) : message{log.toString()}, log{std::move(log)} {}
+coContext::Exception::Exception(Log log) : message{log.toString()}, log{std::move(log)} {}
 
 auto coContext::Exception::swap(Exception &other) noexcept -> void {
     std::swap(this->message, other.message);

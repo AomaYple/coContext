@@ -35,7 +35,7 @@ auto coContext::BasePromise::setParentCoroutineIdentity(const std::uint64_t iden
 
 auto coContext::BasePromise::getChildCoroutine() noexcept -> Coroutine & { return this->childCoroutine; }
 
-auto coContext::BasePromise::setChildCoroutine(Coroutine &&coroutine) noexcept -> void {
+auto coContext::BasePromise::setChildCoroutine(Coroutine coroutine) noexcept -> void {
     this->childCoroutine = std::move(coroutine);
 }
 

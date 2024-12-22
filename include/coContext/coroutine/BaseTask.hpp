@@ -24,7 +24,7 @@ namespace coContext {
         auto await_suspend(std::coroutine_handle<> genericCoroutineHandle) -> void;
 
     protected:
-        explicit BaseTask(Coroutine &&coroutine) noexcept;
+        explicit BaseTask(Coroutine coroutine) noexcept;
 
     private:
         Coroutine coroutine;

@@ -7,8 +7,6 @@
 
 namespace coContext {
     class AsyncWaiter {
-        using TimeSpecification = std::pair<std::unique_ptr<__kernel_timespec>, std::unique_ptr<__kernel_timespec>>;
-
     public:
         explicit AsyncWaiter(SubmissionQueueEntry submissionQueueEntry) noexcept;
 
@@ -26,7 +24,9 @@ namespace coContext {
 
         [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry;
 
-        [[nodiscard]] auto getTimeSpecifications() noexcept -> TimeSpecification &;
+        [[nodiscard]] auto getTimeSpecification() const noexcept -> const std::unique_ptr<__kernel_timespec> &;
+
+        auto setTimeSpecification(std::unique_ptr<__kernel_timespec> timeSpecification) noexcept -> void;
 
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
@@ -39,7 +39,7 @@ namespace coContext {
     private:
         SubmissionQueueEntry submissionQueueEntry;
         Coroutine::Handle coroutineHandle;
-        TimeSpecification timeSpecifications;
+        std::unique_ptr<__kernel_timespec> timeSpecification;
     };
 }    // namespace coContext
 

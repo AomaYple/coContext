@@ -46,8 +46,7 @@ namespace coContext {
         auto submitAndWait(std::uint32_t count, std::source_location sourceLocation = std::source_location::current())
             -> void;
 
-        [[nodiscard]] auto poll(std::move_only_function<auto(const io_uring_cqe *)->void> &&action) const
-            -> std::int32_t;
+        [[nodiscard]] auto poll(std::move_only_function<auto(const io_uring_cqe *)->void> action) const -> std::int32_t;
 
         auto advance(std::uint32_t count) noexcept -> void;
 

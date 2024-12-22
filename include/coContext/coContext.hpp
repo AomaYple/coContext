@@ -31,7 +31,7 @@ namespace coContext {
 
     auto stop() noexcept -> void;
 
-    auto spawn(Coroutine &&coroutine) -> void;
+    auto spawn(Coroutine coroutine) -> void;
 
     template<std::movable T, typename F, typename... Args>
         requires std::is_invocable_r_v<Task<T>, F, Args...>
@@ -95,13 +95,13 @@ namespace coContext {
     [[nodiscard]] auto sleep(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
                              ClockSource clockSource = {}) -> AsyncWaiter;
 
-    [[nodiscard]] auto multipleSleep(std::move_only_function<auto(std::int32_t)->void> &&action,
-                                     std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
-                                     ClockSource clockSource = {}) -> Task<>;
-
     [[nodiscard]] auto updateSleep(std::uint64_t taskIdentity, std::chrono::seconds seconds,
                                    std::chrono::nanoseconds nanoseconds = {}, ClockSource clockSource = {})
         -> AsyncWaiter;
+
+    [[nodiscard]] auto multipleSleep(std::move_only_function<auto(std::int32_t)->void> action,
+                                     std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
+                                     ClockSource clockSource = {}) -> Task<>;
 
     [[nodiscard]] auto poll(std::int32_t fileDescriptor, std::uint32_t mask) -> AsyncWaiter;
 

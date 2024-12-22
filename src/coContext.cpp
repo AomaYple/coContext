@@ -25,7 +25,7 @@ namespace {
     }
 }    // namespace
 
-auto coContext::spawn(Coroutine &&coroutine) -> void { context.spawn(std::move(coroutine)); }
+auto coContext::spawn(Coroutine coroutine) -> void { context.spawn(std::move(coroutine)); }
 
 auto coContext::run() -> void { context.run(); }
 
@@ -52,13 +52,15 @@ auto coContext::direct() noexcept -> Marker { return Marker{IOSQE_FIXED_FILE}; }
 
 auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                         const ClockSource clockSource) -> Marker {
-    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
-    context.getSubmissionQueueEntry().linkTimeout(*timeSpecification, setClockSource(clockSource));
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    AsyncWaiter asyncWaiter{submissionQueueEntry};
 
-    Marker marker{IOSQE_IO_LINK};
-    marker.setTimeSpecification(std::move(timeSpecification));
+    asyncWaiter.setTimeSpecification(std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
+    submissionQueueEntry.linkTimeout(*asyncWaiter.getTimeSpecification(), setClockSource(clockSource));
 
-    return marker;
+    spawn([](AsyncWaiter timeoutAsyncWaiter) -> Task<> { co_await timeoutAsyncWaiter; }, std::move(asyncWaiter));
+
+    return Marker{IOSQE_IO_LINK};
 }
 
 auto coContext::cancel(const std::uint64_t taskIdentity) -> AsyncWaiter {
@@ -84,13 +86,11 @@ auto coContext::cancelAny() -> AsyncWaiter {
 
 [[nodiscard]] constexpr auto sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                                    const std::uint32_t flags) {
-    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
-
     const coContext::SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.timeout(*timeSpecification, 0, flags);
-
     coContext::AsyncWaiter asyncWaiter{submissionQueueEntry};
-    asyncWaiter.getTimeSpecifications().first = std::move(timeSpecification);
+
+    asyncWaiter.setTimeSpecification(std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
+    submissionQueueEntry.timeout(*asyncWaiter.getTimeSpecification(), 0, flags);
 
     return asyncWaiter;
 }
@@ -100,7 +100,25 @@ auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nan
     return ::sleep(seconds, nanoseconds, setClockSource(clockSource));
 }
 
-auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> &&action,
+auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,
+                            const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource) -> AsyncWaiter {
+    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
+
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.updateTimeout(*timeSpecification, taskIdentity, setClockSource(clockSource));
+
+    spawn(
+        [](std::unique_ptr<__kernel_timespec> updateSleepTimeSpecification,
+           const ClockSource updateSleepClockSource) -> Task<> {
+            co_await sleep(std::chrono::seconds{updateSleepTimeSpecification->tv_sec},
+                           std::chrono::nanoseconds{updateSleepTimeSpecification->tv_nsec}, updateSleepClockSource);
+        },
+        std::move(timeSpecification), clockSource);
+
+    return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> action,
                               const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                               const ClockSource clockSource) -> Task<> {
     AsyncWaiter asyncWaiter{::sleep(seconds, nanoseconds, setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT)};
@@ -110,19 +128,6 @@ auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> 
         action(co_await asyncWaiter);
         flags = asyncWaiter.getAsyncWaitResumeFlags();
     }
-}
-
-auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,
-                            const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource) -> AsyncWaiter {
-    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
-
-    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
-    submissionQueueEntry.updateTimeout(*timeSpecification, taskIdentity, setClockSource(clockSource));
-
-    AsyncWaiter asyncWaiter{submissionQueueEntry};
-    asyncWaiter.getTimeSpecifications().first = std::move(timeSpecification);
-
-    return asyncWaiter;
 }
 
 auto coContext::poll(const std::int32_t fileDescriptor, const std::uint32_t mask) -> AsyncWaiter {

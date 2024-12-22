@@ -30,7 +30,7 @@ namespace coContext {
 
         auto stop() noexcept -> void;
 
-        auto spawn(Coroutine &&coroutine) -> void;
+        auto spawn(Coroutine coroutine) -> void;
 
         [[nodiscard]] auto getSubmissionQueueEntry() -> SubmissionQueueEntry;
 
