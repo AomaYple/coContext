@@ -2,8 +2,6 @@
 
 #include "context/Context.hpp"
 
-using namespace std::chrono_literals;
-
 namespace {
     thread_local coContext::Context context;
 
@@ -27,11 +25,11 @@ namespace {
     }
 }    // namespace
 
-auto coContext::spawn(Coroutine coroutine) -> void { context.spawn(std::move(coroutine)); }
-
 auto coContext::run() -> void { context.run(); }
 
 auto coContext::stop() noexcept -> void { return context.stop(); }
+
+auto coContext::spawn(Coroutine coroutine) -> void { context.spawn(std::move(coroutine)); }
 
 auto coContext::syncCancel(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,
                            const std::chrono::nanoseconds nanoseconds) -> std::int32_t {
