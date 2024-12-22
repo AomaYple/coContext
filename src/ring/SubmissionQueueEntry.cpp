@@ -54,6 +54,11 @@ auto coContext::SubmissionQueueEntry::updatePoll(const std::uint64_t oldUserData
     io_uring_prep_poll_update(this->handle, oldUserData, newUserData, mask, flags);
 }
 
+auto coContext::SubmissionQueueEntry::multiplePoll(const std::int32_t fileDescriptor,
+                                                   const std::uint32_t mask) const noexcept -> void {
+    io_uring_prep_poll_multishot(this->handle, fileDescriptor, mask);
+}
+
 auto coContext::SubmissionQueueEntry::installDirectFileDescriptor(const std::int32_t directFileDescriptor,
                                                                   const std::uint32_t flags) const noexcept -> void {
     io_uring_prep_fixed_fd_install(this->handle, directFileDescriptor, flags);

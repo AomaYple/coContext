@@ -49,6 +49,8 @@ namespace coContext {
         auto updatePoll(std::uint64_t oldUserData, std::uint64_t newUserData, std::uint32_t mask,
                         std::uint32_t flags) const noexcept -> void;
 
+        auto multiplePoll(std::int32_t fileDescriptor, std::uint32_t mask) const noexcept -> void;
+
         auto installDirectFileDescriptor(std::int32_t directFileDescriptor, std::uint32_t flags) const noexcept -> void;
 
         auto close(std::int32_t fileDescriptor) const noexcept -> void;

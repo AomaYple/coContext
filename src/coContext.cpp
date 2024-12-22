@@ -139,6 +139,20 @@ auto coContext::updatePoll(const std::uint64_t taskIdentity, const std::uint32_t
     return AsyncWaiter{submissionQueueEntry};
 }
 
+auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> action,
+                             const std::int32_t fileDescriptor, const std::uint32_t mask) -> Task<> {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.multiplePoll(fileDescriptor, mask);
+
+    AsyncWaiter asyncWaiter{submissionQueueEntry};
+
+    std::uint32_t flags{IORING_CQE_F_MORE};
+    while (flags & IORING_CQE_F_MORE) {
+        action(co_await asyncWaiter);
+        flags = asyncWaiter.getAsyncWaitResumeFlags();
+    }
+}
+
 auto coContext::installDirectFileDescriptor(const std::int32_t directFileDescriptor, const bool isSetCloseOnExec)
     -> AsyncWaiter {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
