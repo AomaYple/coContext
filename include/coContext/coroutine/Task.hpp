@@ -38,12 +38,6 @@ namespace coContext {
 
             constexpr auto return_value(T returnValue) { this->returnValue.set_value(std::move(returnValue)); }
 
-            constexpr auto return_value(const T &returnValue)
-                requires std::copyable<T>
-            {
-                this->returnValue.set_value(returnValue);
-            }
-
             [[nodiscard]] constexpr auto getReturnValue() { return this->returnValue.get_future(); }
 
         private:
@@ -200,7 +194,7 @@ namespace coContext {
 
         [[nodiscard]] constexpr auto getReturnValue() noexcept -> std::future<void> & { return this->returnValue; }
 
-        constexpr auto await_resume() { this->returnValue.get(); }
+        constexpr auto await_resume() const noexcept {}
 
     private:
         explicit constexpr Task(const CoroutineHandle coroutineHandle) :
