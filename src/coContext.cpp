@@ -270,6 +270,7 @@ auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void>
                                const std::int32_t socketFileDescriptor, const std::int32_t flags) -> Task<> {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.multipleAccept(socketFileDescriptor, nullptr, nullptr, flags);
+    submissionQueueEntry.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     AsyncWaiter asyncWaiter{submissionQueueEntry};
 
@@ -284,6 +285,7 @@ auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)-
                                      const std::int32_t socketFileDescriptor, const std::int32_t flags) -> Task<> {
     const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
     submissionQueueEntry.multipleAcceptDirect(socketFileDescriptor, nullptr, nullptr, flags);
+    submissionQueueEntry.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     AsyncWaiter asyncWaiter{submissionQueueEntry};
 
