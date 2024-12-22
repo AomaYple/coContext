@@ -80,6 +80,9 @@ namespace coContext {
         auto acceptDirect(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
                           std::int32_t flags, std::uint32_t fileDescriptorIndex) const noexcept -> void;
 
+        auto multipleAccept(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
+                            std::int32_t flags) const noexcept -> void;
+
         auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength) const noexcept
             -> void;
 

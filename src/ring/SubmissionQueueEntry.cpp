@@ -118,6 +118,12 @@ auto coContext::SubmissionQueueEntry::acceptDirect(const std::int32_t socketFile
     io_uring_prep_accept_direct(this->handle, socketFileDescriptor, address, addressLength, flags, fileDescriptorIndex);
 }
 
+auto coContext::SubmissionQueueEntry::multipleAccept(const std::int32_t socketFileDescriptor, sockaddr *const address,
+                                                     socklen_t *const addressLength,
+                                                     const std::int32_t flags) const noexcept -> void {
+    io_uring_prep_multishot_accept(this->handle, socketFileDescriptor, address, addressLength, flags);
+}
+
 auto coContext::SubmissionQueueEntry::connect(const std::int32_t socketFileDescriptor, const sockaddr &address,
                                               const socklen_t addressLength) const noexcept -> void {
     io_uring_prep_connect(this->handle, socketFileDescriptor, std::addressof(address), addressLength);

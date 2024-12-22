@@ -118,10 +118,10 @@ auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> 
                               const ClockSource clockSource) -> Task<> {
     AsyncWaiter asyncWaiter{::sleep(seconds, nanoseconds, setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT)};
 
-    std::uint32_t flags{IORING_CQE_F_MORE};
-    while (flags & IORING_CQE_F_MORE) {
+    std::uint32_t asyncWaitResumeFlags{IORING_CQE_F_MORE};
+    while (asyncWaitResumeFlags & IORING_CQE_F_MORE) {
         action(co_await asyncWaiter);
-        flags = asyncWaiter.getAsyncWaitResumeFlags();
+        asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
     }
 }
 
@@ -146,10 +146,10 @@ auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> a
 
     AsyncWaiter asyncWaiter{submissionQueueEntry};
 
-    std::uint32_t flags{IORING_CQE_F_MORE};
-    while (flags & IORING_CQE_F_MORE) {
+    std::uint32_t asyncWaitResumeFlags{IORING_CQE_F_MORE};
+    while (asyncWaitResumeFlags & IORING_CQE_F_MORE) {
         action(co_await asyncWaiter);
-        flags = asyncWaiter.getAsyncWaitResumeFlags();
+        asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
     }
 }
 
@@ -264,6 +264,20 @@ auto coContext::acceptDirect(const std::int32_t socketFileDescriptor, sockaddr *
     submissionQueueEntry.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     return AsyncWaiter{submissionQueueEntry};
+}
+
+auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void> action,
+                               const std::int32_t socketFileDescriptor, const std::int32_t flags) -> Task<> {
+    const SubmissionQueueEntry submissionQueueEntry{context.getSubmissionQueueEntry()};
+    submissionQueueEntry.multipleAccept(socketFileDescriptor, nullptr, nullptr, flags);
+
+    AsyncWaiter asyncWaiter{submissionQueueEntry};
+
+    std::uint32_t asyncWaitResumeFlags{IORING_CQE_F_MORE};
+    while (asyncWaitResumeFlags & IORING_CQE_F_MORE) {
+        action(co_await asyncWaiter);
+        asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
+    }
 }
 
 auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr &address, const socklen_t addressLength)
