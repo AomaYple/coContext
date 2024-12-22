@@ -27,7 +27,7 @@ namespace {
 
 auto coContext::run() -> void { context.run(); }
 
-auto coContext::stop() noexcept -> void { return context.stop(); }
+auto coContext::stop() noexcept -> void { context.stop(); }
 
 auto coContext::spawn(Coroutine coroutine) -> void { context.spawn(std::move(coroutine)); }
 
