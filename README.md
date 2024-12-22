@@ -200,6 +200,9 @@ auto main() -> int {
 <summary>多线程</summary>
 
 ```c++
+#include <coContext/coContext.hpp>
+#include <thread>
+
 [[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::close(-1); }    // 简短的协程函数
 
 auto main() -> int {
