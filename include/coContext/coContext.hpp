@@ -7,7 +7,7 @@
 #include <functional>
 
 namespace coContext {
-    template<internal::TaskReturnable T = void>
+    template<internal::Returnable T = void>
     struct SpawnResult {
         std::future<T> value;
         std::uint64_t taskIdentity;

@@ -8,10 +8,10 @@
 namespace coContext {
     namespace internal {
         template<typename T>
-        concept TaskReturnable = std::movable<T> || std::is_lvalue_reference_v<T> || std::is_void_v<T>;
+        concept Returnable = std::movable<T> || std::is_lvalue_reference_v<T> || std::is_void_v<T>;
     }    // namespace internal
 
-    template<internal::TaskReturnable T = void>
+    template<internal::Returnable T = void>
     class Task : public internal::BaseTask {
         class Promise;
 
