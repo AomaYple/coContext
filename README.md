@@ -123,12 +123,8 @@ auto main() -> int {
 
 ```c++
 [[nodiscard]] auto func() -> coContext::Task<> {
-    while (true) {    // 无限循环
-        co_await coContext::sleep(1s);    // 等待1秒
-
-        std::println("Hello, coContext!"sv);    // 输出
-    }
-}
+    std::println("{}", co_await coContext::sleep(1s));
+}    // 打印1秒定时的结果
 ```
 
 </details>
