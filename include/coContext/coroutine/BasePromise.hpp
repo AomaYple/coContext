@@ -4,7 +4,7 @@
 
 #include <memory_resource>
 
-namespace coContext {
+namespace coContext::internal {
     class BasePromise {
     public:
         [[nodiscard]] auto operator new(std::size_t) -> void *;
@@ -56,9 +56,10 @@ namespace coContext {
         std::uint64_t parentCoroutineIdentity{std::hash<Coroutine>{}(Coroutine{nullptr})};
         Coroutine childCoroutine{nullptr};
     };
-}    // namespace coContext
+}    // namespace coContext::internal
 
 template<>
-constexpr auto std::swap(coContext::BasePromise &lhs, coContext::BasePromise &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::internal::BasePromise &lhs, coContext::internal::BasePromise &rhs) noexcept
+    -> void {
     lhs.swap(rhs);
 }

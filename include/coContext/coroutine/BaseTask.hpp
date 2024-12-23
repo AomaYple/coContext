@@ -2,7 +2,7 @@
 
 #include "Coroutine.hpp"
 
-namespace coContext {
+namespace coContext::internal {
     class BaseTask {
     public:
         BaseTask(const BaseTask &) = delete;
@@ -29,9 +29,9 @@ namespace coContext {
     private:
         Coroutine coroutine;
     };
-}    // namespace coContext
+}    // namespace coContext::internal
 
 template<>
-constexpr auto std::swap(coContext::BaseTask &lhs, coContext::BaseTask &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::internal::BaseTask &lhs, coContext::internal::BaseTask &rhs) noexcept -> void {
     lhs.swap(rhs);
 }

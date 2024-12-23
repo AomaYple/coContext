@@ -4,7 +4,7 @@
 #include <liburing.h>
 #include <source_location>
 
-namespace coContext {
+namespace coContext::internal {
     class Ring {
     public:
         Ring(std::uint32_t entries, io_uring_params &parameters);
@@ -62,9 +62,9 @@ namespace coContext {
 
         io_uring handle;
     };
-}    // namespace coContext
+}    // namespace coContext::internal
 
 template<>
-constexpr auto std::swap(coContext::Ring &lhs, coContext::Ring &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::internal::Ring &lhs, coContext::internal::Ring &rhs) noexcept -> void {
     lhs.swap(rhs);
 }

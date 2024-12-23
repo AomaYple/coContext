@@ -5,12 +5,13 @@
 
 using namespace std::string_view_literals;
 
-coContext::Log::Log(const Level level, std::pmr::string message, const std::source_location sourceLocation,
-                    const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) noexcept :
+coContext::internal::Log::Log(const Level level, std::pmr::string message, const std::source_location sourceLocation,
+                              const std::chrono::system_clock::time_point timestamp,
+                              const std::thread::id threadId) noexcept :
     level{level}, message{std::move(message)}, sourceLocation{sourceLocation}, timestamp{timestamp},
     threadId{threadId} {}
 
-auto coContext::Log::swap(Log &other) noexcept -> void {
+auto coContext::internal::Log::swap(Log &other) noexcept -> void {
     std::swap(this->level, other.level);
     std::swap(this->message, other.message);
     std::swap(this->sourceLocation, other.sourceLocation);
@@ -18,9 +19,9 @@ auto coContext::Log::swap(Log &other) noexcept -> void {
     std::swap(this->threadId, other.threadId);
 }
 
-auto coContext::Log::getLevel() const noexcept -> Level { return this->level; }
+auto coContext::internal::Log::getLevel() const noexcept -> Level { return this->level; }
 
-auto coContext::Log::toString() const -> std::pmr::string {
+auto coContext::internal::Log::toString() const -> std::pmr::string {
     static constexpr std::array<const std::string_view, 6> levels{"trace"sv, "debug"sv, "info"sv,
                                                                   "warn"sv,  "error"sv, "fatal"sv};
 
@@ -31,7 +32,7 @@ auto coContext::Log::toString() const -> std::pmr::string {
                             getMemoryResource()};
 }
 
-auto coContext::Log::toByte() const -> std::pmr::vector<std::byte> {
+auto coContext::internal::Log::toByte() const -> std::pmr::vector<std::byte> {
     const auto log{this->toString()};
     const auto bytes{std::as_bytes(std::span{log})};
 

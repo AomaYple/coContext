@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-namespace coContext {
+namespace coContext::internal {
     class SubmissionQueueEntry {
     public:
         explicit SubmissionQueueEntry(io_uring_sqe *handle = {}) noexcept;
@@ -217,4 +217,4 @@ namespace coContext {
     };
 
     [[nodiscard]] auto operator==(SubmissionQueueEntry, SubmissionQueueEntry) noexcept -> bool;
-}    // namespace coContext
+}    // namespace coContext::internal

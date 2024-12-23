@@ -2,6 +2,6 @@
 
 #include <memory_resource>
 
-namespace coContext {
+namespace coContext::internal {
     [[nodiscard]] auto getMemoryResource() -> std::pmr::memory_resource *;
-}    // namespace coContext
+}    // namespace coContext::internal

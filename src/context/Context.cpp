@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <sys/resource.h>
 
-coContext::Context::Context() :
+coContext::internal::Context::Context() :
     ring{[] {
         io_uring_params parameters{};
         parameters.flags = IORING_SETUP_SUBMIT_ALL | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_TASKRUN_FLAG |
@@ -43,7 +43,7 @@ coContext::Context::Context() :
     this->ring.registerCpuAffinity(std::addressof(cpuSet), sizeof(cpuSet));
 }
 
-coContext::Context::~Context() {
+coContext::internal::Context::~Context() {
     const std::lock_guard lock{mutex};
 
     if (this->ring.getFileDescriptor() == sharedRingFileDescriptor) sharedRingFileDescriptor = -1;
@@ -51,7 +51,7 @@ coContext::Context::~Context() {
     --cpuCodes[this->cpuCode];
 }
 
-auto coContext::Context::swap(Context &other) noexcept -> void {
+auto coContext::internal::Context::swap(Context &other) noexcept -> void {
     std::swap(this->ring, other.ring);
     std::swap(this->cpuCode, other.cpuCode);
     std::swap(this->isRunning, other.isRunning);
@@ -59,7 +59,7 @@ auto coContext::Context::swap(Context &other) noexcept -> void {
     std::swap(this->schedulingCoroutines, other.schedulingCoroutines);
 }
 
-auto coContext::Context::run() -> void {
+auto coContext::internal::Context::run() -> void {
     this->isRunning = true;
 
     this->scheduleUnscheduledCoroutines();
@@ -80,18 +80,19 @@ auto coContext::Context::run() -> void {
     }
 }
 
-auto coContext::Context::stop() noexcept -> void { this->isRunning = false; }
+auto coContext::internal::Context::stop() noexcept -> void { this->isRunning = false; }
 
-auto coContext::Context::spawn(Coroutine coroutine) -> void {
+auto coContext::internal::Context::spawn(Coroutine coroutine) -> void {
     this->unscheduledCoroutines.emplace(std::move(coroutine));
 }
 
-auto coContext::Context::getSubmissionQueueEntry() -> SubmissionQueueEntry {
+auto coContext::internal::Context::getSubmissionQueueEntry() -> SubmissionQueueEntry {
     return SubmissionQueueEntry{this->ring.getSubmissionQueueEntry()};
 }
 
-auto coContext::Context::syncCancel(const std::variant<std::uint64_t, std::int32_t> identity, const std::int32_t flags,
-                                    const __kernel_timespec timeSpecification) -> std::int32_t {
+auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, std::int32_t> identity,
+                                              const std::int32_t flags, const __kernel_timespec timeSpecification)
+    -> std::int32_t {
     io_uring_sync_cancel_reg parameters{};
 
     if (std::holds_alternative<std::uint64_t>(identity)) parameters.addr = std::get<std::uint64_t>(identity);
@@ -106,7 +107,7 @@ auto coContext::Context::syncCancel(const std::variant<std::uint64_t, std::int32
     return this->ring.syncCancel(parameters);
 }
 
-auto coContext::Context::scheduleUnscheduledCoroutines() -> void {
+auto coContext::internal::Context::scheduleUnscheduledCoroutines() -> void {
     while (!std::empty(this->unscheduledCoroutines)) {
         Coroutine coroutine{std::move(this->unscheduledCoroutines.front())};
         this->unscheduledCoroutines.pop();
@@ -128,7 +129,7 @@ auto coContext::Context::scheduleUnscheduledCoroutines() -> void {
     }
 }
 
-std::uint32_t coContext::Context::fileDescriptorLimit{
+std::uint32_t coContext::internal::Context::fileDescriptorLimit{
     [](const std::source_location sourceLocation = std::source_location::current()) {
         rlimit limit{};
         if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
@@ -141,7 +142,7 @@ std::uint32_t coContext::Context::fileDescriptorLimit{
 
         return static_cast<std::uint32_t>(limit.rlim_cur);
     }()};
-constinit std::mutex coContext::Context::mutex;
-constinit std::int32_t coContext::Context::sharedRingFileDescriptor{-1};
-std::vector<std::uint32_t> coContext::Context::cpuCodes{
+constinit std::mutex coContext::internal::Context::mutex;
+constinit std::int32_t coContext::internal::Context::sharedRingFileDescriptor{-1};
+std::vector<std::uint32_t> coContext::internal::Context::cpuCodes{
     std::vector<std::uint32_t>(std::thread::hardware_concurrency())};

@@ -5,7 +5,7 @@
 #include <source_location>
 #include <thread>
 
-namespace coContext {
+namespace coContext::internal {
     class Log {
     public:
         enum class Level : std::uint8_t { trace, debug, info, warn, error, fatal };
@@ -30,10 +30,9 @@ namespace coContext {
         std::chrono::system_clock::time_point timestamp;
         std::thread::id threadId;
     };
-
-}    // namespace coContext
+}    // namespace coContext::internal
 
 template<>
-constexpr auto std::swap(coContext::Log &lhs, coContext::Log &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::internal::Log &lhs, coContext::internal::Log &rhs) noexcept -> void {
     lhs.swap(rhs);
 }

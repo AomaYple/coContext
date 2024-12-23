@@ -10,12 +10,12 @@ namespace coContext {
     concept TaskReturnType = std::movable<T> || std::is_lvalue_reference_v<T> || std::is_void_v<T>;
 
     template<TaskReturnType T = void>
-    class Task : public BaseTask {
+    class Task : public internal::BaseTask {
         class Promise;
 
         using CoroutineHandle = std::coroutine_handle<Promise>;
 
-        class Promise : public BasePromise {
+        class Promise : public internal::BasePromise {
         public:
             constexpr Promise() = default;
 
@@ -68,19 +68,19 @@ namespace coContext {
 
     private:
         explicit constexpr Task(const CoroutineHandle coroutineHandle) :
-            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
+            BaseTask{internal::Coroutine{internal::Coroutine::Handle::from_address(coroutineHandle.address())}},
             returnValue{coroutineHandle.promise().getReturnValue()} {}
 
         std::future<T> returnValue;
     };
 
     template<typename T>
-    class Task<T &> : public BaseTask {
+    class Task<T &> : public internal::BaseTask {
         class Promise;
 
         using CoroutineHandle = std::coroutine_handle<Promise>;
 
-        class Promise : public BasePromise {
+        class Promise : public internal::BasePromise {
         public:
             constexpr Promise() = default;
 
@@ -133,19 +133,19 @@ namespace coContext {
 
     private:
         explicit constexpr Task(const CoroutineHandle coroutineHandle) :
-            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
+            BaseTask{internal::Coroutine{internal::Coroutine::Handle::from_address(coroutineHandle.address())}},
             returnValue{coroutineHandle.promise().getReturnValue()} {}
 
         std::future<T &> returnValue;
     };
 
     template<>
-    class Task<> : public BaseTask {
+    class Task<> : public internal::BaseTask {
         class Promise;
 
         using CoroutineHandle = std::coroutine_handle<Promise>;
 
-        class Promise : public BasePromise {
+        class Promise : public internal::BasePromise {
         public:
             Promise() = default;
 
@@ -198,7 +198,7 @@ namespace coContext {
 
     private:
         explicit constexpr Task(const CoroutineHandle coroutineHandle) :
-            BaseTask{Coroutine{Coroutine::Handle::from_address(coroutineHandle.address())}},
+            BaseTask{internal::Coroutine{internal::Coroutine::Handle::from_address(coroutineHandle.address())}},
             returnValue{coroutineHandle.promise().getReturnValue()} {}
 
         std::future<void> returnValue;

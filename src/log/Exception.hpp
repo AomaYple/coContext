@@ -2,7 +2,7 @@
 
 #include "Log.hpp"
 
-namespace coContext {
+namespace coContext::internal {
     class Exception final : public std::exception {
     public:
         explicit Exception(Log log = Log{});
@@ -17,10 +17,9 @@ namespace coContext {
         std::pmr::string message;
         Log log;
     };
-
-}    // namespace coContext
+}    // namespace coContext::internal
 
 template<>
-constexpr auto std::swap(coContext::Exception &lhs, coContext::Exception &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::internal::Exception &lhs, coContext::internal::Exception &rhs) noexcept -> void {
     lhs.swap(rhs);
 }

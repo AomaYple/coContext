@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace coContext {
+namespace coContext::internal {
     class AsyncWaiter;
 
     class Marker {
@@ -28,4 +28,4 @@ namespace coContext {
     [[nodiscard]] auto operator==(const Marker &, const Marker &) noexcept -> bool;
 
     [[nodiscard]] auto operator|(AsyncWaiter, Marker) noexcept -> AsyncWaiter;
-}    // namespace coContext
+}    // namespace coContext::internal

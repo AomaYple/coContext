@@ -4,7 +4,7 @@
 
 using namespace std::string_view_literals;
 
-coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) :
+coContext::internal::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) :
     handle{[entries, &parameters](const std::source_location sourceLocation = std::source_location::current()) {
         io_uring handle{};
         if (const std::int32_t result{
@@ -21,9 +21,9 @@ coContext::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) 
         return handle;
     }()} {}
 
-coContext::Ring::Ring(Ring &&other) noexcept : handle{other.handle} { other.handle.ring_fd = -1; }
+coContext::internal::Ring::Ring(Ring &&other) noexcept : handle{other.handle} { other.handle.ring_fd = -1; }
 
-auto coContext::Ring::operator=(Ring &&other) noexcept -> Ring & {
+auto coContext::internal::Ring::operator=(Ring &&other) noexcept -> Ring & {
     if (this == std::addressof(other)) return *this;
 
     this->destroy();
@@ -34,13 +34,13 @@ auto coContext::Ring::operator=(Ring &&other) noexcept -> Ring & {
     return *this;
 }
 
-coContext::Ring::~Ring() { this->destroy(); }
+coContext::internal::Ring::~Ring() { this->destroy(); }
 
-auto coContext::Ring::swap(Ring &other) noexcept -> void { std::swap(this->handle, other.handle); }
+auto coContext::internal::Ring::swap(Ring &other) noexcept -> void { std::swap(this->handle, other.handle); }
 
-auto coContext::Ring::getFileDescriptor() const noexcept -> std::int32_t { return this->handle.ring_fd; }
+auto coContext::internal::Ring::getFileDescriptor() const noexcept -> std::int32_t { return this->handle.ring_fd; }
 
-auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sourceLocation) -> void {
+auto coContext::internal::Ring::registerSelfFileDescriptor(const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_ring_fd(std::addressof(this->handle))}; result != 1) {
         throw Exception{
             Log{Log::Level::error,
@@ -51,8 +51,8 @@ auto coContext::Ring::registerSelfFileDescriptor(const std::source_location sour
     }
 }
 
-auto coContext::Ring::registerSparseFileDescriptor(const std::uint32_t count, const std::source_location sourceLocation)
-    -> void {
+auto coContext::internal::Ring::registerSparseFileDescriptor(const std::uint32_t count,
+                                                             const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_files_sparse(std::addressof(this->handle), count)}; result != 0) {
         throw Exception{
             Log{Log::Level::error,
@@ -63,8 +63,8 @@ auto coContext::Ring::registerSparseFileDescriptor(const std::uint32_t count, co
     }
 }
 
-auto coContext::Ring::registerCpuAffinity(const cpu_set_t *const cpuSet, const std::size_t cpuSetSize,
-                                          const std::source_location sourceLocation) -> void {
+auto coContext::internal::Ring::registerCpuAffinity(const cpu_set_t *const cpuSet, const std::size_t cpuSetSize,
+                                                    const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_iowq_aff(std::addressof(this->handle), cpuSetSize, cpuSet)};
         result != 0) {
         throw Exception{
@@ -76,8 +76,9 @@ auto coContext::Ring::registerCpuAffinity(const cpu_set_t *const cpuSet, const s
     }
 }
 
-auto coContext::Ring::setupRingBuffer(const std::uint32_t entries, const std::int32_t id, const std::uint32_t flags,
-                                      const std::source_location sourceLocation) -> io_uring_buf_ring * {
+auto coContext::internal::Ring::setupRingBuffer(const std::uint32_t entries, const std::int32_t id,
+                                                const std::uint32_t flags, const std::source_location sourceLocation)
+    -> io_uring_buf_ring * {
     std::int32_t error;
     io_uring_buf_ring *const handle{
         io_uring_setup_buf_ring(std::addressof(this->handle), entries, id, flags, std::addressof(error))};
@@ -93,8 +94,9 @@ auto coContext::Ring::setupRingBuffer(const std::uint32_t entries, const std::in
     return handle;
 }
 
-auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const std::uint32_t entries,
-                                     const std::int32_t id, const std::source_location sourceLocation) -> void {
+auto coContext::internal::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const std::uint32_t entries,
+                                               const std::int32_t id, const std::source_location sourceLocation)
+    -> void {
     if (const std::int32_t result{io_uring_free_buf_ring(std::addressof(this->handle), ringBuffer, entries, id)};
         result != 0) {
         throw Exception{
@@ -106,7 +108,7 @@ auto coContext::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const 
     }
 }
 
-auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceLocation) -> io_uring_sqe * {
+auto coContext::internal::Ring::getSubmissionQueueEntry(const std::source_location sourceLocation) -> io_uring_sqe * {
     io_uring_sqe *const submissionQueueEntry{io_uring_get_sqe(std::addressof(this->handle))};
     if (submissionQueueEntry == nullptr) {
         throw Exception{
@@ -118,7 +120,8 @@ auto coContext::Ring::getSubmissionQueueEntry(const std::source_location sourceL
     return submissionQueueEntry;
 }
 
-auto coContext::Ring::submitAndWait(const std::uint32_t count, const std::source_location sourceLocation) -> void {
+auto coContext::internal::Ring::submitAndWait(const std::uint32_t count, const std::source_location sourceLocation)
+    -> void {
     if (const std::int32_t result{io_uring_submit_and_wait(std::addressof(this->handle), count)}; result < 0) {
         throw Exception{
             Log{Log::Level::error,
@@ -129,7 +132,8 @@ auto coContext::Ring::submitAndWait(const std::uint32_t count, const std::source
     }
 }
 
-auto coContext::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->void> action) const -> std::int32_t {
+auto coContext::internal::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->void> action) const
+    -> std::int32_t {
     std::int32_t count{};
 
     std::uint32_t head;
@@ -142,18 +146,19 @@ auto coContext::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->v
     return count;
 }
 
-auto coContext::Ring::advance(const std::uint32_t count) noexcept -> void {
+auto coContext::internal::Ring::advance(const std::uint32_t count) noexcept -> void {
     io_uring_cq_advance(std::addressof(this->handle), count);
 }
 
-auto coContext::Ring::advance(io_uring_buf_ring *const ringBuffer, const std::int32_t completionQueueEntryCount,
-                              const std::int32_t ringBufferBufferCount) noexcept -> void {
+auto coContext::internal::Ring::advance(io_uring_buf_ring *const ringBuffer,
+                                        const std::int32_t completionQueueEntryCount,
+                                        const std::int32_t ringBufferBufferCount) noexcept -> void {
     __io_uring_buf_ring_cq_advance(std::addressof(this->handle), ringBuffer, completionQueueEntryCount,
                                    ringBufferBufferCount);
 }
 
-auto coContext::Ring::syncCancel(io_uring_sync_cancel_reg &parameters, const std::source_location sourceLocation)
-    -> std::int32_t {
+auto coContext::internal::Ring::syncCancel(io_uring_sync_cancel_reg &parameters,
+                                           const std::source_location sourceLocation) -> std::int32_t {
     const std::int32_t result{io_uring_register_sync_cancel(std::addressof(this->handle), std::addressof(parameters))};
     if (result < 0) {
         throw Exception{
@@ -167,6 +172,6 @@ auto coContext::Ring::syncCancel(io_uring_sync_cancel_reg &parameters, const std
     return result;
 }
 
-auto coContext::Ring::destroy() noexcept -> void {
+auto coContext::internal::Ring::destroy() noexcept -> void {
     if (this->handle.ring_fd != -1) io_uring_queue_exit(std::addressof(this->handle));
 }

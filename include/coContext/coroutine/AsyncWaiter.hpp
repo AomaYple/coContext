@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace coContext {
+namespace coContext::internal {
     class AsyncWaiter {
     public:
         explicit AsyncWaiter(SubmissionQueueEntry submissionQueueEntry) noexcept;
@@ -41,9 +41,10 @@ namespace coContext {
         Coroutine::Handle coroutineHandle;
         std::unique_ptr<__kernel_timespec> timeSpecification;
     };
-}    // namespace coContext
+}    // namespace coContext::internal
 
 template<>
-constexpr auto std::swap(coContext::AsyncWaiter &lhs, coContext::AsyncWaiter &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::internal::AsyncWaiter &lhs, coContext::internal::AsyncWaiter &rhs) noexcept
+    -> void {
     lhs.swap(rhs);
 }

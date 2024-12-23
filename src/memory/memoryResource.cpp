@@ -2,7 +2,7 @@
 
 #include "MiMallocResource.hpp"
 
-auto coContext::getMemoryResource() -> std::pmr::memory_resource * {
+auto coContext::internal::getMemoryResource() -> std::pmr::memory_resource * {
 #ifndef NDEBUG
     thread_local std::pmr::unsynchronized_pool_resource resource;
 #else

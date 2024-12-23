@@ -7,7 +7,7 @@
 #include <queue>
 #include <variant>
 
-namespace coContext {
+namespace coContext::internal {
     class SubmissionQueueEntry;
 
     class Context {
@@ -51,9 +51,9 @@ namespace coContext {
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
     };
-}    // namespace coContext
+}    // namespace coContext::internal
 
 template<>
-constexpr auto std::swap(coContext::Context &lhs, coContext::Context &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::internal::Context &lhs, coContext::internal::Context &rhs) noexcept -> void {
     lhs.swap(rhs);
 }

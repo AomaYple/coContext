@@ -2,7 +2,7 @@
 
 #include <coroutine>
 
-namespace coContext {
+namespace coContext::internal {
     class BasePromise;
 
     class Coroutine {
@@ -38,16 +38,16 @@ namespace coContext {
 
         Handle handle;
     };
-}    // namespace coContext
+}    // namespace coContext::internal
 
 template<>
-constexpr auto std::swap(coContext::Coroutine &lhs, coContext::Coroutine &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::internal::Coroutine &lhs, coContext::internal::Coroutine &rhs) noexcept -> void {
     lhs.swap(rhs);
 }
 
 template<>
-struct std::hash<coContext::Coroutine> {
-    [[nodiscard]] constexpr auto operator()(const coContext::Coroutine &coroutine) const noexcept {
-        return std::hash<coContext::Coroutine::Handle>{}(coroutine.get());
+struct std::hash<coContext::internal::Coroutine> {
+    [[nodiscard]] constexpr auto operator()(const coContext::internal::Coroutine &coroutine) const noexcept {
+        return std::hash<coContext::internal::Coroutine::Handle>{}(coroutine.get());
     }
 };

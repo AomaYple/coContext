@@ -4,11 +4,11 @@
 
 #include <utility>
 
-coContext::Coroutine::Coroutine(const Handle handle) noexcept : handle{handle} {}
+coContext::internal::Coroutine::Coroutine(const Handle handle) noexcept : handle{handle} {}
 
-coContext::Coroutine::Coroutine(Coroutine &&other) noexcept : handle{std::exchange(other.handle, nullptr)} {}
+coContext::internal::Coroutine::Coroutine(Coroutine &&other) noexcept : handle{std::exchange(other.handle, nullptr)} {}
 
-auto coContext::Coroutine::operator=(Coroutine &&other) noexcept -> Coroutine & {
+auto coContext::internal::Coroutine::operator=(Coroutine &&other) noexcept -> Coroutine & {
     if (this == std::addressof(other)) return *this;
 
     this->destroy();
@@ -18,20 +18,20 @@ auto coContext::Coroutine::operator=(Coroutine &&other) noexcept -> Coroutine & 
     return *this;
 }
 
-coContext::Coroutine::~Coroutine() { this->destroy(); }
+coContext::internal::Coroutine::~Coroutine() { this->destroy(); }
 
-auto coContext::Coroutine::swap(Coroutine &other) noexcept -> void { std::swap(this->handle, other.handle); }
+auto coContext::internal::Coroutine::swap(Coroutine &other) noexcept -> void { std::swap(this->handle, other.handle); }
 
-auto coContext::Coroutine::get() const noexcept -> Handle { return this->handle; }
+auto coContext::internal::Coroutine::get() const noexcept -> Handle { return this->handle; }
 
-coContext::Coroutine::operator bool() const noexcept { return static_cast<bool>(this->handle); }
+coContext::internal::Coroutine::operator bool() const noexcept { return static_cast<bool>(this->handle); }
 
-auto coContext::Coroutine::promise() const -> BasePromise & { return this->handle.promise(); }
+auto coContext::internal::Coroutine::promise() const -> BasePromise & { return this->handle.promise(); }
 
-auto coContext::Coroutine::operator()() const -> void { this->handle(); }
+auto coContext::internal::Coroutine::operator()() const -> void { this->handle(); }
 
-auto coContext::Coroutine::done() const noexcept -> bool { return this->handle.done(); }
+auto coContext::internal::Coroutine::done() const noexcept -> bool { return this->handle.done(); }
 
-auto coContext::Coroutine::destroy() const -> void {
+auto coContext::internal::Coroutine::destroy() const -> void {
     if (static_cast<bool>(this->handle)) this->handle.destroy();
 }
