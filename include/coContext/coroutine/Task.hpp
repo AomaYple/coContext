@@ -6,10 +6,12 @@
 #include <future>
 
 namespace coContext {
-    template<typename T>
-    concept TaskReturnType = std::movable<T> || std::is_lvalue_reference_v<T> || std::is_void_v<T>;
+    namespace internal {
+        template<typename T>
+        concept TaskReturnable = std::movable<T> || std::is_lvalue_reference_v<T> || std::is_void_v<T>;
+    }    // namespace internal
 
-    template<TaskReturnType T = void>
+    template<internal::TaskReturnable T = void>
     class Task : public internal::BaseTask {
         class Promise;
 
