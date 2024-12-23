@@ -7,10 +7,6 @@
 #include <functional>
 
 namespace coContext {
-    namespace internal {
-        auto spawn(Coroutine coroutine) -> void;
-    }    // namespace internal
-
     template<TaskReturnType T = void>
     struct SpawnResult {
         std::future<T> value;
@@ -30,6 +26,10 @@ namespace coContext {
     };
 
     enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
+
+    namespace internal {
+        auto spawn(Coroutine coroutine) -> void;
+    }    // namespace internal
 
     auto run() -> void;
 
