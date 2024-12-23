@@ -1,4 +1,4 @@
-#include "coContext/memory/memoryResource.hpp"
+#include "memoryResource.hpp"
 
 #include "MiMallocResource.hpp"
 
