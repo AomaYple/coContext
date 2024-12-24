@@ -47,7 +47,7 @@ namespace coContext::internal {
 
         Ring ring;
         std::uint32_t cpuCode;
-        bool isRunning{};
+        bool running{};
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
     };
