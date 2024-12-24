@@ -37,8 +37,8 @@ namespace coContext {
 
     template<std::movable T, typename F, typename... Args>
         requires std::is_invocable_r_v<Task<T>, F, Args...>
-    constexpr auto spawn(F &&function, Args &&...args) {
-        Task<T> task{std::invoke(std::forward<F>(function), std::forward<Args>(args)...)};
+    constexpr auto spawn(F &&f, Args &&...args) {
+        Task<T> task{std::invoke(std::forward<F>(f), std::forward<Args>(args)...)};
 
         internal::Coroutine &coroutine{task.getCoroutine()};
         const std::uint64_t identity{std::hash<internal::Coroutine>{}(coroutine)};
@@ -50,8 +50,8 @@ namespace coContext {
 
     template<typename T, typename F, typename... Args>
         requires std::is_lvalue_reference_v<T> && std::is_invocable_r_v<Task<T &>, F, Args...>
-    constexpr auto spawn(F &&function, Args &&...args) {
-        Task<T &> task{std::invoke(std::forward<F>(function), std::forward<Args>(args)...)};
+    constexpr auto spawn(F &&f, Args &&...args) {
+        Task<T &> task{std::invoke(std::forward<F>(f), std::forward<Args>(args)...)};
 
         internal::Coroutine &coroutine{task.getCoroutine()};
         const std::uint64_t identity{std::hash<internal::Coroutine>{}(coroutine)};
@@ -63,8 +63,8 @@ namespace coContext {
 
     template<typename F, typename... Args>
         requires std::is_invocable_r_v<Task<>, F, Args...>
-    constexpr auto spawn(F &&function, Args &&...args) {
-        Task<> task{std::invoke(std::forward<F>(function), std::forward<Args>(args)...)};
+    constexpr auto spawn(F &&f, Args &&...args) {
+        Task<> task{std::invoke(std::forward<F>(f), std::forward<Args>(args)...)};
 
         internal::Coroutine &coroutine{task.getCoroutine()};
         const std::uint64_t identity{std::hash<internal::Coroutine>{}(coroutine)};
