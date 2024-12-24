@@ -66,11 +66,11 @@ auto coContext::internal::Context::run() -> void {
 
     while (this->isRunning) {
         this->ring.submitAndWait(1);
-        this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completionQueueEntry) {
-            const auto findResult{this->schedulingCoroutines.find(completionQueueEntry->user_data)};
+        this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completion) {
+            const auto findResult{this->schedulingCoroutines.find(completion->user_data)};
 
-            findResult->second.promise().setResult(completionQueueEntry->res);
-            findResult->second.promise().setFlags(completionQueueEntry->flags);
+            findResult->second.promise().setResult(completion->res);
+            findResult->second.promise().setFlags(completion->flags);
 
             this->unscheduledCoroutines.emplace(std::move(findResult->second));
             this->schedulingCoroutines.erase(findResult);

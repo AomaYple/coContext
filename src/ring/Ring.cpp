@@ -137,9 +137,9 @@ auto coContext::internal::Ring::poll(std::move_only_function<auto(const io_uring
     std::int32_t count{};
 
     std::uint32_t head;
-    const io_uring_cqe *completionQueueEntry;
-    io_uring_for_each_cqe(std::addressof(this->handle), head, completionQueueEntry) {
-        action(completionQueueEntry);
+    const io_uring_cqe *completion;
+    io_uring_for_each_cqe(std::addressof(this->handle), head, completion) {
+        action(completion);
         ++count;
     }
 
@@ -150,11 +150,9 @@ auto coContext::internal::Ring::advance(const std::uint32_t count) noexcept -> v
     io_uring_cq_advance(std::addressof(this->handle), count);
 }
 
-auto coContext::internal::Ring::advance(io_uring_buf_ring *const ringBuffer,
-                                        const std::int32_t completionQueueEntryCount,
-                                        const std::int32_t ringBufferBufferCount) noexcept -> void {
-    __io_uring_buf_ring_cq_advance(std::addressof(this->handle), ringBuffer, completionQueueEntryCount,
-                                   ringBufferBufferCount);
+auto coContext::internal::Ring::advance(io_uring_buf_ring *const ringBuffer, const std::int32_t completionCount,
+                                        const std::int32_t bufferCount) noexcept -> void {
+    __io_uring_buf_ring_cq_advance(std::addressof(this->handle), ringBuffer, completionCount, bufferCount);
 }
 
 auto coContext::internal::Ring::syncCancel(io_uring_sync_cancel_reg &parameters,

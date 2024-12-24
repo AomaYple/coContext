@@ -50,8 +50,8 @@ namespace coContext::internal {
 
         auto advance(std::uint32_t count) noexcept -> void;
 
-        auto advance(io_uring_buf_ring *ringBuffer, std::int32_t completionQueueEntryCount,
-                     std::int32_t ringBufferBufferCount) noexcept -> void;
+        auto advance(io_uring_buf_ring *ringBuffer, std::int32_t completionCount, std::int32_t bufferCount) noexcept
+            -> void;
 
         [[nodiscard]] auto syncCancel(io_uring_sync_cancel_reg &parameters,
                                       std::source_location sourceLocation = std::source_location::current())
