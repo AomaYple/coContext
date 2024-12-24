@@ -32,7 +32,7 @@ auto coContext::internal::Log::toString() const -> std::pmr::string {
                             getMemoryResource()};
 }
 
-auto coContext::internal::Log::toByte() const -> std::pmr::vector<std::byte> {
+auto coContext::internal::Log::toBytes() const -> std::pmr::vector<std::byte> {
     const auto log{this->toString()};
     const auto bytes{std::as_bytes(std::span{log})};
 

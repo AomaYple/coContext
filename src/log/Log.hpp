@@ -21,7 +21,7 @@ namespace coContext::internal {
 
         [[nodiscard]] auto toString() const -> std::pmr::string;
 
-        [[nodiscard]] auto toByte() const -> std::pmr::vector<std::byte>;
+        [[nodiscard]] auto toBytes() const -> std::pmr::vector<std::byte>;
 
     private:
         Level level;
