@@ -54,17 +54,17 @@ coContext::internal::Context::~Context() {
 auto coContext::internal::Context::swap(Context &other) noexcept -> void {
     std::swap(this->ring, other.ring);
     std::swap(this->cpuCode, other.cpuCode);
-    std::swap(this->running, other.running);
+    std::swap(this->isRunning, other.isRunning);
     std::swap(this->unscheduledCoroutines, other.unscheduledCoroutines);
     std::swap(this->schedulingCoroutines, other.schedulingCoroutines);
 }
 
 auto coContext::internal::Context::run() -> void {
-    this->running = true;
+    this->isRunning = true;
 
     this->scheduleUnscheduledCoroutines();
 
-    while (this->running) {
+    while (this->isRunning) {
         this->ring.submitAndWait(1);
         this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completion) {
             const auto findResult{this->schedulingCoroutines.find(completion->user_data)};
@@ -80,7 +80,7 @@ auto coContext::internal::Context::run() -> void {
     }
 }
 
-auto coContext::internal::Context::stop() noexcept -> void { this->running = false; }
+auto coContext::internal::Context::stop() noexcept -> void { this->isRunning = false; }
 
 auto coContext::internal::Context::spawn(Coroutine coroutine) -> void {
     this->unscheduledCoroutines.emplace(std::move(coroutine));
