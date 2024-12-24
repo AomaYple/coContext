@@ -59,8 +59,8 @@ auto coContext::internal::Submission::multiplePoll(const std::int32_t fileDescri
     io_uring_prep_poll_multishot(this->handle, fileDescriptor, mask);
 }
 
-auto coContext::internal::Submission::installDirectFileDescriptor(const std::int32_t directFileDescriptor,
-                                                                  const std::uint32_t flags) const noexcept -> void {
+auto coContext::internal::Submission::installDirect(const std::int32_t directFileDescriptor,
+                                                    const std::uint32_t flags) const noexcept -> void {
     io_uring_prep_fixed_fd_install(this->handle, directFileDescriptor, flags);
 }
 

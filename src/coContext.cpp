@@ -154,10 +154,10 @@ auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> a
     }
 }
 
-auto coContext::installDirectFileDescriptor(const std::int32_t directFileDescriptor, const bool isSetCloseOnExec)
+auto coContext::installDirect(const std::int32_t directFileDescriptor, const bool isSetCloseOnExec)
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
-    submission.installDirectFileDescriptor(directFileDescriptor, isSetCloseOnExec ? 0 : IORING_FIXED_FD_NO_CLOEXEC);
+    submission.installDirect(directFileDescriptor, isSetCloseOnExec ? 0 : IORING_FIXED_FD_NO_CLOEXEC);
 
     return internal::AsyncWaiter{submission};
 }
