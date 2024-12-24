@@ -2,7 +2,7 @@
 
 #include "../log/Exception.hpp"
 #include "coContext/coroutine/BasePromise.hpp"
-#include "coContext/ring/SubmissionQueueEntry.hpp"
+#include "coContext/ring/Submission.hpp"
 
 #include <algorithm>
 #include <sys/resource.h>
@@ -86,9 +86,7 @@ auto coContext::internal::Context::spawn(Coroutine coroutine) -> void {
     this->unscheduledCoroutines.emplace(std::move(coroutine));
 }
 
-auto coContext::internal::Context::getSubmissionQueueEntry() -> SubmissionQueueEntry {
-    return SubmissionQueueEntry{this->ring.getSubmissionQueueEntry()};
-}
+auto coContext::internal::Context::getSubmission() -> Submission { return Submission{this->ring.getSubmission()}; }
 
 auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, std::int32_t> identity,
                                               const std::int32_t flags, const __kernel_timespec timeSpecification)

@@ -39,9 +39,8 @@ namespace coContext::internal {
         auto freeRingBuffer(io_uring_buf_ring *ringBuffer, std::uint32_t entries, std::int32_t id,
                             std::source_location sourceLocation = std::source_location::current()) -> void;
 
-        [[nodiscard]] auto
-            getSubmissionQueueEntry(std::source_location sourceLocation = std::source_location::current())
-                -> io_uring_sqe *;
+        [[nodiscard]] auto getSubmission(std::source_location sourceLocation = std::source_location::current())
+            -> io_uring_sqe *;
 
         auto submitAndWait(std::uint32_t count, std::source_location sourceLocation = std::source_location::current())
             -> void;

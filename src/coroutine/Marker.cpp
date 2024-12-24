@@ -11,7 +11,7 @@ auto coContext::internal::operator==(const Marker &lhs, const Marker &rhs) noexc
 }
 
 auto coContext::internal::operator|(AsyncWaiter asyncWaiter, const Marker marker) noexcept -> AsyncWaiter {
-    asyncWaiter.getSubmissionQueueEntry().addFlags(marker.getFlags());
+    asyncWaiter.getSubmission().addFlags(marker.getFlags());
 
     return asyncWaiter;
 }

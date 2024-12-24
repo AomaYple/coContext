@@ -10,19 +10,19 @@
 #include <sys/wait.h>
 
 namespace coContext::internal {
-    class SubmissionQueueEntry {
+    class Submission {
     public:
-        explicit SubmissionQueueEntry(io_uring_sqe *handle = {}) noexcept;
+        explicit Submission(io_uring_sqe *handle = {}) noexcept;
 
-        constexpr SubmissionQueueEntry(const SubmissionQueueEntry &) noexcept = default;
+        constexpr Submission(const Submission &) noexcept = default;
 
-        constexpr auto operator=(const SubmissionQueueEntry &) noexcept -> SubmissionQueueEntry & = default;
+        constexpr auto operator=(const Submission &) noexcept -> Submission & = default;
 
-        constexpr SubmissionQueueEntry(SubmissionQueueEntry &&) noexcept = default;
+        constexpr Submission(Submission &&) noexcept = default;
 
-        constexpr auto operator=(SubmissionQueueEntry &&) noexcept -> SubmissionQueueEntry & = default;
+        constexpr auto operator=(Submission &&) noexcept -> Submission & = default;
 
-        constexpr ~SubmissionQueueEntry() = default;
+        constexpr ~Submission() = default;
 
         [[nodiscard]] auto get() const noexcept -> io_uring_sqe *;
 
@@ -216,5 +216,5 @@ namespace coContext::internal {
         io_uring_sqe *handle;
     };
 
-    [[nodiscard]] auto operator==(SubmissionQueueEntry, SubmissionQueueEntry) noexcept -> bool;
+    [[nodiscard]] auto operator==(Submission, Submission) noexcept -> bool;
 }    // namespace coContext::internal

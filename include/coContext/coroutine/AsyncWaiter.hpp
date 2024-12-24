@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ring/SubmissionQueueEntry.hpp"
+#include "../ring/Submission.hpp"
 #include "Coroutine.hpp"
 
 #include <memory>
@@ -8,7 +8,7 @@
 namespace coContext::internal {
     class AsyncWaiter {
     public:
-        explicit AsyncWaiter(SubmissionQueueEntry submissionQueueEntry) noexcept;
+        explicit AsyncWaiter(Submission submission) noexcept;
 
         AsyncWaiter(const AsyncWaiter &) = delete;
 
@@ -22,7 +22,7 @@ namespace coContext::internal {
 
         auto swap(AsyncWaiter &other) noexcept -> void;
 
-        [[nodiscard]] auto getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry;
+        [[nodiscard]] auto getSubmission() const noexcept -> Submission;
 
         [[nodiscard]] auto getTimeSpecification() const noexcept -> const std::unique_ptr<__kernel_timespec> &;
 
@@ -37,7 +37,7 @@ namespace coContext::internal {
         [[nodiscard]] auto getAsyncWaitResumeFlags() const -> std::uint32_t;
 
     private:
-        SubmissionQueueEntry submissionQueueEntry;
+        Submission submission;
         Coroutine::Handle coroutineHandle;
         std::unique_ptr<__kernel_timespec> timeSpecification;
     };

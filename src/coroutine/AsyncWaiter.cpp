@@ -2,18 +2,15 @@
 
 #include "coContext/coroutine/BasePromise.hpp"
 
-coContext::internal::AsyncWaiter::AsyncWaiter(const SubmissionQueueEntry submissionQueueEntry) noexcept :
-    submissionQueueEntry{submissionQueueEntry} {}
+coContext::internal::AsyncWaiter::AsyncWaiter(const Submission submission) noexcept : submission{submission} {}
 
 auto coContext::internal::AsyncWaiter::swap(AsyncWaiter &other) noexcept -> void {
-    std::swap(this->submissionQueueEntry, other.submissionQueueEntry);
+    std::swap(this->submission, other.submission);
     std::swap(this->coroutineHandle, other.coroutineHandle);
     std::swap(this->timeSpecification, other.timeSpecification);
 }
 
-auto coContext::internal::AsyncWaiter::getSubmissionQueueEntry() const noexcept -> SubmissionQueueEntry {
-    return this->submissionQueueEntry;
-}
+auto coContext::internal::AsyncWaiter::getSubmission() const noexcept -> Submission { return this->submission; }
 
 auto coContext::internal::AsyncWaiter::getTimeSpecification() const noexcept
     -> const std::unique_ptr<__kernel_timespec> & {
@@ -32,7 +29,7 @@ auto coContext::internal::AsyncWaiter::await_suspend(const std::coroutine_handle
     if (this->coroutineHandle == genericCoroutineHandle) return;
 
     this->coroutineHandle = Coroutine::Handle::from_address(genericCoroutineHandle.address());
-    this->submissionQueueEntry.setUserData(std::hash<Coroutine::Handle>{}(this->coroutineHandle));
+    this->submission.setUserData(std::hash<Coroutine::Handle>{}(this->coroutineHandle));
 }
 
 auto coContext::internal::AsyncWaiter::await_resume() const -> std::int32_t {

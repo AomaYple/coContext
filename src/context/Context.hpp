@@ -8,7 +8,7 @@
 #include <variant>
 
 namespace coContext::internal {
-    class SubmissionQueueEntry;
+    class Submission;
 
     class Context {
     public:
@@ -32,7 +32,7 @@ namespace coContext::internal {
 
         auto spawn(Coroutine coroutine) -> void;
 
-        [[nodiscard]] auto getSubmissionQueueEntry() -> SubmissionQueueEntry;
+        [[nodiscard]] auto getSubmission() -> Submission;
 
         [[nodiscard]] auto syncCancel(std::variant<std::uint64_t, std::int32_t> identity, std::int32_t flags,
                                       __kernel_timespec timeSpecification) -> std::int32_t;
