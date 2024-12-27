@@ -159,8 +159,8 @@ namespace coContext::internal {
         auto allocateFile(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
                           std::uint64_t length) const noexcept -> void;
 
-        auto fileStatus(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
-                        std::uint32_t mask, struct statx &buffer) const noexcept -> void;
+        auto getFileStatus(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
+                           std::uint32_t mask, struct statx &buffer) const noexcept -> void;
 
         auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value) const noexcept
             -> void;
