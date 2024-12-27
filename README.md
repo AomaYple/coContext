@@ -119,7 +119,7 @@ auto main() -> int {
 ```
 
 <details>
-<summary>每秒触发的定时器</summary>
+<summary>定时器</summary>
 
 ```c++
 [[nodiscard]] auto func() -> coContext::Task<> {
