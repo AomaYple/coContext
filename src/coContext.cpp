@@ -511,11 +511,11 @@ auto coContext::allocateFile(const std::int32_t fileDescriptor, const std::int32
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::getFileStatus(const std::int32_t directoryFileDescriptor, const std::string_view path,
-                              const std::int32_t flags, const std::uint32_t mask, struct statx &buffer)
+auto coContext::fileStatus(const std::int32_t directoryFileDescriptor, const std::string_view path,
+                           const std::int32_t flags, const std::uint32_t mask, struct statx &buffer)
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
-    submission.getFileStatus(directoryFileDescriptor, path, flags, mask, buffer);
+    submission.fileStatus(directoryFileDescriptor, path, flags, mask, buffer);
 
     return internal::AsyncWaiter{submission};
 }
