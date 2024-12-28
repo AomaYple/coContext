@@ -20,7 +20,7 @@ namespace coContext::internal {
 
         Context(Context &&) noexcept = default;
 
-        auto operator=(Context &&) noexcept -> Context & = default;
+        auto operator=(Context &&) noexcept -> Context &;
 
         ~Context();
 
