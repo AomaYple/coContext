@@ -26,7 +26,7 @@ coContext::internal::Ring::Ring(Ring &&other) noexcept : handle{other.handle} { 
 auto coContext::internal::Ring::operator=(Ring &&other) noexcept -> Ring & {
     if (this == std::addressof(other)) return *this;
 
-    this->destroy();
+    this->~Ring();
 
     this->handle = other.handle;
     other.handle.ring_fd = -1;
@@ -34,7 +34,9 @@ auto coContext::internal::Ring::operator=(Ring &&other) noexcept -> Ring & {
     return *this;
 }
 
-coContext::internal::Ring::~Ring() { this->destroy(); }
+coContext::internal::Ring::~Ring() {
+    if (this->handle.ring_fd != -1) io_uring_queue_exit(std::addressof(this->handle));
+}
 
 auto coContext::internal::Ring::swap(Ring &other) noexcept -> void { std::swap(this->handle, other.handle); }
 
@@ -167,8 +169,4 @@ auto coContext::internal::Ring::syncCancel(io_uring_sync_cancel_reg &parameters,
     }
 
     return result;
-}
-
-auto coContext::internal::Ring::destroy() noexcept -> void {
-    if (this->handle.ring_fd != -1) io_uring_queue_exit(std::addressof(this->handle));
 }

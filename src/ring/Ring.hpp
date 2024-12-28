@@ -57,8 +57,6 @@ namespace coContext::internal {
             -> std::int32_t;
 
     private:
-        auto destroy() noexcept -> void;
-
         io_uring handle;
     };
 }    // namespace coContext::internal
