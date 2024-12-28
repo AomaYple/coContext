@@ -108,8 +108,6 @@ auto coContext::internal::Context::getSubmission() -> Submission { return Submis
 auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, std::int32_t> identity,
                                               const std::int32_t flags, const __kernel_timespec timeSpecification)
     -> std::int32_t {
-    std::vector<std::int32_t> a, b;
-    a = std::move(b);
     io_uring_sync_cancel_reg parameters{};
 
     if (std::holds_alternative<std::uint64_t>(identity)) parameters.addr = std::get<std::uint64_t>(identity);
