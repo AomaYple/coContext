@@ -1,7 +1,6 @@
 #pragma once
 
 #include <liburing.h>
-#include <linux/futex.h>
 #include <span>
 #include <string_view>
 
