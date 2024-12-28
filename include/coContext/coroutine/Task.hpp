@@ -38,7 +38,11 @@ namespace coContext {
 
             [[nodiscard]] constexpr auto get_return_object() { return Task{CoroutineHandle::from_promise(*this)}; }
 
-            constexpr auto return_value(T returnValue) { this->returnValue.set_value(std::move(returnValue)); }
+            template<typename... Args>
+                requires std::constructible_from<T, Args...>
+            constexpr auto return_value(Args &&...args) {
+                this->returnValue.set_value(T{std::forward<Args>(args)...});
+            }
 
             [[nodiscard]] constexpr auto getReturnValue() { return this->returnValue.get_future(); }
 
