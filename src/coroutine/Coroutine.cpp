@@ -11,14 +11,16 @@ coContext::internal::Coroutine::Coroutine(Coroutine &&other) noexcept : handle{s
 auto coContext::internal::Coroutine::operator=(Coroutine &&other) noexcept -> Coroutine & {
     if (this == std::addressof(other)) return *this;
 
-    this->destroy();
+    this->~Coroutine();
 
     this->handle = std::exchange(other.handle, nullptr);
 
     return *this;
 }
 
-coContext::internal::Coroutine::~Coroutine() { this->destroy(); }
+coContext::internal::Coroutine::~Coroutine() {
+    if (static_cast<bool>(this->handle)) this->handle.destroy();
+}
 
 auto coContext::internal::Coroutine::swap(Coroutine &other) noexcept -> void { std::swap(this->handle, other.handle); }
 
@@ -31,7 +33,3 @@ auto coContext::internal::Coroutine::promise() const -> BasePromise & { return t
 auto coContext::internal::Coroutine::operator()() const -> void { this->handle(); }
 
 auto coContext::internal::Coroutine::done() const noexcept -> bool { return this->handle.done(); }
-
-auto coContext::internal::Coroutine::destroy() const -> void {
-    if (static_cast<bool>(this->handle)) this->handle.destroy();
-}

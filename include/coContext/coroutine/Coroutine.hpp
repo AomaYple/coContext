@@ -34,8 +34,6 @@ namespace coContext::internal {
         [[nodiscard]] auto done() const noexcept -> bool;
 
     private:
-        auto destroy() const -> void;
-
         Handle handle;
     };
 }    // namespace coContext::internal
