@@ -281,6 +281,8 @@ namespace coContext {
     [[nodiscard]] auto waitFutex(std::uint32_t &futex, std::uint64_t value, std::uint64_t mask, std::uint32_t flags)
         -> internal::AsyncWaiter;
 
+    [[nodiscard]] auto waitFutex(std::span<futex_waitv> vectorizedFutexs) -> internal::AsyncWaiter;
+
     [[nodiscard]] auto wakeFutex(std::uint32_t &futex, std::uint64_t value, std::uint64_t mask, std::uint32_t flags)
         -> internal::AsyncWaiter;
 }    // namespace coContext

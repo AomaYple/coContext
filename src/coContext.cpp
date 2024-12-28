@@ -652,6 +652,13 @@ auto coContext::waitFutex(std::uint32_t &futex, const std::uint64_t value, const
     return internal::AsyncWaiter{submission};
 }
 
+auto coContext::waitFutex(const std::span<futex_waitv> vectorizedFutexs) -> internal::AsyncWaiter {
+    const internal::Submission submission{context.getSubmission()};
+    submission.waitFutex(vectorizedFutexs, 0);
+
+    return internal::AsyncWaiter{submission};
+}
+
 auto coContext::wakeFutex(std::uint32_t &futex, const std::uint64_t value, const std::uint64_t mask,
                           const std::uint32_t flags) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};

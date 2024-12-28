@@ -1,7 +1,5 @@
 #include "coContext/ring/Submission.hpp"
 
-#include <liburing.h>
-
 coContext::internal::Submission::Submission(io_uring_sqe *const handle) noexcept : handle{handle} {}
 
 auto coContext::internal::Submission::get() const noexcept -> io_uring_sqe * { return this->handle; }
@@ -385,6 +383,11 @@ auto coContext::internal::Submission::waitFutex(std::uint32_t &futex, const std:
                                                 const std::uint64_t mask, const std::uint32_t futexFlags,
                                                 const std::uint32_t flags) const noexcept -> void {
     io_uring_prep_futex_wait(this->handle, std::addressof(futex), value, mask, futexFlags, flags);
+}
+
+auto coContext::internal::Submission::waitFutex(const std::span<futex_waitv> vectorizedFutexs,
+                                                const std::uint32_t flags) const noexcept -> void {
+    io_uring_prep_futex_waitv(this->handle, std::data(vectorizedFutexs), std::size(vectorizedFutexs), flags);
 }
 
 auto coContext::internal::Submission::wakeFutex(std::uint32_t &futex, const std::uint64_t value,
