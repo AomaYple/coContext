@@ -269,9 +269,11 @@ auto coContext::acceptDirect(const std::int32_t socketFileDescriptor, sockaddr *
 
 auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void> action,
                                const std::int32_t socketFileDescriptor, sockaddr *const address,
-                               socklen_t *const addressLength, const std::int32_t flags) -> Task<> {
+                               socklen_t *const addressLength, const std::int32_t flags, const bool isDirect)
+    -> Task<> {
     const internal::Submission submission{context.getSubmission()};
     submission.multipleAccept(socketFileDescriptor, address, addressLength, flags);
+    submission.addFlags(isDirect ? IOSQE_FIXED_FILE : 0);
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     internal::AsyncWaiter asyncWaiter{submission};
@@ -285,9 +287,11 @@ auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void>
 
 auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)->void> action,
                                      const std::int32_t socketFileDescriptor, sockaddr *const address,
-                                     socklen_t *const addressLength, const std::int32_t flags) -> Task<> {
+                                     socklen_t *const addressLength, const std::int32_t flags, const bool isDirect)
+    -> Task<> {
     const internal::Submission submission{context.getSubmission()};
     submission.multipleAcceptDirect(socketFileDescriptor, address, addressLength, flags);
+    submission.addFlags(isDirect ? IOSQE_FIXED_FILE : 0);
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     internal::AsyncWaiter asyncWaiter{submission};

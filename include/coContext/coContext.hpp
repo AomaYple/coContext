@@ -150,11 +150,12 @@ namespace coContext {
 
     [[nodiscard]] auto multipleAccept(std::move_only_function<auto(std::int32_t)->void> action,
                                       std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
-                                      std::int32_t flags = {}) -> Task<>;
+                                      std::int32_t flags = {}, bool isDirect = {}) -> Task<>;
 
     [[nodiscard]] auto multipleAcceptDirect(std::move_only_function<auto(std::int32_t)->void> action,
                                             std::int32_t socketFileDescriptor, sockaddr *address,
-                                            socklen_t *addressLength, std::int32_t flags = {}) -> Task<>;
+                                            socklen_t *addressLength, std::int32_t flags = {}, bool isDirect = {})
+        -> Task<>;
 
     [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength)
         -> internal::AsyncWaiter;
