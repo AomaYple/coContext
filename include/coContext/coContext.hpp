@@ -125,10 +125,10 @@ namespace coContext {
         -> internal::AsyncWaiter;
 
     [[nodiscard]] auto getSocketOption(std::int32_t socketFileDescriptor, std::int32_t level, std::int32_t optionName,
-                                       void *optionValue, std::int32_t optionLength) -> internal::AsyncWaiter;
+                                       std::span<std::byte> option) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto setSocketOption(std::int32_t socketFileDescriptor, std::int32_t level, std::int32_t optionName,
-                                       void *optionValue, std::int32_t optionLength) -> internal::AsyncWaiter;
+                                       std::span<std::byte> option) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto getSocketReceiveBufferUnreadDataSize(std::int32_t socketFileDescriptor) -> internal::AsyncWaiter;
 
