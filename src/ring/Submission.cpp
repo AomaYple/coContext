@@ -278,10 +278,9 @@ auto coContext::internal::Submission::allocateFile(const std::int32_t fileDescri
     io_uring_prep_fallocate(this->handle, fileDescriptor, mode, offset, length);
 }
 
-auto coContext::internal::Submission::getFileStatus(const std::int32_t directoryFileDescriptor,
-                                                    const std::string_view path, const std::int32_t flags,
-                                                    const std::uint32_t mask, struct statx &buffer) const noexcept
-    -> void {
+auto coContext::internal::Submission::status(const std::int32_t directoryFileDescriptor, const std::string_view path,
+                                             const std::int32_t flags, const std::uint32_t mask,
+                                             struct statx &buffer) const noexcept -> void {
     io_uring_prep_statx(this->handle, directoryFileDescriptor, std::data(path), flags, mask, std::addressof(buffer));
 }
 

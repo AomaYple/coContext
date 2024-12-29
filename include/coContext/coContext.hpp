@@ -231,8 +231,8 @@ namespace coContext {
     [[nodiscard]] auto allocateFile(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
                                     std::uint64_t length) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto getFileStatus(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
-                                     std::uint32_t mask, struct statx &buffer) -> internal::AsyncWaiter;
+    [[nodiscard]] auto status(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
+                              std::uint32_t mask, struct statx &buffer) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value)
         -> internal::AsyncWaiter;
