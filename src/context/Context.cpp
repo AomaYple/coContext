@@ -58,12 +58,12 @@ auto coContext::internal::Context::operator=(Context &&other) noexcept -> Contex
 }
 
 coContext::internal::Context::~Context() {
-    const std::int32_t fileDescriptor{this->ring.getFileDescriptor()};
-    if (fileDescriptor == -1) return;
+    const std::int32_t ringFileDescriptor{this->ring.getFileDescriptor()};
+    if (ringFileDescriptor == -1) return;
 
     const std::lock_guard lock{mutex};
 
-    if (fileDescriptor == sharedRingFileDescriptor) sharedRingFileDescriptor = -1;
+    if (ringFileDescriptor == sharedRingFileDescriptor) sharedRingFileDescriptor = -1;
 
     --cpuCodes[this->cpuCode];
 }
