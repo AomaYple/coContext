@@ -193,7 +193,8 @@ auto coContext::directSocket(const std::int32_t domain, const std::int32_t type,
 }
 
 auto coContext::getSocketOption(const std::int32_t socketFileDescriptor, const std::int32_t level,
-                                const std::int32_t optionName, std::span<std::byte> option) -> internal::AsyncWaiter {
+                                const std::int32_t optionName, const std::span<std::byte> option)
+    -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.socketCommand(SOCKET_URING_OP_GETSOCKOPT, socketFileDescriptor, level, optionName, option);
 
@@ -201,7 +202,8 @@ auto coContext::getSocketOption(const std::int32_t socketFileDescriptor, const s
 }
 
 auto coContext::setSocketOption(const std::int32_t socketFileDescriptor, const std::int32_t level,
-                                const std::int32_t optionName, std::span<std::byte> option) -> internal::AsyncWaiter {
+                                const std::int32_t optionName, const std::span<std::byte> option)
+    -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.socketCommand(SOCKET_URING_OP_SETSOCKOPT, socketFileDescriptor, level, optionName, option);
 
