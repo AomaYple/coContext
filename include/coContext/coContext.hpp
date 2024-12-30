@@ -40,7 +40,7 @@ namespace coContext {
     constexpr auto spawn(F &&f, Args &&...args) {
         Task<T> task{std::invoke(std::forward<F>(f), std::forward<Args>(args)...)};
 
-        internal::Coroutine &coroutine{task.getCoroutine()};
+        internal::Coroutine coroutine{std::move(task.getCoroutine())};
         const std::uint64_t identity{std::hash<internal::Coroutine>{}(coroutine)};
 
         spawn(std::move(coroutine));
@@ -53,7 +53,7 @@ namespace coContext {
     constexpr auto spawn(F &&f, Args &&...args) {
         Task<T &> task{std::invoke(std::forward<F>(f), std::forward<Args>(args)...)};
 
-        internal::Coroutine &coroutine{task.getCoroutine()};
+        internal::Coroutine coroutine{std::move(task.getCoroutine())};
         const std::uint64_t identity{std::hash<internal::Coroutine>{}(coroutine)};
 
         spawn(std::move(coroutine));
@@ -66,7 +66,7 @@ namespace coContext {
     constexpr auto spawn(F &&f, Args &&...args) {
         Task<> task{std::invoke(std::forward<F>(f), std::forward<Args>(args)...)};
 
-        internal::Coroutine &coroutine{task.getCoroutine()};
+        internal::Coroutine coroutine{std::move(task.getCoroutine())};
         const std::uint64_t identity{std::hash<internal::Coroutine>{}(coroutine)};
 
         spawn(std::move(coroutine));
