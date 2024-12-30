@@ -85,12 +85,13 @@ auto coContext::internal::Context::run() -> void {
         this->ring.submitAndWait(1);
         this->ring.advance(this->ring.poll([this](const io_uring_cqe *const completion) {
             const auto findResult{this->schedulingCoroutines.find(completion->user_data)};
-
-            findResult->second.promise().setResult(completion->res);
-            findResult->second.promise().setFlags(completion->flags);
-
-            this->unscheduledCoroutines.emplace(std::move(findResult->second));
+            Coroutine coroutine{std::move(findResult->second)};
             this->schedulingCoroutines.erase(findResult);
+
+            coroutine.promise().setResult(completion->res);
+            coroutine.promise().setFlags(completion->flags);
+
+            this->scheduleCoroutine(std::move(coroutine));
         }));
 
         this->scheduleUnscheduledCoroutines();
@@ -127,20 +128,26 @@ auto coContext::internal::Context::scheduleUnscheduledCoroutines() -> void {
         Coroutine coroutine{std::move(this->unscheduledCoroutines.front())};
         this->unscheduledCoroutines.pop();
 
-        coroutine();
+        this->scheduleCoroutine(std::move(coroutine));
+    }
+}
 
-        if (!coroutine.done()) {
-            if (Coroutine & childCoroutine{coroutine.promise().getChildCoroutine()}; static_cast<bool>(childCoroutine))
-                this->unscheduledCoroutines.emplace(std::move(childCoroutine));
+auto coContext::internal::Context::scheduleCoroutine(Coroutine coroutine) -> void {
+    coroutine();
 
-            const std::uint64_t identity{std::hash<Coroutine>{}(coroutine)};
-            this->schedulingCoroutines.emplace(identity, std::move(coroutine));
-        } else if (const auto findResult{
-                       this->schedulingCoroutines.find(coroutine.promise().getParentCoroutineIdentity())};
-                   findResult != std::cend(this->schedulingCoroutines)) {
-            this->unscheduledCoroutines.emplace(std::move(findResult->second));
-            this->schedulingCoroutines.erase(findResult);
-        }
+    if (!coroutine.done()) {
+        Coroutine childCoroutine{std::move(coroutine.promise().getChildCoroutine())};
+
+        const std::uint64_t identity{std::hash<Coroutine>{}(coroutine)};
+        this->schedulingCoroutines.emplace(identity, std::move(coroutine));
+
+        if (static_cast<bool>(childCoroutine)) this->scheduleCoroutine(std::move(childCoroutine));
+    } else if (const auto findResult{this->schedulingCoroutines.find(coroutine.promise().getParentCoroutineIdentity())};
+               findResult != std::cend(this->schedulingCoroutines)) {
+        Coroutine parentCoroutine{std::move(findResult->second)};
+        this->schedulingCoroutines.erase(findResult);
+
+        this->scheduleCoroutine(std::move(parentCoroutine));
     }
 }
 

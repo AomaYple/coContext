@@ -40,6 +40,8 @@ namespace coContext::internal {
     private:
         auto scheduleUnscheduledCoroutines() -> void;
 
+        auto scheduleCoroutine(Coroutine coroutine) -> void;
+
         static std::uint32_t fileDescriptorLimit;
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
