@@ -84,9 +84,10 @@ auto coContext::internal::Submission::directSocket(const std::int32_t domain, co
 
 auto coContext::internal::Submission::socketCommand(const std::int32_t operation,
                                                     const std::int32_t socketFileDescriptor, const std::int32_t level,
-                                                    const std::int32_t optionName, void *const optionValue,
-                                                    const std::int32_t optionLength) const noexcept -> void {
-    io_uring_prep_cmd_sock(this->handle, operation, socketFileDescriptor, level, optionName, optionValue, optionLength);
+                                                    const std::int32_t optionName,
+                                                    const std::span<std::byte> option) const noexcept -> void {
+    io_uring_prep_cmd_sock(this->handle, operation, socketFileDescriptor, level, optionName, std::data(option),
+                           static_cast<std::int32_t>(std::size(option)));
 }
 
 auto coContext::internal::Submission::discardCommand(const std::int32_t fileDescriptor, const std::uint64_t offset,

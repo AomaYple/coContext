@@ -59,8 +59,7 @@ namespace coContext::internal {
                           std::uint32_t flags) const noexcept -> void;
 
         auto socketCommand(std::int32_t operation, std::int32_t socketFileDescriptor, std::int32_t level,
-                           std::int32_t optionName, void *optionValue, std::int32_t optionLength) const noexcept
-            -> void;
+                           std::int32_t optionName, std::span<std::byte> option) const noexcept -> void;
 
         auto discardCommand(std::int32_t fileDescriptor, std::uint64_t offset, std::uint64_t length) const noexcept
             -> void;

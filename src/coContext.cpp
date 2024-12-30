@@ -195,8 +195,7 @@ auto coContext::directSocket(const std::int32_t domain, const std::int32_t type,
 auto coContext::getSocketOption(const std::int32_t socketFileDescriptor, const std::int32_t level,
                                 const std::int32_t optionName, std::span<std::byte> option) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
-    submission.socketCommand(SOCKET_URING_OP_GETSOCKOPT, socketFileDescriptor, level, optionName, std::data(option),
-                             static_cast<std::int32_t>(std::size(option)));
+    submission.socketCommand(SOCKET_URING_OP_GETSOCKOPT, socketFileDescriptor, level, optionName, option);
 
     return internal::AsyncWaiter{submission};
 }
@@ -204,22 +203,21 @@ auto coContext::getSocketOption(const std::int32_t socketFileDescriptor, const s
 auto coContext::setSocketOption(const std::int32_t socketFileDescriptor, const std::int32_t level,
                                 const std::int32_t optionName, std::span<std::byte> option) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
-    submission.socketCommand(SOCKET_URING_OP_SETSOCKOPT, socketFileDescriptor, level, optionName, std::data(option),
-                             static_cast<std::int32_t>(std::size(option)));
+    submission.socketCommand(SOCKET_URING_OP_SETSOCKOPT, socketFileDescriptor, level, optionName, option);
 
     return internal::AsyncWaiter{submission};
 }
 
 auto coContext::getSocketReceiveBufferUnreadDataSize(const std::int32_t socketFileDescriptor) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
-    submission.socketCommand(SOCKET_URING_OP_SIOCINQ, socketFileDescriptor, 0, 0, nullptr, 0);
+    submission.socketCommand(SOCKET_URING_OP_SIOCINQ, socketFileDescriptor, 0, 0, std::span<std::byte>{});
 
     return internal::AsyncWaiter{submission};
 }
 
 auto coContext::getSocketSendBufferUnsentDataSize(const std::int32_t socketFileDescriptor) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
-    submission.socketCommand(SOCKET_URING_OP_SIOCOUTQ, socketFileDescriptor, 0, 0, nullptr, 0);
+    submission.socketCommand(SOCKET_URING_OP_SIOCOUTQ, socketFileDescriptor, 0, 0, std::span<std::byte>{});
 
     return internal::AsyncWaiter{submission};
 }
