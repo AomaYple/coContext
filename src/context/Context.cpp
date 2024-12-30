@@ -44,7 +44,7 @@ coContext::internal::Context::Context() :
 }
 
 auto coContext::internal::Context::operator=(Context &&other) noexcept -> Context & {
-    if (std::addressof(other) == this) return *this;
+    if (this == std::addressof(other)) return *this;
 
     this->~Context();
 
