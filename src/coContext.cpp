@@ -141,11 +141,13 @@ auto coContext::updatePoll(const std::uint64_t taskIdentity, const std::uint32_t
 }
 
 auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> action,
-                             const std::int32_t fileDescriptor, const std::uint32_t mask) -> Task<> {
+                             const std::int32_t fileDescriptor, const std::uint32_t mask, const bool isDirect)
+    -> Task<> {
     const internal::Submission submission{context.getSubmission()};
     submission.multiplePoll(fileDescriptor, mask);
 
     internal::AsyncWaiter asyncWaiter{submission};
+    if (isDirect) asyncWaiter = internal::AsyncWaiter{std::move(asyncWaiter)} | direct();
 
     std::uint32_t asyncWaitResumeFlags{IORING_CQE_F_MORE};
     while (asyncWaitResumeFlags & IORING_CQE_F_MORE) {
@@ -271,10 +273,10 @@ auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void>
     -> Task<> {
     const internal::Submission submission{context.getSubmission()};
     submission.multipleAccept(socketFileDescriptor, address, addressLength, flags);
-    submission.addFlags(isDirect ? IOSQE_FIXED_FILE : 0);
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     internal::AsyncWaiter asyncWaiter{submission};
+    if (isDirect) asyncWaiter = internal::AsyncWaiter{std::move(asyncWaiter)} | direct();
 
     std::uint32_t asyncWaitResumeFlags{IORING_CQE_F_MORE};
     while (asyncWaitResumeFlags & IORING_CQE_F_MORE) {
@@ -289,10 +291,10 @@ auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)-
     -> Task<> {
     const internal::Submission submission{context.getSubmission()};
     submission.multipleAcceptDirect(socketFileDescriptor, address, addressLength, flags);
-    submission.addFlags(isDirect ? IOSQE_FIXED_FILE : 0);
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     internal::AsyncWaiter asyncWaiter{submission};
+    if (isDirect) asyncWaiter = internal::AsyncWaiter{std::move(asyncWaiter)} | direct();
 
     std::uint32_t asyncWaitResumeFlags{IORING_CQE_F_MORE};
     while (asyncWaitResumeFlags & IORING_CQE_F_MORE) {
