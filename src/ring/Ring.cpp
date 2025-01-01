@@ -147,10 +147,6 @@ auto coContext::internal::Ring::poll(std::move_only_function<auto(const io_uring
     return count;
 }
 
-auto coContext::internal::Ring::advance(const std::uint32_t count) noexcept -> void {
-    io_uring_cq_advance(std::addressof(this->handle), count);
-}
-
 auto coContext::internal::Ring::advance(io_uring_buf_ring *const ringBuffer, const std::int32_t completionCount,
                                         const std::int32_t bufferCount) noexcept -> void {
     __io_uring_buf_ring_cq_advance(std::addressof(this->handle), ringBuffer, completionCount, bufferCount);

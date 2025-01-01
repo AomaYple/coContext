@@ -47,8 +47,6 @@ namespace coContext::internal {
 
         [[nodiscard]] auto poll(std::move_only_function<auto(const io_uring_cqe *)->void> action) const -> std::int32_t;
 
-        auto advance(std::uint32_t count) noexcept -> void;
-
         auto advance(io_uring_buf_ring *ringBuffer, std::int32_t completionCount, std::int32_t bufferCount) noexcept
             -> void;
 

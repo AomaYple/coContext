@@ -1,11 +1,11 @@
 #pragma once
 
 #include "../memory/memoryResource.hpp"
-#include "../ring/Ring.hpp"
+#include "../ring/RingBuffer.hpp"
 #include "coContext/coroutine/Coroutine.hpp"
 
 #include <queue>
-#include <variant>
+#include <unordered_map>
 
 namespace coContext::internal {
     class Submission;
@@ -32,10 +32,10 @@ namespace coContext::internal {
 
         auto spawn(Coroutine coroutine) -> void;
 
-        [[nodiscard]] auto getSubmission() -> Submission;
+        [[nodiscard]] auto getSubmission() const -> Submission;
 
         [[nodiscard]] auto syncCancel(std::variant<std::uint64_t, std::int32_t> identity, std::int32_t flags,
-                                      __kernel_timespec timeSpecification) -> std::int32_t;
+                                      __kernel_timespec timeSpecification) const -> std::int32_t;
 
     private:
         auto scheduleUnscheduledCoroutines() -> void;
@@ -47,11 +47,12 @@ namespace coContext::internal {
         static constinit std::int32_t sharedRingFileDescriptor;
         static std::vector<std::uint32_t> cpuCodes;
 
-        Ring ring;
+        std::shared_ptr<Ring> ring;
         std::uint32_t cpuCode;
         bool isRunning{};
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
+        RingBuffer ringBuffer;
     };
 }    // namespace coContext::internal
 
