@@ -48,8 +48,6 @@ auto coContext::syncCancelAny(const std::chrono::seconds seconds, const std::chr
                               __kernel_timespec{seconds.count(), nanoseconds.count()});
 }
 
-auto coContext::direct() noexcept -> internal::Marker { return internal::Marker{IOSQE_FIXED_FILE}; }
-
 auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                         const ClockSource clockSource) -> internal::Marker {
     const internal::Submission submission{context.getSubmission()};
@@ -63,6 +61,8 @@ auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::n
 
     return internal::Marker{IOSQE_IO_LINK};
 }
+
+auto coContext::direct() noexcept -> internal::Marker { return internal::Marker{IOSQE_FIXED_FILE}; }
 
 auto coContext::cancel(const std::uint64_t taskIdentity) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
