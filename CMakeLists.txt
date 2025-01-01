@@ -49,7 +49,7 @@ find_package(mimalloc REQUIRED)
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
         uring
-        mimalloc
+        $<$<CONFIG:Release>:mimalloc>
 )
 
 set(installTargets ${PROJECT_NAME}Targets)
