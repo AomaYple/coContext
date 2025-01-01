@@ -29,7 +29,7 @@ target_include_directories(${PROJECT_NAME}
 target_compile_options(${PROJECT_NAME}
         PRIVATE
         -Wall -Wextra -Wpedantic
-        $<$<CONFIG:Debug>:-ggdb3 -Og -fsanitize=address -fsanitize=leak -fsanitize=undefined>
+        $<$<CONFIG:Debug>:-g3 -ggdb3 -Og -fsanitize=address -fsanitize=leak -fsanitize=undefined>
         $<$<CONFIG:Release>:-Ofast>
 )
 
