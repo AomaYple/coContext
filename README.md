@@ -43,7 +43,7 @@ auto main() -> int {
 - [GCC](https://gcc.gnu.org) >= 14
 - [CMake](https://cmake.org) >= 3.30
 - [Ninja](https://ninja-build.org) >= 1.8.2
-- [liburing](https://github.com/axboe/liburing) >= 2.7
+- [liburing](https://github.com/axboe/liburing) >= 2.8
 - [mimalloc](https://github.com/microsoft/mimalloc)
 
 建议使用[Arch Linux](https://archlinux.org)
