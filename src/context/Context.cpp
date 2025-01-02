@@ -22,7 +22,7 @@ coContext::internal::Context::Context() :
         }
 
         auto ring{std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getMemoryResource()},
-                                             fileDescriptorLimit * 2, parameters)};
+                                             fileDescriptorLimit * 4, parameters)};
 
         if (sharedRingFileDescriptor == -1) sharedRingFileDescriptor = ring->getFileDescriptor();
 
