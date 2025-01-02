@@ -76,10 +76,6 @@ target_link_libraries(your_target
 )
 ```
 
-## 使用须知
-
-- 用户应当**避免**使用`coContext::internal`中的函数和类，因为它们是内部使用的
-
 ## 更多示例
 
 ### 启动和停止
