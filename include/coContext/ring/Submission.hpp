@@ -27,6 +27,8 @@ namespace coContext::internal {
 
         auto setUserData(std::uint64_t userData) const noexcept -> void;
 
+        auto setBufferGroup(std::uint16_t bufferGroup) const noexcept -> void;
+
         auto linkTimeout(__kernel_timespec &timeSpecification, std::uint32_t flags) const noexcept -> void;
 
         auto cancel(std::uint64_t userData, std::int32_t flags) const noexcept -> void;

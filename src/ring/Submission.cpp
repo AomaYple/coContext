@@ -16,6 +16,10 @@ auto coContext::internal::Submission::setUserData(const std::uint64_t userData) 
     io_uring_sqe_set_data64(this->handle, userData);
 }
 
+auto coContext::internal::Submission::setBufferGroup(const std::uint16_t bufferGroup) const noexcept -> void {
+    this->handle->buf_group = bufferGroup;
+}
+
 auto coContext::internal::Submission::linkTimeout(__kernel_timespec &timeSpecification,
                                                   const std::uint32_t flags) const noexcept -> void {
     io_uring_prep_link_timeout(this->handle, std::addressof(timeSpecification), flags);
