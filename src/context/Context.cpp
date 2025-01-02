@@ -36,7 +36,7 @@ coContext::internal::Context::Context() :
 
         return static_cast<std::uint32_t>(std::distance(std::begin(cpuCodes), minElement));
     }()},
-    ringBuffer{this->ring, fileDescriptorLimit, 0, 0} {
+    ringBuffer{this->ring, fileDescriptorLimit * 2, 0, IOU_PBUF_RING_INC} {
     this->ring->registerSelfFileDescriptor();
 
     this->ring->registerSparseFileDescriptor(fileDescriptorLimit);
