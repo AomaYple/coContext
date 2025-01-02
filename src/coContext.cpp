@@ -253,6 +253,7 @@ auto coContext::accept(const std::int32_t socketFileDescriptor, sockaddr *const 
                        const std::int32_t flags) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.accept(socketFileDescriptor, address, addressLength, flags);
+
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -262,6 +263,7 @@ auto coContext::acceptDirect(const std::int32_t socketFileDescriptor, sockaddr *
                              socklen_t *const addressLength, const std::int32_t flags) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.acceptDirect(socketFileDescriptor, address, addressLength, flags, IORING_FILE_INDEX_ALLOC);
+
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -273,6 +275,7 @@ auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void>
     -> Task<> {
     const internal::Submission submission{context.getSubmission()};
     submission.multipleAccept(socketFileDescriptor, address, addressLength, flags);
+
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     internal::AsyncWaiter asyncWaiter{submission};
@@ -291,6 +294,7 @@ auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)-
     -> Task<> {
     const internal::Submission submission{context.getSubmission()};
     submission.multipleAcceptDirect(socketFileDescriptor, address, addressLength, flags);
+
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     internal::AsyncWaiter asyncWaiter{submission};
@@ -322,6 +326,7 @@ auto coContext::receive(const std::int32_t socketFileDescriptor, const std::span
                         const std::int32_t flags) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.receive(socketFileDescriptor, buffer, flags);
+
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -331,6 +336,7 @@ auto coContext::receive(const std::int32_t socketFileDescriptor, msghdr &message
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.receive(socketFileDescriptor, message, flags);
+
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -358,6 +364,7 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr &mess
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.send(socketFileDescriptor, message, flags);
+
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
