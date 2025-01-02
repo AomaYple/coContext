@@ -113,6 +113,8 @@ auto coContext::internal::Context::getSubmission() const -> Submission {
     return Submission{this->ring->getSubmission()};
 }
 
+auto coContext::internal::Context::getRingBufferId() const noexcept -> std::int32_t { return this->ringBuffer.getId(); }
+
 auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, std::int32_t> identity,
                                               const std::int32_t flags, const __kernel_timespec timeSpecification) const
     -> std::int32_t {

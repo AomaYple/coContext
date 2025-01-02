@@ -35,6 +35,8 @@ namespace coContext::internal {
 
         [[nodiscard]] auto getSubmission() const -> Submission;
 
+        [[nodiscard]] auto getRingBufferId() const noexcept -> std::int32_t;
+
         [[nodiscard]] auto syncCancel(std::variant<std::uint64_t, std::int32_t> identity, std::int32_t flags,
                                       __kernel_timespec timeSpecification) const -> std::int32_t;
 
