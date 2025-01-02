@@ -150,6 +150,12 @@ auto coContext::internal::Submission::receive(const std::int32_t socketFileDescr
     io_uring_prep_recvmsg(this->handle, socketFileDescriptor, std::addressof(message), flags);
 }
 
+auto coContext::internal::Submission::multipleReceive(const std::int32_t socketFileDescriptor,
+                                                      const std::span<std::byte> buffer,
+                                                      const std::int32_t flags) const noexcept -> void {
+    io_uring_prep_recv_multishot(this->handle, socketFileDescriptor, std::data(buffer), std::size(buffer), flags);
+}
+
 auto coContext::internal::Submission::send(const std::int32_t socketFileDescriptor,
                                            const std::span<const std::byte> buffer,
                                            const std::int32_t flags) const noexcept -> void {

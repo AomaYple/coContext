@@ -90,6 +90,9 @@ namespace coContext::internal {
 
         auto receive(std::int32_t socketFileDescriptor, msghdr &message, std::uint32_t flags) const noexcept -> void;
 
+        auto multipleReceive(std::int32_t socketFileDescriptor, std::span<std::byte> buffer,
+                             std::int32_t flags) const noexcept -> void;
+
         auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer,
                   std::int32_t flags) const noexcept -> void;
 
