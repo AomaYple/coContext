@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../memory/memoryResource.hpp"
+#include "../ring/BufferGroup.hpp"
 #include "../ring/RingBuffer.hpp"
 #include "coContext/coroutine/Coroutine.hpp"
 
@@ -46,6 +47,7 @@ namespace coContext::internal {
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
         static std::vector<std::uint32_t> cpuCodes;
+        static const std::uint16_t bufferCount;
 
         std::shared_ptr<Ring> ring;
         std::uint32_t cpuCode;
@@ -53,6 +55,7 @@ namespace coContext::internal {
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
         RingBuffer ringBuffer;
+        BufferGroup bufferGroup;
     };
 }    // namespace coContext::internal
 

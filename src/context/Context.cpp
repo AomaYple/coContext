@@ -36,7 +36,7 @@ coContext::internal::Context::Context() :
 
         return static_cast<std::uint32_t>(std::distance(std::begin(cpuCodes), minElement));
     }()},
-    ringBuffer{this->ring, fileDescriptorLimit * 2, 0, IOU_PBUF_RING_INC} {
+    ringBuffer{this->ring, bufferCount, 0, IOU_PBUF_RING_INC}, bufferGroup{bufferCount, 2048} {
     this->ring->registerSelfFileDescriptor();
 
     this->ring->registerSparseFileDescriptor(fileDescriptorLimit);
@@ -175,3 +175,4 @@ constinit std::mutex coContext::internal::Context::mutex;
 constinit std::int32_t coContext::internal::Context::sharedRingFileDescriptor{-1};
 std::vector<std::uint32_t> coContext::internal::Context::cpuCodes{
     std::vector<std::uint32_t>(std::thread::hardware_concurrency())};
+const std::uint16_t coContext::internal::Context::bufferCount{static_cast<std::uint16_t>(fileDescriptorLimit * 2)};
