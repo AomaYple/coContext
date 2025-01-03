@@ -6,8 +6,7 @@
 #include "coContext/ring/Submission.hpp"
 
 #include <algorithm>
-
-using namespace std::string_view_literals;
+#include <sys/resource.h>
 
 coContext::internal::Context::Context() :
     ring{[] {
@@ -40,7 +39,19 @@ coContext::internal::Context::Context() :
     ringBuffer{this->ring, entries, 0, IOU_PBUF_RING_INC} {
     this->ring->registerSelfFileDescriptor();
 
-    this->ring->registerSparseFileDescriptor(getFileDescriptorLimit());
+    this->ring->registerSparseFileDescriptor([](const std::source_location sourceLocation =
+                                                    std::source_location::current()) {
+        rlimit limit{};
+        if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
+            throw Exception{
+                Log{Log::Level::fatal,
+                    std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getMemoryResource()},
+                    sourceLocation}
+            };
+        }
+
+        return limit.rlim_cur;
+    }());
 
     constexpr cpu_set_t cpuSet{};
     CPU_SET(this->cpuCode, std::addressof(cpuSet));
@@ -138,49 +149,23 @@ auto coContext::internal::Context::getRingBufferId() const noexcept -> std::int3
 auto coContext::internal::Context::getData(const std::uint16_t bufferId, const std::size_t dataSize) noexcept
     -> std::span<const std::byte> {
     auto &[buffer, offset]{this->bufferGroup[bufferId]};
+    this->ringBuffer.addBuffer(buffer, bufferId);
+
     const std::span data{std::cbegin(buffer) + static_cast<std::ptrdiff_t>(offset), dataSize};
     offset += dataSize;
 
     return data;
 }
 
-auto coContext::internal::Context::revertBuffer(const std::uint16_t bufferId) noexcept -> void {
-    auto &[buffer, offset]{this->bufferGroup[bufferId]};
-    offset = 0;
-
-    this->ringBuffer.addBuffer(buffer, bufferId);
+auto coContext::internal::Context::clearBufferOffset(const std::uint16_t bufferId) noexcept -> void {
+    this->bufferGroup[bufferId].offset = 0;
 }
 
-auto coContext::internal::Context::expandBuffer(const std::source_location sourceLocation) -> void {
-    if (std::size(this->bufferGroup) == std::numeric_limits<std::uint16_t>::max()) {
-        throw Exception{
-            Log{Log::Level::error,
-                std::pmr::string{"buffer group size exceeds the maximum value"sv, getMemoryResource()},
-                sourceLocation}
-        };
-    }
+auto coContext::internal::Context::expandBuffer() -> void {
+    if (std::size(this->bufferGroup) == std::numeric_limits<std::uint16_t>::max() + 1) return;
 
-    std::size_t newSize{std::size(this->bufferGroup) * 2};
-    if (newSize == 0) newSize = 1;
-    else if (newSize > std::numeric_limits<std::uint16_t>::max()) newSize = std::numeric_limits<std::uint16_t>::max();
-
-    this->bufferGroup.resize(newSize);
-
-    for (auto i{static_cast<std::uint16_t>(std::size(this->bufferGroup) / 2)}; i != std::size(this->bufferGroup); ++i)
-        this->ringBuffer.addBuffer(this->bufferGroup[i].buffer, i);
-}
-
-auto coContext::internal::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> rlim_t {
-    rlimit limit{};
-    if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
-        throw Exception{
-            Log{Log::Level::fatal,
-                std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getMemoryResource()},
-                sourceLocation}
-        };
-    }
-
-    return limit.rlim_cur;
+    this->bufferGroup.emplace_back();
+    this->ringBuffer.addBuffer(this->bufferGroup.back().buffer, std::size(this->bufferGroup) - 1);
 }
 
 auto coContext::internal::Context::scheduleUnscheduledCoroutines() -> void {

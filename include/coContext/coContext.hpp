@@ -168,6 +168,10 @@ namespace coContext {
     [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, msghdr &message, std::uint32_t flags)
         -> internal::AsyncWaiter;
 
+    [[nodiscard]] auto
+        multipleReceive(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
+                        std::int32_t socketFileDescriptor, std::int32_t flags, bool isDirect = {}) -> Task<>;
+
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags)
         -> internal::AsyncWaiter;
 

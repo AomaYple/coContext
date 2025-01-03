@@ -5,8 +5,6 @@
 #include "coContext/coroutine/Coroutine.hpp"
 
 #include <queue>
-#include <source_location>
-#include <sys/resource.h>
 #include <unordered_map>
 
 namespace coContext::internal {
@@ -48,14 +46,11 @@ namespace coContext::internal {
 
         [[nodiscard]] auto getData(std::uint16_t bufferId, std::size_t dataSize) noexcept -> std::span<const std::byte>;
 
-        auto revertBuffer(std::uint16_t bufferId) noexcept -> void;
+        auto clearBufferOffset(std::uint16_t bufferId) noexcept -> void;
 
-        auto expandBuffer(std::source_location sourceLocation = std::source_location::current()) -> void;
+        auto expandBuffer() -> void;
 
     private:
-        [[nodiscard]] static auto
-            getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current()) -> rlim_t;
-
         auto scheduleUnscheduledCoroutines() -> void;
 
         auto scheduleCoroutine(Coroutine coroutine) -> void;
