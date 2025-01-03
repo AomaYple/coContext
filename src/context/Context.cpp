@@ -6,7 +6,6 @@
 #include "coContext/ring/Submission.hpp"
 
 #include <algorithm>
-#include <sys/resource.h>
 
 using namespace std::string_view_literals;
 
@@ -23,8 +22,8 @@ coContext::internal::Context::Context() :
             parameters.wq_fd = sharedRingFileDescriptor;
         }
 
-        auto ring{std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getMemoryResource()},
-                                             fileDescriptorLimit * 4, parameters)};
+        auto ring{
+            std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getMemoryResource()}, entries, parameters)};
 
         if (sharedRingFileDescriptor == -1) sharedRingFileDescriptor = ring->getFileDescriptor();
 
@@ -38,16 +37,14 @@ coContext::internal::Context::Context() :
 
         return static_cast<std::uint32_t>(std::distance(std::begin(cpuCodes), minElement));
     }()},
-    ringBuffer{this->ring, 32768, 0, IOU_PBUF_RING_INC} {
+    ringBuffer{this->ring, entries, 0, IOU_PBUF_RING_INC} {
     this->ring->registerSelfFileDescriptor();
 
-    this->ring->registerSparseFileDescriptor(fileDescriptorLimit);
+    this->ring->registerSparseFileDescriptor(getFileDescriptorLimit());
 
     constexpr cpu_set_t cpuSet{};
     CPU_SET(this->cpuCode, std::addressof(cpuSet));
     this->ring->registerCpuAffinity(std::addressof(cpuSet), sizeof(cpuSet));
-
-    this->ringBuffer.addBuffer(this->bufferGroup.front().buffer, 0);
 }
 
 auto coContext::internal::Context::operator=(Context &&other) noexcept -> Context & {
@@ -155,7 +152,7 @@ auto coContext::internal::Context::revertBuffer(const std::uint16_t bufferId) no
 }
 
 auto coContext::internal::Context::expandBuffer(const std::source_location sourceLocation) -> void {
-    if (this->bufferGroup.size() == std::numeric_limits<std::uint16_t>::max()) {
+    if (std::size(this->bufferGroup) == std::numeric_limits<std::uint16_t>::max()) {
         throw Exception{
             Log{Log::Level::error,
                 std::pmr::string{"buffer group size exceeds the maximum value"sv, getMemoryResource()},
@@ -163,12 +160,27 @@ auto coContext::internal::Context::expandBuffer(const std::source_location sourc
         };
     }
 
-    this->bufferGroup.resize(this->bufferGroup.size() * 2 > std::numeric_limits<std::uint16_t>::max() ?
-                                 std::numeric_limits<std::uint16_t>::max() :
-                                 this->bufferGroup.size() * 2);
+    std::size_t newSize{std::size(this->bufferGroup) * 2};
+    if (newSize == 0) newSize = 1;
+    else if (newSize > std::numeric_limits<std::uint16_t>::max()) newSize = std::numeric_limits<std::uint16_t>::max();
 
-    for (auto i{static_cast<std::uint16_t>(this->bufferGroup.size() / 2)}; i != this->bufferGroup.size(); ++i)
+    this->bufferGroup.resize(newSize);
+
+    for (auto i{static_cast<std::uint16_t>(std::size(this->bufferGroup) / 2)}; i != std::size(this->bufferGroup); ++i)
         this->ringBuffer.addBuffer(this->bufferGroup[i].buffer, i);
+}
+
+auto coContext::internal::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> rlim_t {
+    rlimit limit{};
+    if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
+        throw Exception{
+            Log{Log::Level::fatal,
+                std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getMemoryResource()},
+                sourceLocation}
+        };
+    }
+
+    return limit.rlim_cur;
 }
 
 auto coContext::internal::Context::scheduleUnscheduledCoroutines() -> void {
@@ -199,19 +211,6 @@ auto coContext::internal::Context::scheduleCoroutine(Coroutine coroutine) -> voi
     }
 }
 
-std::uint32_t coContext::internal::Context::fileDescriptorLimit{
-    [](const std::source_location sourceLocation = std::source_location::current()) {
-        rlimit limit{};
-        if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
-            throw Exception{
-                Log{Log::Level::fatal,
-                    std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getMemoryResource()},
-                    sourceLocation}
-            };
-        }
-
-        return static_cast<std::uint32_t>(limit.rlim_cur);
-    }()};
 constinit std::mutex coContext::internal::Context::mutex;
 constinit std::int32_t coContext::internal::Context::sharedRingFileDescriptor{-1};
 std::vector<std::uint32_t> coContext::internal::Context::cpuCodes{

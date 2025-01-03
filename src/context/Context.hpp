@@ -6,6 +6,7 @@
 
 #include <queue>
 #include <source_location>
+#include <sys/resource.h>
 #include <unordered_map>
 
 namespace coContext::internal {
@@ -52,11 +53,14 @@ namespace coContext::internal {
         auto expandBuffer(std::source_location sourceLocation = std::source_location::current()) -> void;
 
     private:
+        [[nodiscard]] static auto
+            getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current()) -> rlim_t;
+
         auto scheduleUnscheduledCoroutines() -> void;
 
         auto scheduleCoroutine(Coroutine coroutine) -> void;
 
-        static std::uint32_t fileDescriptorLimit;
+        static constexpr std::uint16_t entries{32768};
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
         static std::vector<std::uint32_t> cpuCodes;
@@ -67,7 +71,7 @@ namespace coContext::internal {
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
         RingBuffer ringBuffer;
-        std::pmr::vector<Buffer> bufferGroup{1, getMemoryResource()};
+        std::pmr::vector<Buffer> bufferGroup{getMemoryResource()};
     };
 }    // namespace coContext::internal
 
