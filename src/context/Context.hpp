@@ -11,7 +11,7 @@ namespace coContext::internal {
     class Submission;
 
     struct Buffer {
-        std::pmr::vector<std::byte> buffer{1024, getMemoryResource()};
+        std::pmr::vector<std::byte> buffer{2048, getMemoryResource()};
         std::size_t offset{};
     };
 

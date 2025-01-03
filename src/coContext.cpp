@@ -119,13 +119,8 @@ auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> 
     internal::AsyncWaiter asyncWaiter{
         ::sleep(seconds, nanoseconds, setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT)};
 
-    std::uint32_t asyncWaitResumeFlags;
-    do {
-        const std::int32_t result{co_await asyncWaiter};
-        asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
-
-        action(result);
-    } while ((asyncWaitResumeFlags & IORING_CQE_F_MORE) != 0);
+    do action(co_await asyncWaiter);
+    while ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
 auto coContext::poll(const std::int32_t fileDescriptor, const std::uint32_t mask) -> internal::AsyncWaiter {
@@ -151,13 +146,8 @@ auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> a
     internal::AsyncWaiter asyncWaiter{submission};
     if (isDirect) asyncWaiter = internal::AsyncWaiter{std::move(asyncWaiter)} | direct();
 
-    std::uint32_t asyncWaitResumeFlags;
-    do {
-        const std::int32_t result{co_await asyncWaiter};
-        asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
-
-        action(result);
-    } while ((asyncWaitResumeFlags & IORING_CQE_F_MORE) != 0);
+    do action(co_await asyncWaiter);
+    while ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
 auto coContext::installDirect(const std::int32_t directFileDescriptor, const bool isSetCloseOnExecute)
@@ -285,13 +275,8 @@ auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void>
     internal::AsyncWaiter asyncWaiter{submission};
     if (isDirect) asyncWaiter = internal::AsyncWaiter{std::move(asyncWaiter)} | direct();
 
-    std::uint32_t asyncWaitResumeFlags;
-    do {
-        const std::int32_t result{co_await asyncWaiter};
-        asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
-
-        action(result);
-    } while ((asyncWaitResumeFlags & IORING_CQE_F_MORE) != 0);
+    do action(co_await asyncWaiter);
+    while ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
 auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)->void> action,
@@ -306,13 +291,8 @@ auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)-
     internal::AsyncWaiter asyncWaiter{submission};
     if (isDirect) asyncWaiter = internal::AsyncWaiter{std::move(asyncWaiter)} | direct();
 
-    std::uint32_t asyncWaitResumeFlags;
-    do {
-        const std::int32_t result{co_await asyncWaiter};
-        asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
-
-        action(result);
-    } while ((asyncWaitResumeFlags & IORING_CQE_F_MORE) != 0);
+    do action(co_await asyncWaiter);
+    while ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
 auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr &address, const socklen_t addressLength)
