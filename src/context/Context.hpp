@@ -1,15 +1,20 @@
 #pragma once
 
 #include "../memory/memoryResource.hpp"
-#include "../ring/BufferGroup.hpp"
 #include "../ring/RingBuffer.hpp"
 #include "coContext/coroutine/Coroutine.hpp"
 
 #include <queue>
+#include <source_location>
 #include <unordered_map>
 
 namespace coContext::internal {
     class Submission;
+
+    struct Buffer {
+        std::pmr::vector<std::byte> buffer{1024, getMemoryResource()};
+        std::size_t offset{};
+    };
 
     class Context {
     public:
@@ -35,10 +40,16 @@ namespace coContext::internal {
 
         [[nodiscard]] auto getSubmission() const -> Submission;
 
-        [[nodiscard]] auto getRingBufferId() const noexcept -> std::int32_t;
-
         [[nodiscard]] auto syncCancel(std::variant<std::uint64_t, std::int32_t> identity, std::int32_t flags,
                                       __kernel_timespec timeSpecification) const -> std::int32_t;
+
+        [[nodiscard]] auto getRingBufferId() const noexcept -> std::int32_t;
+
+        [[nodiscard]] auto getData(std::uint16_t bufferId, std::size_t dataSize) noexcept -> std::span<const std::byte>;
+
+        auto revertBuffer(std::uint16_t bufferId) noexcept -> void;
+
+        auto expandBuffer(std::source_location sourceLocation = std::source_location::current()) -> void;
 
     private:
         auto scheduleUnscheduledCoroutines() -> void;
@@ -49,7 +60,6 @@ namespace coContext::internal {
         static constinit std::mutex mutex;
         static constinit std::int32_t sharedRingFileDescriptor;
         static std::vector<std::uint32_t> cpuCodes;
-        static const std::uint16_t bufferCount;
 
         std::shared_ptr<Ring> ring;
         std::uint32_t cpuCode;
@@ -57,7 +67,7 @@ namespace coContext::internal {
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
         RingBuffer ringBuffer;
-        BufferGroup bufferGroup;
+        std::pmr::vector<Buffer> bufferGroup{1, getMemoryResource()};
     };
 }    // namespace coContext::internal
 
