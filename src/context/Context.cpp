@@ -5,8 +5,6 @@
 #include "coContext/coroutine/BasePromise.hpp"
 #include "coContext/ring/Submission.hpp"
 
-#include <sys/resource.h>
-
 coContext::internal::Context::Context() :
     ring{[] {
         io_uring_params parameters{};
@@ -18,19 +16,7 @@ coContext::internal::Context::Context() :
     ringBuffer{this->ring, entries, 0, IOU_PBUF_RING_INC} {
     this->ring->registerSelfFileDescriptor();
 
-    this->ring->registerSparseFileDescriptor([](const std::source_location sourceLocation =
-                                                    std::source_location::current()) {
-        rlimit limit{};
-        if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
-            throw Exception{
-                Log{Log::Level::fatal,
-                    std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getMemoryResource()},
-                    sourceLocation}
-            };
-        }
-
-        return limit.rlim_cur;
-    }());
+    this->ring->registerSparseFileDescriptor(getFileDescriptorLimit());
 }
 
 auto coContext::internal::Context::swap(Context &other) noexcept -> void {
@@ -113,6 +99,19 @@ auto coContext::internal::Context::expandBuffer() -> void {
 
     this->bufferGroup.emplace_back();
     this->ringBuffer.addBuffer(this->bufferGroup.back().buffer, std::size(this->bufferGroup) - 1);
+}
+
+auto coContext::internal::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> rlim_t {
+    rlimit limit{};
+    if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
+        throw Exception{
+            Log{Log::Level::fatal,
+                std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getMemoryResource()},
+                sourceLocation}
+        };
+    }
+
+    return limit.rlim_cur;
 }
 
 auto coContext::internal::Context::scheduleUnscheduledCoroutines() -> void {

@@ -5,6 +5,8 @@
 #include "coContext/coroutine/Coroutine.hpp"
 
 #include <queue>
+#include <source_location>
+#include <sys/resource.h>
 #include <unordered_map>
 
 namespace coContext::internal {
@@ -51,6 +53,9 @@ namespace coContext::internal {
         auto expandBuffer() -> void;
 
     private:
+        [[nodiscard]] static auto
+            getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current()) -> rlim_t;
+
         auto scheduleUnscheduledCoroutines() -> void;
 
         auto scheduleCoroutine(Coroutine coroutine) -> void;
