@@ -10,7 +10,7 @@
 - IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
 - 嵌套**任意数量**的**任意返回值**的协程
 - 多线程
-- 直接文件描述符，以`directSocket` `acceptDirect` `openDirect`方式获得
+- 直接文件描述符，可以与普通文件描述符相互转换
 
 ## 基础用法
 
@@ -210,7 +210,7 @@ auto main() -> int {
 <details>
 <summary>直接文件描述符</summary>
 
-- 直接文件描述符的优点
+- 优点
     - 直接文件描述符的操作开销较普通文件描述符更低，因为内核在操作开始时会抓取文件描述符引用计数，并在操作完成后丢弃它
     - 如果进程文件表是共享的（例如多线程程序），普通文件描述符的开销会更大
 
@@ -231,8 +231,8 @@ auto main() -> int {
 
 - 直接文件描述符必须以`closeDirect()`关闭
 - 直接文件描述的IO操作必须以`direct()`标记
-- 直接文件描述符可以通过`installDirect()`转换为普通文件描述符
-- 暂不支持普通文件描述符转换为直接文件描述符
+- 直接文件描述符可以通过`installDirect()`转换为普通文件描述符，普通文件描述符可以通过`toDirect()`转换为直接文件描述符
+- 可以通过`directSocket` `acceptDirect` `multipleAcceptDirect` `openDirect`获得直接文件描述符
 - 转换后的直接文件描述符和普通文件描述符**相互独立**
 
 </details>
