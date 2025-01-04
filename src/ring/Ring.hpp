@@ -29,9 +29,6 @@ namespace coContext::internal {
                                           std::source_location sourceLocation = std::source_location::current())
             -> void;
 
-        auto registerCpuAffinity(const cpu_set_t *cpuSet, std::size_t cpuSetSize,
-                                 std::source_location sourceLocation = std::source_location::current()) -> void;
-
         [[nodiscard]] auto setupRingBuffer(std::uint32_t entries, std::int32_t id, std::uint32_t flags,
                                            std::source_location sourceLocation = std::source_location::current())
             -> io_uring_buf_ring *;

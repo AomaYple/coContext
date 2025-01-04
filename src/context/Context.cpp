@@ -5,7 +5,6 @@
 #include "coContext/coroutine/BasePromise.hpp"
 #include "coContext/ring/Submission.hpp"
 
-#include <algorithm>
 #include <sys/resource.h>
 
 coContext::internal::Context::Context() :
@@ -14,27 +13,7 @@ coContext::internal::Context::Context() :
         parameters.flags = IORING_SETUP_SUBMIT_ALL | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_TASKRUN_FLAG |
                            IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN;
 
-        const std::lock_guard lock{mutex};
-
-        if (sharedRingFileDescriptor != -1) {
-            parameters.flags |= IORING_SETUP_ATTACH_WQ;
-            parameters.wq_fd = sharedRingFileDescriptor;
-        }
-
-        auto ring{
-            std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getMemoryResource()}, entries, parameters)};
-
-        if (sharedRingFileDescriptor == -1) sharedRingFileDescriptor = ring->getFileDescriptor();
-
-        return ring;
-    }()},
-    cpuCode{[] {
-        const std::lock_guard lock{mutex};
-
-        const auto minElement{std::ranges::min_element(cpuCodes)};
-        ++*minElement;
-
-        return static_cast<std::uint32_t>(std::distance(std::begin(cpuCodes), minElement));
+        return std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getMemoryResource()}, entries, parameters);
     }()},
     ringBuffer{this->ring, entries, 0, IOU_PBUF_RING_INC} {
     this->ring->registerSelfFileDescriptor();
@@ -52,47 +31,15 @@ coContext::internal::Context::Context() :
 
         return limit.rlim_cur;
     }());
-
-    constexpr cpu_set_t cpuSet{};
-    CPU_SET(this->cpuCode, std::addressof(cpuSet));
-    this->ring->registerCpuAffinity(std::addressof(cpuSet), sizeof(cpuSet));
-}
-
-auto coContext::internal::Context::operator=(Context &&other) noexcept -> Context & {
-    if (this == std::addressof(other)) return *this;
-
-    this->~Context();
-
-    this->ring = std::move(other.ring);
-    this->cpuCode = other.cpuCode;
-    this->isRunning = other.isRunning;
-    this->unscheduledCoroutines = std::move(other.unscheduledCoroutines);
-    this->schedulingCoroutines = std::move(other.schedulingCoroutines);
-    this->ringBuffer = std::move(other.ringBuffer);
-    this->bufferGroup = std::move(other.bufferGroup);
-
-    return *this;
-}
-
-coContext::internal::Context::~Context() {
-    const std::int32_t ringFileDescriptor{this->ring->getFileDescriptor()};
-    if (ringFileDescriptor == -1) return;
-
-    const std::lock_guard lock{mutex};
-
-    if (ringFileDescriptor == sharedRingFileDescriptor) sharedRingFileDescriptor = -1;
-
-    --cpuCodes[this->cpuCode];
 }
 
 auto coContext::internal::Context::swap(Context &other) noexcept -> void {
     std::swap(this->ring, other.ring);
-    std::swap(this->cpuCode, other.cpuCode);
-    std::swap(this->isRunning, other.isRunning);
-    std::swap(this->unscheduledCoroutines, other.unscheduledCoroutines);
-    std::swap(this->schedulingCoroutines, other.schedulingCoroutines);
     std::swap(this->ringBuffer, other.ringBuffer);
     std::swap(this->bufferGroup, other.bufferGroup);
+    std::swap(this->unscheduledCoroutines, other.unscheduledCoroutines);
+    std::swap(this->schedulingCoroutines, other.schedulingCoroutines);
+    std::swap(this->isRunning, other.isRunning);
 }
 
 auto coContext::internal::Context::run() -> void {
@@ -195,8 +142,3 @@ auto coContext::internal::Context::scheduleCoroutine(Coroutine coroutine) -> voi
         this->scheduleCoroutine(std::move(parentCoroutine));
     }
 }
-
-constinit std::mutex coContext::internal::Context::mutex;
-constinit std::int32_t coContext::internal::Context::sharedRingFileDescriptor{-1};
-std::vector<std::uint32_t> coContext::internal::Context::cpuCodes{
-    std::vector<std::uint32_t>(std::thread::hardware_concurrency())};

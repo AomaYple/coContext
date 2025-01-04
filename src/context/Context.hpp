@@ -25,9 +25,9 @@ namespace coContext::internal {
 
         Context(Context &&) noexcept = default;
 
-        auto operator=(Context &&) noexcept -> Context &;
+        auto operator=(Context &&) noexcept -> Context & = default;
 
-        ~Context();
+        ~Context() = default;
 
         auto swap(Context &other) noexcept -> void;
 
@@ -56,17 +56,13 @@ namespace coContext::internal {
         auto scheduleCoroutine(Coroutine coroutine) -> void;
 
         static constexpr std::uint16_t entries{32768};
-        static constinit std::mutex mutex;
-        static constinit std::int32_t sharedRingFileDescriptor;
-        static std::vector<std::uint32_t> cpuCodes;
 
         std::shared_ptr<Ring> ring;
-        std::uint32_t cpuCode;
-        bool isRunning{};
-        std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
-        std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
         RingBuffer ringBuffer;
         std::pmr::vector<Buffer> bufferGroup{getMemoryResource()};
+        std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
+        std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
+        bool isRunning{};
     };
 }    // namespace coContext::internal
 

@@ -65,19 +65,6 @@ auto coContext::internal::Ring::registerSparseFileDescriptor(const std::uint32_t
     }
 }
 
-auto coContext::internal::Ring::registerCpuAffinity(const cpu_set_t *const cpuSet, const std::size_t cpuSetSize,
-                                                    const std::source_location sourceLocation) -> void {
-    if (const std::int32_t result{io_uring_register_iowq_aff(std::addressof(this->handle), cpuSetSize, cpuSet)};
-        result != 0) {
-        throw Exception{
-            Log{Log::Level::error,
-                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                 getMemoryResource()},
-                sourceLocation}
-        };
-    }
-}
-
 auto coContext::internal::Ring::setupRingBuffer(const std::uint32_t entries, const std::int32_t id,
                                                 const std::uint32_t flags, const std::source_location sourceLocation)
     -> io_uring_buf_ring * {
