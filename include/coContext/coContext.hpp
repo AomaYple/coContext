@@ -184,6 +184,14 @@ namespace coContext {
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags)
         -> internal::AsyncWaiter;
 
+    [[nodiscard]] auto zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
+                                    std::int32_t socketFileDescriptor, std::span<const std::byte> buffer,
+                                    std::int32_t flags, bool isDirect = {}) -> Task<>;
+
+    [[nodiscard]] auto zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
+                                    std::int32_t socketFileDescriptor, const msghdr &message, std::int32_t flags,
+                                    bool isDirect = {}) -> Task<>;
+
     [[nodiscard]] auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset,
                               std::int32_t outFileDescriptor, std::int64_t outFileDescriptorOffset,
                               std::uint32_t length, std::uint32_t flags) -> internal::AsyncWaiter;

@@ -407,6 +407,36 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr &mess
     return internal::AsyncWaiter{submission};
 }
 
+auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
+                             const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
+                             const std::int32_t flags, const bool isDirect) -> Task<> {
+    const internal::Submission submission{context.getSubmission()};
+    submission.zeroCopySend(socketFileDescriptor, buffer, flags, IORING_RECVSEND_POLL_FIRST);
+
+    internal::AsyncWaiter asyncWaiter{submission};
+    if (isDirect) asyncWaiter = internal::AsyncWaiter{std::move(asyncWaiter)} | direct();
+
+    const std::int32_t result{co_await asyncWaiter};
+    if ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
+
+    action(result);
+}
+
+auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
+                             const std::int32_t socketFileDescriptor, const msghdr &message, const std::int32_t flags,
+                             const bool isDirect) -> Task<> {
+    const internal::Submission submission{context.getSubmission()};
+    submission.zeroCopySend(socketFileDescriptor, message, flags);
+
+    internal::AsyncWaiter asyncWaiter{submission};
+    if (isDirect) asyncWaiter = internal::AsyncWaiter{std::move(asyncWaiter)} | direct();
+
+    const std::int32_t result{co_await asyncWaiter};
+    if ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
+
+    action(result);
+}
+
 auto coContext::splice(const std::int32_t inFileDescriptor, const std::int64_t inFileDescriptorOffset,
                        const std::int32_t outFileDescriptor, const std::int64_t outFileDescriptorOffset,
                        const std::uint32_t length, const std::uint32_t flags) -> internal::AsyncWaiter {

@@ -105,6 +105,12 @@ namespace coContext::internal {
 
         auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags) const noexcept -> void;
 
+        auto zeroCopySend(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
+                          std::uint32_t zeroCopyFlags) const noexcept -> void;
+
+        auto zeroCopySend(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags) const noexcept
+            -> void;
+
         auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset, std::int32_t outFileDescriptor,
                     std::int64_t outFileDescriptorOffset, std::uint32_t length, std::uint32_t flags) const noexcept
             -> void;
