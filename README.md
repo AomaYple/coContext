@@ -266,7 +266,7 @@ auto main() -> int {
 
 constexpr auto acceptAction(const std::int32_t socket, const std::int32_t result) {
     if (result >= 0) {
-        coContext::spawn(
+        spawn(
             coContext::multipleReceive,
             [result](const std::int32_t receiveResult, const std::span<const std::byte> data) {
                 receiveAction(result, receiveResult, data);
@@ -275,7 +275,7 @@ constexpr auto acceptAction(const std::int32_t socket, const std::int32_t result
         // 如果result大于等于0，就调用multipleReceive协程，将receiveAction作为回调函数传入，并利用lambda捕获result
         // coContext::none()表示不使用标记
         // 如果使用coContext::direct()则表示使用直接IO，使用coContext::timeout()则表示使用超时，并且可以组合使用
-    } else coContext::spawn(normalClose, socket);
+    } else spawn(normalClose, socket);
 }
 
 [[nodiscard]] auto multipleAccept(const std::int32_t socket) -> coContext::Task<> {
