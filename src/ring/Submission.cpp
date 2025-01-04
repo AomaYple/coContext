@@ -20,6 +20,16 @@ auto coContext::internal::Submission::setBufferGroup(const std::uint16_t bufferG
     this->handle->buf_group = bufferGroup;
 }
 
+auto coContext::internal::Submission::updateFileDescriptors(const std::span<std::int32_t> fileDescriptors,
+                                                            const std::int32_t offset) const noexcept -> void {
+    io_uring_prep_files_update(this->handle, std::data(fileDescriptors), std::size(fileDescriptors), offset);
+}
+
+auto coContext::internal::Submission::installDirect(const std::int32_t directFileDescriptor,
+                                                    const std::uint32_t flags) const noexcept -> void {
+    io_uring_prep_fixed_fd_install(this->handle, directFileDescriptor, flags);
+}
+
 auto coContext::internal::Submission::linkTimeout(__kernel_timespec &timeSpecification,
                                                   const std::uint32_t flags) const noexcept -> void {
     io_uring_prep_link_timeout(this->handle, std::addressof(timeSpecification), flags);
@@ -59,11 +69,6 @@ auto coContext::internal::Submission::updatePoll(const std::uint64_t oldUserData
 auto coContext::internal::Submission::multiplePoll(const std::int32_t fileDescriptor,
                                                    const std::uint32_t mask) const noexcept -> void {
     io_uring_prep_poll_multishot(this->handle, fileDescriptor, mask);
-}
-
-auto coContext::internal::Submission::installDirect(const std::int32_t directFileDescriptor,
-                                                    const std::uint32_t flags) const noexcept -> void {
-    io_uring_prep_fixed_fd_install(this->handle, directFileDescriptor, flags);
 }
 
 auto coContext::internal::Submission::close(const std::int32_t fileDescriptor) const noexcept -> void {

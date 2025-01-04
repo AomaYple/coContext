@@ -29,6 +29,10 @@ namespace coContext::internal {
 
         auto setBufferGroup(std::uint16_t bufferGroup) const noexcept -> void;
 
+        auto updateFileDescriptors(std::span<std::int32_t> fileDescriptors, std::int32_t offset) const noexcept -> void;
+
+        auto installDirect(std::int32_t directFileDescriptor, std::uint32_t flags) const noexcept -> void;
+
         auto linkTimeout(__kernel_timespec &timeSpecification, std::uint32_t flags) const noexcept -> void;
 
         auto cancel(std::uint64_t userData, std::int32_t flags) const noexcept -> void;
@@ -47,8 +51,6 @@ namespace coContext::internal {
                         std::uint32_t flags) const noexcept -> void;
 
         auto multiplePoll(std::int32_t fileDescriptor, std::uint32_t mask) const noexcept -> void;
-
-        auto installDirect(std::int32_t directFileDescriptor, std::uint32_t flags) const noexcept -> void;
 
         auto close(std::int32_t fileDescriptor) const noexcept -> void;
 

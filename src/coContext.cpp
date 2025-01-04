@@ -48,6 +48,16 @@ auto coContext::syncCancelAny(const std::chrono::seconds seconds, const std::chr
                               __kernel_timespec{seconds.count(), nanoseconds.count()});
 }
 
+auto coContext::installDirect(const std::int32_t directFileDescriptor, const bool isSetCloseOnExecute)
+    -> internal::AsyncWaiter {
+    const internal::Submission submission{context.getSubmission()};
+    submission.installDirect(directFileDescriptor, isSetCloseOnExecute ? 0 : IORING_FIXED_FD_NO_CLOEXEC);
+
+    return internal::AsyncWaiter{submission};
+}
+
+auto coContext::direct() noexcept -> internal::Marker { return internal::Marker{IOSQE_FIXED_FILE}; }
+
 auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                         const ClockSource clockSource) -> internal::Marker {
     const internal::Submission submission{context.getSubmission()};
@@ -61,8 +71,6 @@ auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::n
 
     return internal::Marker{IOSQE_IO_LINK};
 }
-
-auto coContext::direct() noexcept -> internal::Marker { return internal::Marker{IOSQE_FIXED_FILE}; }
 
 auto coContext::cancel(const std::uint64_t taskIdentity) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
@@ -148,14 +156,6 @@ auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> a
 
     do action(co_await asyncWaiter);
     while ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0);
-}
-
-auto coContext::installDirect(const std::int32_t directFileDescriptor, const bool isSetCloseOnExecute)
-    -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.installDirect(directFileDescriptor, isSetCloseOnExecute ? 0 : IORING_FIXED_FD_NO_CLOEXEC);
-
-    return internal::AsyncWaiter{submission};
 }
 
 auto coContext::close(const std::int32_t fileDescriptor) -> internal::AsyncWaiter {

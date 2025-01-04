@@ -83,10 +83,13 @@ namespace coContext {
     [[nodiscard]] auto syncCancelAny(std::chrono::seconds seconds = {}, std::chrono::nanoseconds nanoseconds = {})
         -> std::int32_t;
 
-    [[nodiscard]] auto timeout(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
-                               ClockSource clockSource = {}) -> internal::Marker;
+    [[nodiscard]] auto installDirect(std::int32_t directFileDescriptor, bool isSetCloseOnExecute = true)
+        -> internal::AsyncWaiter;
 
     [[nodiscard]] auto direct() noexcept -> internal::Marker;
+
+    [[nodiscard]] auto timeout(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
+                               ClockSource clockSource = {}) -> internal::Marker;
 
     [[nodiscard]] auto cancel(std::uint64_t taskIdentity) -> internal::AsyncWaiter;
 
@@ -111,9 +114,6 @@ namespace coContext {
 
     [[nodiscard]] auto multiplePoll(std::move_only_function<auto(std::int32_t)->void> action,
                                     std::int32_t fileDescriptor, std::uint32_t mask, bool isDirect = {}) -> Task<>;
-
-    [[nodiscard]] auto installDirect(std::int32_t directFileDescriptor, bool isSetCloseOnExecute = true)
-        -> internal::AsyncWaiter;
 
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> internal::AsyncWaiter;
 
