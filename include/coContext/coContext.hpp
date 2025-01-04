@@ -4,8 +4,6 @@
 #include "coroutine/Marker.hpp"
 #include "coroutine/Task.hpp"
 
-#include <functional>
-
 namespace coContext {
     template<internal::Returnable T = void>
     struct SpawnResult {
@@ -108,14 +106,16 @@ namespace coContext {
 
     [[nodiscard]] auto multipleSleep(std::move_only_function<auto(std::int32_t)->void> action,
                                      std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
-                                     ClockSource clockSource = {}) -> Task<>;
+                                     ClockSource clockSource = {}, internal::Marker marker = internal::Marker{})
+        -> Task<>;
 
     [[nodiscard]] auto poll(std::int32_t fileDescriptor, std::uint32_t mask) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto updatePoll(std::uint64_t taskIdentity, std::uint32_t mask) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto multiplePoll(std::move_only_function<auto(std::int32_t)->void> action,
-                                    std::int32_t fileDescriptor, std::uint32_t mask, bool isDirect = {}) -> Task<>;
+                                    std::int32_t fileDescriptor, std::uint32_t mask,
+                                    internal::Marker marker = internal::Marker{}) -> Task<>;
 
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> internal::AsyncWaiter;
 
@@ -152,12 +152,12 @@ namespace coContext {
 
     [[nodiscard]] auto multipleAccept(std::move_only_function<auto(std::int32_t)->void> action,
                                       std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
-                                      std::int32_t flags = {}, bool isDirect = {}) -> Task<>;
+                                      std::int32_t flags = {}, internal::Marker marker = internal::Marker{}) -> Task<>;
 
     [[nodiscard]] auto multipleAcceptDirect(std::move_only_function<auto(std::int32_t)->void> action,
                                             std::int32_t socketFileDescriptor, sockaddr *address,
-                                            socklen_t *addressLength, std::int32_t flags = {}, bool isDirect = {})
-        -> Task<>;
+                                            socklen_t *addressLength, std::int32_t flags = {},
+                                            internal::Marker marker = internal::Marker{}) -> Task<>;
 
     [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength)
         -> internal::AsyncWaiter;
@@ -172,7 +172,8 @@ namespace coContext {
 
     [[nodiscard]] auto
         multipleReceive(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
-                        std::int32_t socketFileDescriptor, std::int32_t flags, bool isDirect = {}) -> Task<>;
+                        std::int32_t socketFileDescriptor, std::int32_t flags,
+                        internal::Marker marker = internal::Marker{}) -> Task<>;
 
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags)
         -> internal::AsyncWaiter;
@@ -186,11 +187,11 @@ namespace coContext {
 
     [[nodiscard]] auto zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
                                     std::int32_t socketFileDescriptor, std::span<const std::byte> buffer,
-                                    std::int32_t flags, bool isDirect = {}) -> Task<>;
+                                    std::int32_t flags, internal::Marker marker = internal::Marker{}) -> Task<>;
 
     [[nodiscard]] auto zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
                                     std::int32_t socketFileDescriptor, const msghdr &message, std::int32_t flags,
-                                    bool isDirect = {}) -> Task<>;
+                                    internal::Marker marker = internal::Marker{}) -> Task<>;
 
     [[nodiscard]] auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset,
                               std::int32_t outFileDescriptor, std::int64_t outFileDescriptorOffset,
@@ -226,7 +227,8 @@ namespace coContext {
 
     [[nodiscard]] auto
         multipleRead(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
-                     std::int32_t fileDescriptor, std::int32_t offset = -1, bool isDirect = {}) -> Task<>;
+                     std::int32_t fileDescriptor, std::int32_t offset = -1,
+                     internal::Marker marker = internal::Marker{}) -> Task<>;
 
     [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::uint64_t offset = -1)
         -> internal::AsyncWaiter;
