@@ -6,7 +6,7 @@ using namespace std::string_view_literals;
 
 coContext::internal::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) :
     handle{[entries, &parameters](const std::source_location sourceLocation = std::source_location::current()) {
-        io_uring handle{};
+        io_uring handle;
         if (const std::int32_t result{
                 io_uring_queue_init_params(entries, std::addressof(handle), std::addressof(parameters))};
             result != 0) {
