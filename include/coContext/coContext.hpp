@@ -86,7 +86,9 @@ namespace coContext {
     [[nodiscard]] auto installDirect(std::int32_t directFileDescriptor, bool isSetCloseOnExecute = true)
         -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto direct() noexcept -> internal::Marker;
+    [[nodiscard]] auto none() -> internal::Marker;
+
+    [[nodiscard]] auto direct() -> internal::Marker;
 
     [[nodiscard]] auto timeout(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
                                ClockSource clockSource = {}) -> internal::Marker;
@@ -106,16 +108,15 @@ namespace coContext {
 
     [[nodiscard]] auto multipleSleep(std::move_only_function<auto(std::int32_t)->void> action,
                                      std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
-                                     ClockSource clockSource = {}, internal::Marker marker = internal::Marker{})
-        -> Task<>;
+                                     ClockSource clockSource = {}, internal::Marker marker = none()) -> Task<>;
 
     [[nodiscard]] auto poll(std::int32_t fileDescriptor, std::uint32_t mask) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto updatePoll(std::uint64_t taskIdentity, std::uint32_t mask) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto multiplePoll(std::move_only_function<auto(std::int32_t)->void> action,
-                                    std::int32_t fileDescriptor, std::uint32_t mask,
-                                    internal::Marker marker = internal::Marker{}) -> Task<>;
+                                    std::int32_t fileDescriptor, std::uint32_t mask, internal::Marker marker = none())
+        -> Task<>;
 
     [[nodiscard]] auto close(std::int32_t fileDescriptor) -> internal::AsyncWaiter;
 
@@ -152,12 +153,12 @@ namespace coContext {
 
     [[nodiscard]] auto multipleAccept(std::move_only_function<auto(std::int32_t)->void> action,
                                       std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
-                                      std::int32_t flags = {}, internal::Marker marker = internal::Marker{}) -> Task<>;
+                                      std::int32_t flags = {}, internal::Marker marker = none()) -> Task<>;
 
     [[nodiscard]] auto multipleAcceptDirect(std::move_only_function<auto(std::int32_t)->void> action,
                                             std::int32_t socketFileDescriptor, sockaddr *address,
                                             socklen_t *addressLength, std::int32_t flags = {},
-                                            internal::Marker marker = internal::Marker{}) -> Task<>;
+                                            internal::Marker marker = none()) -> Task<>;
 
     [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength)
         -> internal::AsyncWaiter;
@@ -172,8 +173,8 @@ namespace coContext {
 
     [[nodiscard]] auto
         multipleReceive(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
-                        std::int32_t socketFileDescriptor, std::int32_t flags,
-                        internal::Marker marker = internal::Marker{}) -> Task<>;
+                        std::int32_t socketFileDescriptor, std::int32_t flags, internal::Marker marker = none())
+            -> Task<>;
 
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags)
         -> internal::AsyncWaiter;
@@ -227,8 +228,7 @@ namespace coContext {
 
     [[nodiscard]] auto
         multipleRead(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
-                     std::int32_t fileDescriptor, std::int32_t offset = -1,
-                     internal::Marker marker = internal::Marker{}) -> Task<>;
+                     std::int32_t fileDescriptor, std::int32_t offset = -1, internal::Marker marker = none()) -> Task<>;
 
     [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::uint64_t offset = -1)
         -> internal::AsyncWaiter;

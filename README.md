@@ -11,6 +11,7 @@
 - 嵌套**任意数量**的**任意返回值**的协程
 - 多线程
 - 直接文件描述符，可以与普通文件描述符相互转换
+- 支持多发射IO
 
 ## 基础用法
 
@@ -234,5 +235,54 @@ auto main() -> int {
 - 直接文件描述符可以通过`installDirect()`转换为普通文件描述符，普通文件描述符可以通过`toDirect()`转换为直接文件描述符
 - 可以通过`directSocket` `acceptDirect` `multipleAcceptDirect` `openDirect`获得直接文件描述符
 - 转换后的直接文件描述符和普通文件描述符**相互独立**
+
+</details>
+
+<details>
+
+<summary>多发射IO</summary>
+
+### 什么是多发射IO？就是只需发出一次请求，就可以多次接收到结果
+
+- 优点
+    - 减少了系统调用的次数
+    - 减少了内核态和用户态的切换次数
+    - 减少了内核态和用户态的数据拷贝次数
+    - 减少了内核态和用户态的上下文切换次数
+- 支持`multipleSleep` `multiplePoll` `multipleAccept` `multipleAcceptDirect` `multipleReceive` `multipleRead`
+
+```c++
+[[nodiscard]] auto normalClose(const std::int32_t socket) -> coContext::Task<> { co_await coContext::close(socket); }
+
+[[nodiscard]] auto normalSend(const std::int32_t socket, const std::span<const std::byte> data) -> coContext::Task<> {
+    if (const std::int32_t result{co_await coContext::send(socket, data, 0)}; result <= 0) spawn(normalClose, socket);
+}
+
+[[nodiscard]] constexpr auto receiveAction(const std::int32_t socket, const std::int32_t result,
+                                           const std::span<const std::byte> data) {
+    if (result > 0) spawn(normalSend, socket, data);    // 如果result大于0，就调用normalSend协程，将data作为参数传入
+    else spawn(normalClose, socket);    // 否则调用normalClose协程，将socket作为参数传入
+}
+
+constexpr auto acceptAction(const std::int32_t socket, const std::int32_t result) {
+    if (result >= 0) {
+        coContext::spawn(
+            coContext::multipleReceive,
+            [result](const std::int32_t receiveResult, const std::span<const std::byte> data) {
+                receiveAction(result, receiveResult, data);
+            },
+            result, 0, coContext::none());
+        // 如果result大于等于0，就调用multipleReceive协程，将receiveAction作为回调函数传入，并利用lambda捕获result
+        // coContext::none()表示不使用标记
+        // 如果使用coContext::direct()则表示使用直接IO，使用coContext::timeout()则表示使用超时，并且可以组合使用
+    } else coContext::spawn(normalClose, socket);
+}
+
+[[nodiscard]] auto multipleAccept(const std::int32_t socket) -> coContext::Task<> {
+    co_await coContext::multipleAccept([socket](const std::int32_t result) { acceptAction(socket, result); }, socket,
+                                       nullptr, nullptr, 0);
+    // 阻塞地执行multipleAccept协程，将acceptAction作为回调函数传入，并利用lambda捕获socket
+}
+```
 
 </details>

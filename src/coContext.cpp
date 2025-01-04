@@ -63,7 +63,9 @@ auto coContext::installDirect(const std::int32_t directFileDescriptor, const boo
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::direct() noexcept -> internal::Marker { return internal::Marker{IOSQE_FIXED_FILE}; }
+auto coContext::none() -> internal::Marker { return internal::Marker{}; }
+
+auto coContext::direct() -> internal::Marker { return internal::Marker{IOSQE_FIXED_FILE}; }
 
 auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                         const ClockSource clockSource) -> internal::Marker {
