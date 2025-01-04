@@ -48,6 +48,13 @@ auto coContext::syncCancelAny(const std::chrono::seconds seconds, const std::chr
                               __kernel_timespec{seconds.count(), nanoseconds.count()});
 }
 
+auto coContext::toDirect(const std::span<std::int32_t> fileDescriptors) -> internal::AsyncWaiter {
+    const internal::Submission submission{context.getSubmission()};
+    submission.updateFileDescriptors(fileDescriptors, IORING_FILE_INDEX_ALLOC);
+
+    return internal::AsyncWaiter{submission};
+}
+
 auto coContext::installDirect(const std::int32_t directFileDescriptor, const bool isSetCloseOnExecute)
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};

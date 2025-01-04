@@ -83,6 +83,8 @@ namespace coContext {
     [[nodiscard]] auto syncCancelAny(std::chrono::seconds seconds = {}, std::chrono::nanoseconds nanoseconds = {})
         -> std::int32_t;
 
+    [[nodiscard]] auto toDirect(std::span<std::int32_t> fileDescriptors) -> internal::AsyncWaiter;
+
     [[nodiscard]] auto installDirect(std::int32_t directFileDescriptor, bool isSetCloseOnExecute = true)
         -> internal::AsyncWaiter;
 
