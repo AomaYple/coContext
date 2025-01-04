@@ -380,6 +380,7 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<co
                      const std::int32_t flags) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.send(socketFileDescriptor, buffer, flags);
+
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -390,6 +391,8 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<co
                      const socklen_t destinationAddressLength) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.send(socketFileDescriptor, buffer, flags, destinationAddress, destinationAddressLength);
+
+    submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
 }
@@ -427,6 +430,8 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
 
     const internal::Submission submission{context.getSubmission()};
     submission.zeroCopySend(socketFileDescriptor, message, flags);
+
+    submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
 
