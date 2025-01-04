@@ -162,7 +162,7 @@ auto coContext::internal::Context::clearBufferOffset(const std::uint16_t bufferI
 }
 
 auto coContext::internal::Context::expandBuffer() -> void {
-    if (std::size(this->bufferGroup) == std::numeric_limits<std::uint16_t>::max() + 1) return;
+    if (std::size(this->bufferGroup) == entries) return;
 
     this->bufferGroup.emplace_back();
     this->ringBuffer.addBuffer(this->bufferGroup.back().buffer, std::size(this->bufferGroup) - 1);
