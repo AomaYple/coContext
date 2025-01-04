@@ -497,6 +497,44 @@ auto coContext::read(const std::int32_t fileDescriptor, const std::span<const io
     return internal::AsyncWaiter{submission};
 }
 
+auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
+                             const std::int32_t fileDescriptor, const std::int32_t offset, const bool isDirect)
+    -> Task<> {
+    bool isRestart;
+    do {
+        isRestart = false;
+
+        const internal::Submission submission{context.getSubmission()};
+        submission.multipleRead(fileDescriptor, 0, offset, context.getRingBufferId());
+
+        internal::AsyncWaiter asyncWaiter{submission};
+        if (isDirect) asyncWaiter = internal::AsyncWaiter{std::move(asyncWaiter)} | direct();
+
+        std::uint32_t asyncWaitResumeFlags;
+        do {
+            const std::int32_t result{co_await asyncWaiter};
+            if (result == -ENOBUFS) {
+                isRestart = true;
+                context.expandBuffer();
+
+                break;
+            }
+
+            asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
+
+            std::span<const std::byte> data;
+            if ((asyncWaitResumeFlags & IORING_CQE_F_BUFFER) != 0) {
+                const std::uint32_t bufferId{asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT};
+                data = context.getData(bufferId, result);
+
+                if ((asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.clearBufferOffset(bufferId);
+            }
+
+            action(result, data);
+        } while ((asyncWaitResumeFlags & IORING_CQE_F_MORE) != 0);
+    } while (isRestart);
+}
+
 auto coContext::write(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
                       const std::uint64_t offset) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};

@@ -138,6 +138,9 @@ namespace coContext::internal {
         auto read(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
                   std::int32_t flags) const noexcept -> void;
 
+        auto multipleRead(std::int32_t fileDescriptor, std::uint32_t length, std::uint64_t offset,
+                          std::int32_t bufferGroup) const noexcept -> void;
+
         auto write(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::uint64_t offset) const noexcept
             -> void;
 

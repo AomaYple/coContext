@@ -251,6 +251,12 @@ auto coContext::internal::Submission::read(const std::int32_t fileDescriptor, co
     io_uring_prep_readv2(this->handle, fileDescriptor, std::data(buffer), std::size(buffer), offset, flags);
 }
 
+auto coContext::internal::Submission::multipleRead(const std::int32_t fileDescriptor, const std::uint32_t length,
+                                                   const std::uint64_t offset,
+                                                   const std::int32_t bufferGroup) const noexcept -> void {
+    io_uring_prep_read_multishot(this->handle, fileDescriptor, length, offset, bufferGroup);
+}
+
 auto coContext::internal::Submission::write(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
                                             const std::uint64_t offset) const noexcept -> void {
     io_uring_prep_write(this->handle, fileDescriptor, std::data(buffer), std::size(buffer), offset);

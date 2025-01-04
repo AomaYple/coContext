@@ -216,6 +216,10 @@ namespace coContext {
     [[nodiscard]] auto read(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
                             std::int32_t flags) -> internal::AsyncWaiter;
 
+    [[nodiscard]] auto
+        multipleRead(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
+                     std::int32_t fileDescriptor, std::int32_t offset = -1, bool isDirect = {}) -> Task<>;
+
     [[nodiscard]] auto write(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::uint64_t offset = -1)
         -> internal::AsyncWaiter;
 
