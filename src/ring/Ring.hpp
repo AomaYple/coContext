@@ -21,8 +21,6 @@ namespace coContext::internal {
 
         auto swap(Ring &other) noexcept -> void;
 
-        [[nodiscard]] auto getFileDescriptor() const noexcept -> std::int32_t;
-
         auto registerSelfFileDescriptor(std::source_location sourceLocation = std::source_location::current()) -> void;
 
         auto registerSparseFileDescriptor(std::uint32_t count,

@@ -40,8 +40,6 @@ coContext::internal::Ring::~Ring() {
 
 auto coContext::internal::Ring::swap(Ring &other) noexcept -> void { std::swap(this->handle, other.handle); }
 
-auto coContext::internal::Ring::getFileDescriptor() const noexcept -> std::int32_t { return this->handle.ring_fd; }
-
 auto coContext::internal::Ring::registerSelfFileDescriptor(const std::source_location sourceLocation) -> void {
     if (const std::int32_t result{io_uring_register_ring_fd(std::addressof(this->handle))}; result != 1) {
         throw Exception{
