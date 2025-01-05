@@ -5,12 +5,13 @@
 #include <source_location>
 #include <thread>
 
-namespace coContext::internal {
+namespace coContext {
     class Log {
     public:
         enum class Level : std::uint8_t { trace, debug, info, warn, error, fatal };
 
-        explicit Log(Level level = Level::info, std::pmr::string message = std::pmr::string{getMemoryResource()},
+        explicit Log(Level level = Level::info,
+                     std::pmr::string message = std::pmr::string{internal::getMemoryResource()},
                      std::source_location sourceLocation = std::source_location::current(),
                      std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now(),
                      std::thread::id threadId = std::this_thread::get_id()) noexcept;
@@ -30,9 +31,9 @@ namespace coContext::internal {
         std::chrono::system_clock::time_point timestamp;
         std::thread::id threadId;
     };
-}    // namespace coContext::internal
+}    // namespace coContext
 
 template<>
-constexpr auto std::swap(coContext::internal::Log &lhs, coContext::internal::Log &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::Log &lhs, coContext::Log &rhs) noexcept -> void {
     lhs.swap(rhs);
 }
