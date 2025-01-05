@@ -28,6 +28,17 @@ namespace {
 
         return flags;
     }
+
+    [[nodiscard]] constexpr auto rawSleep(const std::chrono::seconds seconds,
+                                          const std::chrono::nanoseconds nanoseconds, const std::uint32_t flags) {
+        const coContext::internal::Submission submission{context.getSubmission()};
+        coContext::internal::AsyncWaiter asyncWaiter{submission};
+
+        asyncWaiter.setTimeSpecification(std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
+        submission.timeout(*asyncWaiter.getTimeSpecification(), 0, flags);
+
+        return asyncWaiter;
+    }
 }    // namespace
 
 auto coContext::internal::spawn(Coroutine coroutine) -> void { context.spawn(std::move(coroutine)); }
@@ -108,20 +119,9 @@ auto coContext::cancelAny() -> internal::AsyncWaiter {
     return internal::AsyncWaiter{submission};
 }
 
-[[nodiscard]] constexpr auto sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
-                                   const std::uint32_t flags) {
-    const coContext::internal::Submission submission{context.getSubmission()};
-    coContext::internal::AsyncWaiter asyncWaiter{submission};
-
-    asyncWaiter.setTimeSpecification(std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
-    submission.timeout(*asyncWaiter.getTimeSpecification(), 0, flags);
-
-    return asyncWaiter;
-}
-
 auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                       const ClockSource clockSource) -> internal::AsyncWaiter {
-    return ::sleep(seconds, nanoseconds, setClockSource(clockSource));
+    return rawSleep(seconds, nanoseconds, setClockSource(clockSource));
 }
 
 auto coContext::updateSleep(const std::uint64_t taskId, const std::chrono::seconds seconds,
@@ -140,7 +140,7 @@ auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> 
                               const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                               const ClockSource clockSource, internal::Marker marker) -> Task<> {
     internal::AsyncWaiter asyncWaiter{
-        ::sleep(seconds, nanoseconds, setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT) | std::move(marker)};
+        rawSleep(seconds, nanoseconds, setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT) | std::move(marker)};
 
     do action(co_await asyncWaiter);
     while ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0);
