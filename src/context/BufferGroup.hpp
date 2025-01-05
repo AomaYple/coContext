@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../memory/memoryResource.hpp"
+#include "coContext/memory/memoryResource.hpp"
 
 #include <memory>
 

@@ -3,6 +3,7 @@
 #include "coroutine/AsyncWaiter.hpp"
 #include "coroutine/Marker.hpp"
 #include "coroutine/Task.hpp"
+#include "log/Log.hpp"
 
 namespace coContext {
     template<internal::Returnable T = void>

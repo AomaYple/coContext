@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Log.hpp"
+#include "coContext/log/Log.hpp"
 
 namespace coContext::internal {
     class Exception final : public std::exception {

@@ -1,4 +1,4 @@
-#include "memoryResource.hpp"
+#include "coContext/memory/memoryResource.hpp"
 
 #ifdef NDEBUG
     #include "MiMallocResource.hpp"

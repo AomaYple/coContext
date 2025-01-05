@@ -1,6 +1,6 @@
 #include "coContext/coroutine/BasePromise.hpp"
 
-#include "../memory/memoryResource.hpp"
+#include "coContext/memory/memoryResource.hpp"
 
 auto coContext::internal::BasePromise::operator new(const std::size_t numberOfBytes) -> void * {
     return allocator.allocate_bytes(numberOfBytes);

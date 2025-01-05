@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../memory/memoryResource.hpp"
 #include "../ring/Ring.hpp"
 #include "../ring/RingBuffer.hpp"
 #include "coContext/coroutine/Coroutine.hpp"
+#include "coContext/memory/memoryResource.hpp"
 
 #include <queue>
 #include <sys/resource.h>
