@@ -2,8 +2,11 @@
 
 #include "context/BufferGroup.hpp"
 #include "context/Context.hpp"
+#include "log/Logger.hpp"
 
 namespace {
+    thread_local auto logger{std::allocate_shared<coContext::internal::Logger>(
+        std::pmr::polymorphic_allocator{coContext::internal::getMemoryResource()})};
     thread_local coContext::internal::Context context;
     thread_local coContext::internal::BufferGroup bufferGroup{context.getRingBuffer()};
 
