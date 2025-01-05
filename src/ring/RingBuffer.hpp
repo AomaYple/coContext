@@ -1,5 +1,7 @@
 #pragma once
 
+#include "coContext/memory/memoryResource.hpp"
+
 #include <liburing/io_uring.h>
 #include <memory>
 
@@ -7,6 +9,11 @@ namespace coContext::internal {
     class Ring;
 
     class RingBuffer {
+        struct Buffer {
+            std::pmr::vector<std::byte> data{1024, getMemoryResource()};
+            std::size_t offset{};
+        };
+
     public:
         RingBuffer(std::shared_ptr<Ring> ring, std::uint32_t entries, std::int32_t id, std::uint32_t flags);
 
@@ -22,15 +29,21 @@ namespace coContext::internal {
 
         auto swap(RingBuffer &other) noexcept -> void;
 
-        [[nodiscard]] auto getEntries() const noexcept -> std::uint32_t;
-
         [[nodiscard]] auto getId() const noexcept -> std::int32_t;
-
-        auto addBuffer(std::span<std::byte> buffer, std::uint16_t bufferId) noexcept -> void;
 
         auto advance(std::int32_t count) noexcept -> void;
 
+        [[nodiscard]] auto readData(std::uint16_t bufferId, std::size_t dataSize) noexcept
+            -> std::span<const std::byte>;
+
+        auto markBufferUsed(std::uint16_t bufferId) noexcept -> void;
+
+        auto expandBuffer() -> void;
+
     private:
+        auto addBuffer(std::uint16_t bufferId) noexcept -> void;
+
+        std::pmr::vector<Buffer> buffers{getMemoryResource()};
         std::shared_ptr<Ring> ring;
         io_uring_buf_ring *handle;
         std::uint32_t entries;

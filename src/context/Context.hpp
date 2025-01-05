@@ -3,7 +3,6 @@
 #include "../ring/Ring.hpp"
 #include "../ring/RingBuffer.hpp"
 #include "coContext/coroutine/Coroutine.hpp"
-#include "coContext/memory/memoryResource.hpp"
 
 #include <queue>
 #include <sys/resource.h>
@@ -27,7 +26,7 @@ namespace coContext::internal {
 
         auto swap(Context &other) noexcept -> void;
 
-        [[nodiscard]] auto getRingBuffer() const noexcept -> std::shared_ptr<RingBuffer>;
+        [[nodiscard]] auto getRingBuffer() noexcept -> RingBuffer &;
 
         auto run() -> void;
 
@@ -58,8 +57,7 @@ namespace coContext::internal {
             return std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getMemoryResource()}, entries,
                                               parameters);
         }()};
-        std::shared_ptr<RingBuffer> ringBuffer{std::allocate_shared<RingBuffer>(
-            std::pmr::polymorphic_allocator{getMemoryResource()}, this->ring, entries, 0, IOU_PBUF_RING_INC)};
+        RingBuffer ringBuffer{this->ring, entries, 0, IOU_PBUF_RING_INC};
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
         bool isRunning{};

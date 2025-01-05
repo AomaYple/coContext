@@ -18,9 +18,7 @@ auto coContext::internal::Context::swap(Context &other) noexcept -> void {
     std::swap(this->isRunning, other.isRunning);
 }
 
-auto coContext::internal::Context::getRingBuffer() const noexcept -> std::shared_ptr<RingBuffer> {
-    return this->ringBuffer;
-}
+auto coContext::internal::Context::getRingBuffer() noexcept -> RingBuffer & { return this->ringBuffer; }
 
 auto coContext::internal::Context::run() -> void {
     this->isRunning = true;
@@ -29,7 +27,7 @@ auto coContext::internal::Context::run() -> void {
 
     while (this->isRunning) {
         this->ring->submitAndWait(1);
-        this->ringBuffer->advance(this->ring->poll([this](const io_uring_cqe *const completion) {
+        this->ringBuffer.advance(this->ring->poll([this](const io_uring_cqe *const completion) {
             const auto findResult{this->schedulingCoroutines.find(completion->user_data)};
             Coroutine coroutine{std::move(findResult->second)};
             this->schedulingCoroutines.erase(findResult);
