@@ -8,19 +8,19 @@ namespace coContext {
     template<internal::Returnable T = void>
     struct SpawnResult {
         std::future<T> value;
-        std::uint64_t taskIdentity;
+        std::uint64_t taskId;
     };
 
     template<typename T>
     struct SpawnResult<T &> {
         std::future<T &> value;
-        std::uint64_t taskIdentity;
+        std::uint64_t taskId;
     };
 
     template<>
     struct SpawnResult<> {
         std::future<void> value;
-        std::uint64_t taskIdentity;
+        std::uint64_t taskId;
     };
 
     enum class ClockSource : std::uint8_t { monotonic, absolute, boot, real };
@@ -39,11 +39,11 @@ namespace coContext {
         Task<T> task{std::invoke(std::forward<F>(f), std::forward<Args>(args)...)};
 
         internal::Coroutine coroutine{std::move(task.getCoroutine())};
-        const std::uint64_t identity{std::hash<internal::Coroutine>{}(coroutine)};
+        const std::uint64_t id{std::hash<internal::Coroutine>{}(coroutine)};
 
         spawn(std::move(coroutine));
 
-        return SpawnResult{std::move(task.getReturnValue()), identity};
+        return SpawnResult{std::move(task.getReturnValue()), id};
     }
 
     template<typename T, typename F, typename... Args>
@@ -52,11 +52,11 @@ namespace coContext {
         Task<T &> task{std::invoke(std::forward<F>(f), std::forward<Args>(args)...)};
 
         internal::Coroutine coroutine{std::move(task.getCoroutine())};
-        const std::uint64_t identity{std::hash<internal::Coroutine>{}(coroutine)};
+        const std::uint64_t id{std::hash<internal::Coroutine>{}(coroutine)};
 
         spawn(std::move(coroutine));
 
-        return SpawnResult{std::move(task.getReturnValue()), identity};
+        return SpawnResult{std::move(task.getReturnValue()), id};
     }
 
     template<typename F, typename... Args>
@@ -65,14 +65,14 @@ namespace coContext {
         Task<> task{std::invoke(std::forward<F>(f), std::forward<Args>(args)...)};
 
         internal::Coroutine coroutine{std::move(task.getCoroutine())};
-        const std::uint64_t identity{std::hash<internal::Coroutine>{}(coroutine)};
+        const std::uint64_t id{std::hash<internal::Coroutine>{}(coroutine)};
 
         spawn(std::move(coroutine));
 
-        return SpawnResult{std::move(task.getReturnValue()), identity};
+        return SpawnResult{std::move(task.getReturnValue()), id};
     }
 
-    [[nodiscard]] auto syncCancel(std::uint64_t taskIdentity, std::chrono::seconds seconds = {},
+    [[nodiscard]] auto syncCancel(std::uint64_t taskId, std::chrono::seconds seconds = {},
                                   std::chrono::nanoseconds nanoseconds = {}) -> std::int32_t;
 
     [[nodiscard]] auto syncCancel(std::int32_t fileDescriptor, bool isMatchAll = {}, std::chrono::seconds seconds = {},
@@ -93,7 +93,7 @@ namespace coContext {
     [[nodiscard]] auto timeout(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
                                ClockSource clockSource = {}) -> internal::Marker;
 
-    [[nodiscard]] auto cancel(std::uint64_t taskIdentity) -> internal::AsyncWaiter;
+    [[nodiscard]] auto cancel(std::uint64_t taskId) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto cancel(std::int32_t fileDescriptor, bool isMatchAll = {}) -> internal::AsyncWaiter;
 
@@ -102,7 +102,7 @@ namespace coContext {
     [[nodiscard]] auto sleep(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
                              ClockSource clockSource = {}) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto updateSleep(std::uint64_t taskIdentity, std::chrono::seconds seconds,
+    [[nodiscard]] auto updateSleep(std::uint64_t taskId, std::chrono::seconds seconds,
                                    std::chrono::nanoseconds nanoseconds = {}, ClockSource clockSource = {})
         -> internal::AsyncWaiter;
 
@@ -112,7 +112,7 @@ namespace coContext {
 
     [[nodiscard]] auto poll(std::int32_t fileDescriptor, std::uint32_t mask) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto updatePoll(std::uint64_t taskIdentity, std::uint32_t mask) -> internal::AsyncWaiter;
+    [[nodiscard]] auto updatePoll(std::uint64_t taskId, std::uint32_t mask) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto multiplePoll(std::move_only_function<auto(std::int32_t)->void> action,
                                     std::int32_t fileDescriptor, std::uint32_t mask, internal::Marker marker = none())

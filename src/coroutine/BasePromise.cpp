@@ -14,7 +14,7 @@ auto coContext::internal::BasePromise::operator delete(void *const pointer, cons
 auto coContext::internal::BasePromise::swap(BasePromise &other) noexcept -> void {
     std::swap(this->result, other.result);
     std::swap(this->flags, other.flags);
-    std::swap(this->parentCoroutineIdentity, other.parentCoroutineIdentity);
+    std::swap(this->parentCoroutineId, other.parentCoroutineId);
     std::swap(this->childCoroutine, other.childCoroutine);
 }
 
@@ -26,12 +26,12 @@ auto coContext::internal::BasePromise::getFlags() const noexcept -> std::uint32_
 
 auto coContext::internal::BasePromise::setFlags(const std::uint32_t flags) noexcept -> void { this->flags = flags; }
 
-auto coContext::internal::BasePromise::getParentCoroutineIdentity() const noexcept -> std::uint64_t {
-    return this->parentCoroutineIdentity;
+auto coContext::internal::BasePromise::getParentCoroutineId() const noexcept -> std::uint64_t {
+    return this->parentCoroutineId;
 }
 
-auto coContext::internal::BasePromise::setParentCoroutineIdentity(const std::uint64_t identity) noexcept -> void {
-    this->parentCoroutineIdentity = identity;
+auto coContext::internal::BasePromise::setParentCoroutineId(const std::uint64_t id) noexcept -> void {
+    this->parentCoroutineId = id;
 }
 
 auto coContext::internal::BasePromise::getChildCoroutine() noexcept -> Coroutine & { return this->childCoroutine; }

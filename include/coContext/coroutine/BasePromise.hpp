@@ -31,9 +31,9 @@ namespace coContext::internal {
 
         auto setFlags(std::uint32_t flags) noexcept -> void;
 
-        [[nodiscard]] auto getParentCoroutineIdentity() const noexcept -> std::uint64_t;
+        [[nodiscard]] auto getParentCoroutineId() const noexcept -> std::uint64_t;
 
-        auto setParentCoroutineIdentity(std::uint64_t identity) noexcept -> void;
+        auto setParentCoroutineId(std::uint64_t id) noexcept -> void;
 
         [[nodiscard]] auto getChildCoroutine() noexcept -> Coroutine &;
 
@@ -53,7 +53,7 @@ namespace coContext::internal {
 
         std::int32_t result{};
         std::uint32_t flags{};
-        std::uint64_t parentCoroutineIdentity{std::hash<Coroutine>{}(Coroutine{nullptr})};
+        std::uint64_t parentCoroutineId{std::hash<Coroutine>{}(Coroutine{nullptr})};
         Coroutine childCoroutine{nullptr};
     };
 }    // namespace coContext::internal

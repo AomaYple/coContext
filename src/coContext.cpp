@@ -31,9 +31,9 @@ auto coContext::run() -> void { context.run(); }
 
 auto coContext::stop() noexcept -> void { context.stop(); }
 
-auto coContext::syncCancel(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,
+auto coContext::syncCancel(const std::uint64_t taskId, const std::chrono::seconds seconds,
                            const std::chrono::nanoseconds nanoseconds) -> std::int32_t {
-    return context.syncCancel(taskIdentity, 0, __kernel_timespec{seconds.count(), nanoseconds.count()});
+    return context.syncCancel(taskId, 0, __kernel_timespec{seconds.count(), nanoseconds.count()});
 }
 
 auto coContext::syncCancel(const std::int32_t fileDescriptor, const bool isMatchAll, const std::chrono::seconds seconds,
@@ -82,9 +82,9 @@ auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::n
         }};
 }
 
-auto coContext::cancel(const std::uint64_t taskIdentity) -> internal::AsyncWaiter {
+auto coContext::cancel(const std::uint64_t taskId) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
-    submission.cancel(taskIdentity, 0);
+    submission.cancel(taskId, 0);
 
     return internal::AsyncWaiter{submission};
 }
@@ -119,14 +119,14 @@ auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nan
     return ::sleep(seconds, nanoseconds, setClockSource(clockSource));
 }
 
-auto coContext::updateSleep(const std::uint64_t taskIdentity, const std::chrono::seconds seconds,
+auto coContext::updateSleep(const std::uint64_t taskId, const std::chrono::seconds seconds,
                             const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource)
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     internal::AsyncWaiter asyncWaiter{submission};
 
     asyncWaiter.setTimeSpecification(std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
-    submission.updateTimeout(taskIdentity, *asyncWaiter.getTimeSpecification(), setClockSource(clockSource));
+    submission.updateTimeout(taskId, *asyncWaiter.getTimeSpecification(), setClockSource(clockSource));
 
     return asyncWaiter;
 }
@@ -148,9 +148,9 @@ auto coContext::poll(const std::int32_t fileDescriptor, const std::uint32_t mask
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::updatePoll(const std::uint64_t taskIdentity, const std::uint32_t mask) -> internal::AsyncWaiter {
+auto coContext::updatePoll(const std::uint64_t taskId, const std::uint32_t mask) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
-    submission.updatePoll(taskIdentity, 0, mask, IORING_POLL_UPDATE_EVENTS);
+    submission.updatePoll(taskId, 0, mask, IORING_POLL_UPDATE_EVENTS);
 
     return internal::AsyncWaiter{submission};
 }
