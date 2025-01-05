@@ -368,9 +368,9 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
             std::span<const std::byte> data;
             if ((asyncWaitResumeFlags & IORING_CQE_F_BUFFER) != 0) {
                 const std::uint32_t bufferId{asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT};
-                data = context.getData(bufferId, result);
+                data = context.readFromBuffer(bufferId, result);
 
-                if ((asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.clearBufferOffset(bufferId);
+                if ((asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.markBufferUsed(bufferId);
             }
 
             action(result, data);
@@ -560,9 +560,9 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
             std::span<const std::byte> data;
             if ((asyncWaitResumeFlags & IORING_CQE_F_BUFFER) != 0) {
                 const std::uint32_t bufferId{asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT};
-                data = context.getData(bufferId, result);
+                data = context.readFromBuffer(bufferId, result);
 
-                if ((asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.clearBufferOffset(bufferId);
+                if ((asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.markBufferUsed(bufferId);
             }
 
             action(result, data);

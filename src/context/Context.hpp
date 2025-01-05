@@ -46,9 +46,10 @@ namespace coContext::internal {
 
         [[nodiscard]] auto getRingBufferId() const noexcept -> std::int32_t;
 
-        [[nodiscard]] auto getData(std::uint16_t bufferId, std::size_t dataSize) noexcept -> std::span<const std::byte>;
+        [[nodiscard]] auto readFromBuffer(std::uint16_t bufferId, std::size_t dataSize) noexcept
+            -> std::span<const std::byte>;
 
-        auto clearBufferOffset(std::uint16_t bufferId) noexcept -> void;
+        auto markBufferUsed(std::uint16_t bufferId) noexcept -> void;
 
         auto expandBuffer() -> void;
 

@@ -79,7 +79,7 @@ auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, 
 
 auto coContext::internal::Context::getRingBufferId() const noexcept -> std::int32_t { return this->ringBuffer.getId(); }
 
-auto coContext::internal::Context::getData(const std::uint16_t bufferId, const std::size_t dataSize) noexcept
+auto coContext::internal::Context::readFromBuffer(const std::uint16_t bufferId, const std::size_t dataSize) noexcept
     -> std::span<const std::byte> {
     auto &[buffer, offset]{this->bufferGroup[bufferId]};
     this->ringBuffer.addBuffer(buffer, bufferId);
@@ -90,7 +90,7 @@ auto coContext::internal::Context::getData(const std::uint16_t bufferId, const s
     return data;
 }
 
-auto coContext::internal::Context::clearBufferOffset(const std::uint16_t bufferId) noexcept -> void {
+auto coContext::internal::Context::markBufferUsed(const std::uint16_t bufferId) noexcept -> void {
     this->bufferGroup[bufferId].offset = 0;
 }
 
