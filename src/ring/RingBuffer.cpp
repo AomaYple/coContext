@@ -69,7 +69,7 @@ auto coContext::internal::RingBuffer::expandBuffer() -> void {
 }
 
 auto coContext::internal::RingBuffer::addBuffer(const std::uint16_t bufferId) noexcept -> void {
-    io_uring_buf_ring_add(this->handle, std::data(this->buffers[bufferId].data),
-                          std::size(this->buffers[bufferId].data), bufferId, io_uring_buf_ring_mask(this->entries),
-                          this->offset++);
+    const std::span data{this->buffers[bufferId].data};
+    io_uring_buf_ring_add(this->handle, std::data(data), std::size(data), bufferId,
+                          io_uring_buf_ring_mask(this->entries), this->offset++);
 }
