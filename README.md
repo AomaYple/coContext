@@ -102,7 +102,7 @@ auto main() -> int {
 
     const std::jthread worker{[&result] {
         std::println("{}"sv, result.value.get());    // 阻塞地等待任务结束，并输出任务返回值
-        std::println("{}"sv, result.taskIdentity);    // 输出任务标识符
+        std::println("{}"sv, result.taskId);    // 输出任务标识符
     }};
 
     coContext::run();
@@ -136,13 +136,13 @@ auto main() -> int {
 <details>
 <summary>取消IO</summary>
 
-- 基于`taskIdentity`取消任务中正在运行的io
+- 基于`taskId`取消任务中正在运行的io
 
 ```c++
 [[nodiscard]] auto func() -> coContext::Task<> { co_await coContext::sleep(4s); }    // 发起一个4s的定时
 
-[[nodiscard]] auto cancelFunc(const std::uint64_t taskIdentity) -> coContext::Task<> {
-    co_await coContext::cancel(taskIdentity);    // 基于任务标识符取消任务中正在运行的io
+[[nodiscard]] auto cancelFunc(const std::uint64_t taskId) -> coContext::Task<> {
+    co_await coContext::cancel(taskId);    // 基于任务标识符取消任务中正在运行的io
 }
 ```
 
