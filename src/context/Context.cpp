@@ -1,19 +1,10 @@
 #include "Context.hpp"
 
 #include "../log/Exception.hpp"
-#include "../ring/Ring.hpp"
 #include "coContext/coroutine/BasePromise.hpp"
 #include "coContext/ring/Submission.hpp"
 
-coContext::internal::Context::Context() :
-    ring{[] {
-        io_uring_params parameters{};
-        parameters.flags = IORING_SETUP_SUBMIT_ALL | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_TASKRUN_FLAG |
-                           IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN;
-
-        return std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getMemoryResource()}, entries, parameters);
-    }()},
-    ringBuffer{this->ring, entries, 0, IOU_PBUF_RING_INC} {
+coContext::internal::Context::Context() {
     this->ring->registerSelfFileDescriptor();
 
     this->ring->registerSparseFileDescriptor(getFileDescriptorLimit());
@@ -22,10 +13,13 @@ coContext::internal::Context::Context() :
 auto coContext::internal::Context::swap(Context &other) noexcept -> void {
     std::swap(this->ring, other.ring);
     std::swap(this->ringBuffer, other.ringBuffer);
-    std::swap(this->bufferGroup, other.bufferGroup);
     std::swap(this->unscheduledCoroutines, other.unscheduledCoroutines);
     std::swap(this->schedulingCoroutines, other.schedulingCoroutines);
     std::swap(this->isRunning, other.isRunning);
+}
+
+auto coContext::internal::Context::getRingBuffer() const noexcept -> std::shared_ptr<RingBuffer> {
+    return this->ringBuffer;
 }
 
 auto coContext::internal::Context::run() -> void {
@@ -35,7 +29,7 @@ auto coContext::internal::Context::run() -> void {
 
     while (this->isRunning) {
         this->ring->submitAndWait(1);
-        this->ringBuffer.advance(this->ring->poll([this](const io_uring_cqe *const completion) {
+        this->ringBuffer->advance(this->ring->poll([this](const io_uring_cqe *const completion) {
             const auto findResult{this->schedulingCoroutines.find(completion->user_data)};
             Coroutine coroutine{std::move(findResult->second)};
             this->schedulingCoroutines.erase(findResult);
@@ -75,30 +69,6 @@ auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, 
     parameters.timeout = timeSpecification;
 
     return this->ring->syncCancel(parameters);
-}
-
-auto coContext::internal::Context::getRingBufferId() const noexcept -> std::int32_t { return this->ringBuffer.getId(); }
-
-auto coContext::internal::Context::readFromBuffer(const std::uint16_t bufferId, const std::size_t dataSize) noexcept
-    -> std::span<const std::byte> {
-    auto &[buffer, offset]{this->bufferGroup[bufferId]};
-    this->ringBuffer.addBuffer(buffer, bufferId);
-
-    const std::span data{std::cbegin(buffer) + static_cast<std::ptrdiff_t>(offset), dataSize};
-    offset += dataSize;
-
-    return data;
-}
-
-auto coContext::internal::Context::markBufferUsed(const std::uint16_t bufferId) noexcept -> void {
-    this->bufferGroup[bufferId].offset = 0;
-}
-
-auto coContext::internal::Context::expandBuffer() -> void {
-    if (std::size(this->bufferGroup) == entries) return;
-
-    this->bufferGroup.emplace_back();
-    this->ringBuffer.addBuffer(this->bufferGroup.back().buffer, std::size(this->bufferGroup) - 1);
 }
 
 auto coContext::internal::Context::getFileDescriptorLimit(const std::source_location sourceLocation) -> rlim_t {

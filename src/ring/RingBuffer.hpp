@@ -22,6 +22,8 @@ namespace coContext::internal {
 
         auto swap(RingBuffer &other) noexcept -> void;
 
+        [[nodiscard]] auto getEntries() const noexcept -> std::uint32_t;
+
         [[nodiscard]] auto getId() const noexcept -> std::int32_t;
 
         auto addBuffer(std::span<std::byte> buffer, std::uint16_t bufferId) noexcept -> void;

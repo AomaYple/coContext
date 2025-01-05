@@ -1,21 +1,15 @@
 #pragma once
 
 #include "../memory/memoryResource.hpp"
+#include "../ring/Ring.hpp"
 #include "../ring/RingBuffer.hpp"
 #include "coContext/coroutine/Coroutine.hpp"
 
 #include <queue>
-#include <source_location>
 #include <sys/resource.h>
-#include <unordered_map>
 
 namespace coContext::internal {
     class Submission;
-
-    struct Buffer {
-        std::pmr::vector<std::byte> buffer{1024, getMemoryResource()};
-        std::size_t offset{};
-    };
 
     class Context {
     public:
@@ -33,6 +27,8 @@ namespace coContext::internal {
 
         auto swap(Context &other) noexcept -> void;
 
+        [[nodiscard]] auto getRingBuffer() const noexcept -> std::shared_ptr<RingBuffer>;
+
         auto run() -> void;
 
         auto stop() noexcept -> void;
@@ -44,15 +40,6 @@ namespace coContext::internal {
         [[nodiscard]] auto syncCancel(std::variant<std::uint64_t, std::int32_t> id, std::int32_t flags,
                                       __kernel_timespec timeSpecification) const -> std::int32_t;
 
-        [[nodiscard]] auto getRingBufferId() const noexcept -> std::int32_t;
-
-        [[nodiscard]] auto readFromBuffer(std::uint16_t bufferId, std::size_t dataSize) noexcept
-            -> std::span<const std::byte>;
-
-        auto markBufferUsed(std::uint16_t bufferId) noexcept -> void;
-
-        auto expandBuffer() -> void;
-
     private:
         [[nodiscard]] static auto
             getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current()) -> rlim_t;
@@ -63,9 +50,16 @@ namespace coContext::internal {
 
         static constexpr std::uint16_t entries{32768};
 
-        std::shared_ptr<Ring> ring;
-        RingBuffer ringBuffer;
-        std::pmr::vector<Buffer> bufferGroup{getMemoryResource()};
+        std::shared_ptr<Ring> ring{[] {
+            io_uring_params parameters{};
+            parameters.flags = IORING_SETUP_SUBMIT_ALL | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_TASKRUN_FLAG |
+                               IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN;
+
+            return std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getMemoryResource()}, entries,
+                                              parameters);
+        }()};
+        std::shared_ptr<RingBuffer> ringBuffer{std::allocate_shared<RingBuffer>(
+            std::pmr::polymorphic_allocator{getMemoryResource()}, this->ring, entries, 0, IOU_PBUF_RING_INC)};
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getMemoryResource()};
         bool isRunning{};

@@ -38,6 +38,8 @@ auto coContext::internal::RingBuffer::swap(RingBuffer &other) noexcept -> void {
     std::swap(this->offset, other.offset);
 }
 
+auto coContext::internal::RingBuffer::getEntries() const noexcept -> std::uint32_t { return this->entries; }
+
 auto coContext::internal::RingBuffer::getId() const noexcept -> std::int32_t { return this->id; }
 
 auto coContext::internal::RingBuffer::addBuffer(const std::span<std::byte> buffer,
