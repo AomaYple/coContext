@@ -12,6 +12,7 @@
 - 多线程
 - 直接文件描述符，可以与普通文件描述符相互转换
 - 支持多发射IO
+- 零拷贝发送
 
 ## 基础用法
 
@@ -282,6 +283,31 @@ constexpr auto acceptAction(const std::int32_t socket, const std::int32_t result
     co_await coContext::multipleAccept([socket](const std::int32_t result) { acceptAction(socket, result); }, socket,
                                        nullptr, nullptr, 0);
     // 阻塞地执行multipleAccept协程，将acceptAction作为回调函数传入，并利用lambda捕获socket
+}
+```
+
+</details>
+
+<details>
+
+<summary>零拷贝发送</summary>
+
+#### 什么是零拷贝发送？就是在数据传输过程中，避免拷贝数据。
+
+- 优点
+    - 避免了数据拷贝，提高了性能
+- 缺点
+    - 会尽量零拷贝，但无法保证零拷贝，可能会退回到拷贝
+    - 需要数据量较大，建议在3000字节以上使用
+
+```c++
+constexpr auto zeroCopySendAction(const std::int32_t result) {
+    std::println("zero copy send result: {}", result);    // 打印零拷贝发送结果
+}
+
+[[nodiscard]] auto zeroCopySend(const std::int32_t socket, const std::span<const std::byte> data) -> coContext::Task<> {
+    co_await coContext::zeroCopySend(zeroCopySendAction, socket, data, 0);
+    // 发起零拷贝发送请求，并注册一个回调函数，当发送完成时调用该回调函数
 }
 ```
 
