@@ -365,16 +365,18 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
 
             asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
 
-            std::span<const std::byte> data;
-            if ((asyncWaitResumeFlags & IORING_CQE_F_BUFFER) != 0) {
-                const std::uint32_t bufferId{asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT};
-                data = context.getRingBuffer().readData(bufferId, result);
+            const bool isSelectedBuffer{(asyncWaitResumeFlags & IORING_CQE_F_BUFFER) != 0};
 
-                if ((asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0)
-                    context.getRingBuffer().markBufferUsed(bufferId);
-            }
+            std::span<const std::byte> data;
+            if (isSelectedBuffer)
+                data = context.getRingBuffer().readData(asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT, result);
 
             action(result, data);
+
+            if (isSelectedBuffer) {
+                context.getRingBuffer().revertBuffer(asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT,
+                                                     (asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0);
+            }
         } while ((asyncWaitResumeFlags & IORING_CQE_F_MORE) != 0);
     } while (isRestart);
 }
@@ -558,16 +560,18 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
 
             asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
 
-            std::span<const std::byte> data;
-            if ((asyncWaitResumeFlags & IORING_CQE_F_BUFFER) != 0) {
-                const std::uint32_t bufferId{asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT};
-                data = context.getRingBuffer().readData(bufferId, result);
+            const bool isSelectedBuffer{(asyncWaitResumeFlags & IORING_CQE_F_BUFFER) != 0};
 
-                if ((asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0)
-                    context.getRingBuffer().markBufferUsed(bufferId);
-            }
+            std::span<const std::byte> data;
+            if (isSelectedBuffer)
+                data = context.getRingBuffer().readData(asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT, result);
 
             action(result, data);
+
+            if (isSelectedBuffer) {
+                context.getRingBuffer().revertBuffer(asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT,
+                                                     (asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0);
+            }
         } while ((asyncWaitResumeFlags & IORING_CQE_F_MORE) != 0);
     } while (isRestart);
 }
