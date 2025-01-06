@@ -36,7 +36,7 @@ namespace coContext::internal {
         [[nodiscard]] auto readData(std::uint16_t bufferId, std::size_t dataSize) noexcept
             -> std::span<const std::byte>;
 
-        auto revertBuffer(std::uint16_t bufferId, bool isUsed) -> void;
+        auto markBufferUsed(std::uint16_t bufferId) noexcept -> void;
 
         auto expandBuffer() -> void;
 

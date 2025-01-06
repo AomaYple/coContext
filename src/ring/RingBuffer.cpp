@@ -2,7 +2,6 @@
 
 #include "Ring.hpp"
 
-#include <algorithm>
 #include <utility>
 
 coContext::internal::RingBuffer::RingBuffer(std::shared_ptr<Ring> ring, const std::uint32_t entries,
@@ -49,35 +48,23 @@ auto coContext::internal::RingBuffer::advance(const std::int32_t count) noexcept
 
 auto coContext::internal::RingBuffer::readData(const std::uint16_t bufferId, const std::size_t dataSize) noexcept
     -> std::span<const std::byte> {
-    auto &[data, offset]{this->buffers[bufferId]};
+    this->addBuffer(bufferId);
 
+    auto &[data, offset]{this->buffers[bufferId]};
     const std::span subData{std::cbegin(data) + static_cast<std::ptrdiff_t>(offset), dataSize};
     offset += dataSize;
 
     return subData;
 }
 
-auto coContext::internal::RingBuffer::revertBuffer(const std::uint16_t bufferId, const bool isUsed) -> void {
-    if (isUsed) {
-        auto &[data, offset]{this->buffers[bufferId]};
-
-        data.resize(std::size(data) * 2);
-        offset = 0;
-    }
-
-    this->addBuffer(bufferId);
+auto coContext::internal::RingBuffer::markBufferUsed(const std::uint16_t bufferId) noexcept -> void {
+    this->buffers[bufferId].offset = 0;
 }
 
 auto coContext::internal::RingBuffer::expandBuffer() -> void {
     if (std::size(this->buffers) == this->entries) return;
 
-    if (const auto result{std::ranges::max_element(
-            this->buffers,
-            [](const Buffer &lhs, const Buffer &rhs) noexcept { return std::size(lhs.data) < std::size(rhs.data); })};
-        result != std::cend(this->buffers))
-        this->buffers.emplace_back(result->data);
-    else this->buffers.emplace_back();
-
+    this->buffers.emplace_back();
     this->addBuffer(std::size(this->buffers) - 1);
 }
 
