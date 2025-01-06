@@ -211,39 +211,40 @@ auto coContext::internal::Submission::tee(const std::int32_t inFileDescriptor, c
     io_uring_prep_tee(this->handle, inFileDescriptor, outFileDescriptor, length, flags);
 }
 
-auto coContext::internal::Submission::open(const std::string_view path, const std::int32_t flags,
+auto coContext::internal::Submission::open(const std::filesystem::path &path, const std::int32_t flags,
                                            const mode_t mode) const noexcept -> void {
-    io_uring_prep_open(this->handle, std::data(path), flags, mode);
+    io_uring_prep_open(this->handle, path.c_str(), flags, mode);
 }
 
-auto coContext::internal::Submission::open(const std::int32_t directoryFileDescriptor, const std::string_view path,
-                                           const std::int32_t flags, const mode_t mode) const noexcept -> void {
-    io_uring_prep_openat(this->handle, directoryFileDescriptor, std::data(path), flags, mode);
+auto coContext::internal::Submission::open(const std::int32_t directoryFileDescriptor,
+                                           const std::filesystem::path &path, const std::int32_t flags,
+                                           const mode_t mode) const noexcept -> void {
+    io_uring_prep_openat(this->handle, directoryFileDescriptor, path.c_str(), flags, mode);
 }
 
-auto coContext::internal::Submission::open(const std::int32_t directoryFileDescriptor, const std::string_view path,
-                                           open_how &openHow) const noexcept -> void {
-    io_uring_prep_openat2(this->handle, directoryFileDescriptor, std::data(path), std::addressof(openHow));
+auto coContext::internal::Submission::open(const std::int32_t directoryFileDescriptor,
+                                           const std::filesystem::path &path, open_how &openHow) const noexcept
+    -> void {
+    io_uring_prep_openat2(this->handle, directoryFileDescriptor, path.c_str(), std::addressof(openHow));
 }
 
-auto coContext::internal::Submission::openDirect(const std::string_view path, const std::int32_t flags,
+auto coContext::internal::Submission::openDirect(const std::filesystem::path &path, const std::int32_t flags,
                                                  const mode_t mode,
                                                  const std::uint32_t fileDescriptorIndex) const noexcept -> void {
-    io_uring_prep_open_direct(this->handle, std::data(path), flags, mode, fileDescriptorIndex);
+    io_uring_prep_open_direct(this->handle, path.c_str(), flags, mode, fileDescriptorIndex);
 }
 
 auto coContext::internal::Submission::openDirect(const std::int32_t directoryFileDescriptor,
-                                                 const std::string_view path, const std::int32_t flags,
+                                                 const std::filesystem::path &path, const std::int32_t flags,
                                                  const mode_t mode,
                                                  const std::uint32_t fileDescriptorIndex) const noexcept -> void {
-    io_uring_prep_openat_direct(this->handle, directoryFileDescriptor, std::data(path), flags, mode,
-                                fileDescriptorIndex);
+    io_uring_prep_openat_direct(this->handle, directoryFileDescriptor, path.c_str(), flags, mode, fileDescriptorIndex);
 }
 
 auto coContext::internal::Submission::openDirect(const std::int32_t directoryFileDescriptor,
-                                                 const std::string_view path, open_how &openHow,
+                                                 const std::filesystem::path &path, open_how &openHow,
                                                  const std::uint32_t fileDescriptorIndex) const noexcept -> void {
-    io_uring_prep_openat2_direct(this->handle, directoryFileDescriptor, std::data(path), std::addressof(openHow),
+    io_uring_prep_openat2_direct(this->handle, directoryFileDescriptor, path.c_str(), std::addressof(openHow),
                                  fileDescriptorIndex);
 }
 
@@ -312,15 +313,16 @@ auto coContext::internal::Submission::allocateFile(const std::int32_t fileDescri
     io_uring_prep_fallocate(this->handle, fileDescriptor, mode, offset, length);
 }
 
-auto coContext::internal::Submission::status(const std::int32_t directoryFileDescriptor, const std::string_view path,
-                                             const std::int32_t flags, const std::uint32_t mask,
-                                             struct statx &buffer) const noexcept -> void {
-    io_uring_prep_statx(this->handle, directoryFileDescriptor, std::data(path), flags, mask, std::addressof(buffer));
+auto coContext::internal::Submission::status(const std::int32_t directoryFileDescriptor,
+                                             const std::filesystem::path &path, const std::int32_t flags,
+                                             const std::uint32_t mask, struct statx &buffer) const noexcept -> void {
+    io_uring_prep_statx(this->handle, directoryFileDescriptor, path.c_str(), flags, mask, std::addressof(buffer));
 }
 
-auto coContext::internal::Submission::getExtendedAttribute(const std::string_view path, const std::string_view name,
+auto coContext::internal::Submission::getExtendedAttribute(const std::filesystem::path &path,
+                                                           const std::string_view name,
                                                            const std::span<char> value) const noexcept -> void {
-    io_uring_prep_getxattr(this->handle, std::data(name), std::data(value), std::data(path), std::size(value));
+    io_uring_prep_getxattr(this->handle, std::data(name), std::data(value), path.c_str(), std::size(value));
 }
 
 auto coContext::internal::Submission::getExtendedAttribute(const std::int32_t fileDescriptor,
@@ -329,10 +331,10 @@ auto coContext::internal::Submission::getExtendedAttribute(const std::int32_t fi
     io_uring_prep_fgetxattr(this->handle, fileDescriptor, std::data(name), std::data(value), std::size(value));
 }
 
-auto coContext::internal::Submission::setExtendedAttribute(const std::string_view path, const std::string_view name,
-                                                           const std::span<char> value,
+auto coContext::internal::Submission::setExtendedAttribute(const std::filesystem::path &path,
+                                                           const std::string_view name, const std::span<char> value,
                                                            const std::int32_t flags) const noexcept -> void {
-    io_uring_prep_setxattr(this->handle, std::data(name), std::data(value), std::data(path), flags, std::size(value));
+    io_uring_prep_setxattr(this->handle, std::data(name), std::data(value), path.c_str(), flags, std::size(value));
 }
 
 auto coContext::internal::Submission::setExtendedAttribute(const std::int32_t fileDescriptor,
@@ -341,64 +343,65 @@ auto coContext::internal::Submission::setExtendedAttribute(const std::int32_t fi
     io_uring_prep_fsetxattr(this->handle, fileDescriptor, std::data(name), std::data(value), flags, std::size(value));
 }
 
-auto coContext::internal::Submission::makeDirectory(const std::string_view path, const mode_t mode) const noexcept
+auto coContext::internal::Submission::makeDirectory(const std::filesystem::path &path, const mode_t mode) const noexcept
     -> void {
-    io_uring_prep_mkdir(this->handle, std::data(path), mode);
+    io_uring_prep_mkdir(this->handle, path.c_str(), mode);
 }
 
 auto coContext::internal::Submission::makeDirectory(const std::int32_t directoryFileDescriptor,
-                                                    const std::string_view path, const mode_t mode) const noexcept
+                                                    const std::filesystem::path &path, const mode_t mode) const noexcept
     -> void {
-    io_uring_prep_mkdirat(this->handle, directoryFileDescriptor, std::data(path), mode);
+    io_uring_prep_mkdirat(this->handle, directoryFileDescriptor, path.c_str(), mode);
 }
 
-auto coContext::internal::Submission::rename(const std::string_view oldPath,
-                                             const std::string_view newPath) const noexcept -> void {
-    io_uring_prep_rename(this->handle, std::data(oldPath), std::data(newPath));
+auto coContext::internal::Submission::rename(const std::filesystem::path &oldPath,
+                                             const std::filesystem::path &newPath) const noexcept -> void {
+    io_uring_prep_rename(this->handle, oldPath.c_str(), newPath.c_str());
 }
 
 auto coContext::internal::Submission::rename(const std::int32_t oldDirectoryFileDescriptor,
-                                             const std::string_view oldPath,
+                                             const std::filesystem::path &oldPath,
                                              const std::int32_t newDirectoryFileDescriptor,
-                                             const std::string_view newPath, const std::uint32_t flags) const noexcept
-    -> void {
-    io_uring_prep_renameat(this->handle, oldDirectoryFileDescriptor, std::data(oldPath), newDirectoryFileDescriptor,
-                           std::data(newPath), flags);
+                                             const std::filesystem::path &newPath,
+                                             const std::uint32_t flags) const noexcept -> void {
+    io_uring_prep_renameat(this->handle, oldDirectoryFileDescriptor, oldPath.c_str(), newDirectoryFileDescriptor,
+                           newPath.c_str(), flags);
 }
 
-auto coContext::internal::Submission::link(const std::string_view oldPath, const std::string_view newPath,
+auto coContext::internal::Submission::link(const std::filesystem::path &oldPath, const std::filesystem::path &newPath,
                                            const std::int32_t flags) const noexcept -> void {
-    io_uring_prep_link(this->handle, std::data(oldPath), std::data(newPath), flags);
+    io_uring_prep_link(this->handle, oldPath.c_str(), newPath.c_str(), flags);
 }
 
 auto coContext::internal::Submission::link(const std::int32_t oldDirectoryFileDescriptor,
-                                           const std::string_view oldPath,
+                                           const std::filesystem::path &oldPath,
                                            const std::int32_t newDirectoryFileDescriptor,
-                                           const std::string_view newPath, const std::int32_t flags) const noexcept
-    -> void {
-    io_uring_prep_linkat(this->handle, oldDirectoryFileDescriptor, std::data(oldPath), newDirectoryFileDescriptor,
-                         std::data(newPath), flags);
+                                           const std::filesystem::path &newPath,
+                                           const std::int32_t flags) const noexcept -> void {
+    io_uring_prep_linkat(this->handle, oldDirectoryFileDescriptor, oldPath.c_str(), newDirectoryFileDescriptor,
+                         newPath.c_str(), flags);
 }
 
 auto coContext::internal::Submission::symbolicLink(const std::string_view target,
-                                                   const std::string_view linkPath) const noexcept -> void {
-    io_uring_prep_symlink(this->handle, std::data(target), std::data(linkPath));
+                                                   const std::filesystem::path &linkPath) const noexcept -> void {
+    io_uring_prep_symlink(this->handle, std::data(target), linkPath.c_str());
 }
 
 auto coContext::internal::Submission::symbolicLink(const std::string_view target,
                                                    const std::int32_t newDirectoryFileDescriptor,
-                                                   const std::string_view linkPath) const noexcept -> void {
-    io_uring_prep_symlinkat(this->handle, std::data(target), newDirectoryFileDescriptor, std::data(linkPath));
+                                                   const std::filesystem::path &linkPath) const noexcept -> void {
+    io_uring_prep_symlinkat(this->handle, std::data(target), newDirectoryFileDescriptor, linkPath.c_str());
 }
 
-auto coContext::internal::Submission::unlink(const std::string_view path, const std::int32_t flags) const noexcept
+auto coContext::internal::Submission::unlink(const std::filesystem::path &path, const std::int32_t flags) const noexcept
     -> void {
-    io_uring_prep_unlink(this->handle, std::data(path), flags);
+    io_uring_prep_unlink(this->handle, path.c_str(), flags);
 }
 
-auto coContext::internal::Submission::unlink(const std::int32_t directoryFileDescriptor, const std::string_view path,
-                                             const std::int32_t flags) const noexcept -> void {
-    io_uring_prep_unlinkat(this->handle, directoryFileDescriptor, std::data(path), flags);
+auto coContext::internal::Submission::unlink(const std::int32_t directoryFileDescriptor,
+                                             const std::filesystem::path &path, const std::int32_t flags) const noexcept
+    -> void {
+    io_uring_prep_unlinkat(this->handle, directoryFileDescriptor, path.c_str(), flags);
 }
 
 auto coContext::internal::Submission::adviseMemory(const std::span<std::byte> buffer,

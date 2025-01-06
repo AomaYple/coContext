@@ -3,8 +3,6 @@
 #include "../ring/Submission.hpp"
 #include "Coroutine.hpp"
 
-#include <memory>
-
 namespace coContext::internal {
     class AsyncWaiter {
     public:

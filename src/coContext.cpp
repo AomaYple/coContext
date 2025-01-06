@@ -462,7 +462,7 @@ auto coContext::tee(const std::int32_t inFileDescriptor, const std::int32_t outF
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::open(const std::string_view path, const std::int32_t flags, const mode_t mode)
+auto coContext::open(const std::filesystem::path &path, const std::int32_t flags, const mode_t mode)
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.open(path, flags, mode);
@@ -470,15 +470,15 @@ auto coContext::open(const std::string_view path, const std::int32_t flags, cons
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::open(const std::int32_t directoryFileDescriptor, const std::string_view path, const std::int32_t flags,
-                     const mode_t mode) -> internal::AsyncWaiter {
+auto coContext::open(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
+                     const std::int32_t flags, const mode_t mode) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.open(directoryFileDescriptor, path, flags, mode);
 
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::open(const std::int32_t directoryFileDescriptor, const std::string_view path, open_how &openHow)
+auto coContext::open(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path, open_how &openHow)
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.open(directoryFileDescriptor, path, openHow);
@@ -486,7 +486,7 @@ auto coContext::open(const std::int32_t directoryFileDescriptor, const std::stri
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::openDirect(const std::string_view path, const std::int32_t flags, const mode_t mode)
+auto coContext::openDirect(const std::filesystem::path &path, const std::int32_t flags, const mode_t mode)
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.openDirect(path, flags, mode, IORING_FILE_INDEX_ALLOC);
@@ -494,7 +494,7 @@ auto coContext::openDirect(const std::string_view path, const std::int32_t flags
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std::string_view path,
+auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
                            const std::int32_t flags, const mode_t mode) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.openDirect(directoryFileDescriptor, path, flags, mode, IORING_FILE_INDEX_ALLOC);
@@ -502,8 +502,8 @@ auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std::string_view path, open_how &openHow)
-    -> internal::AsyncWaiter {
+auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
+                           open_how &openHow) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.openDirect(directoryFileDescriptor, path, openHow, IORING_FILE_INDEX_ALLOC);
 
@@ -634,7 +634,7 @@ auto coContext::allocateFile(const std::int32_t fileDescriptor, const std::int32
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::status(const std::int32_t directoryFileDescriptor, const std::string_view path,
+auto coContext::status(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
                        const std::int32_t flags, const std::uint32_t mask, struct statx &buffer)
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
@@ -643,7 +643,7 @@ auto coContext::status(const std::int32_t directoryFileDescriptor, const std::st
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::getExtendedAttribute(const std::string_view path, const std::string_view name,
+auto coContext::getExtendedAttribute(const std::filesystem::path &path, const std::string_view name,
                                      const std::span<char> value) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.getExtendedAttribute(path, name, value);
@@ -659,7 +659,7 @@ auto coContext::getExtendedAttribute(const std::int32_t fileDescriptor, const st
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::setExtendedAttribute(const std::string_view path, const std::string_view name,
+auto coContext::setExtendedAttribute(const std::filesystem::path &path, const std::string_view name,
                                      const std::span<char> value, const std::int32_t flags) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.setExtendedAttribute(path, name, value, flags);
@@ -675,14 +675,14 @@ auto coContext::setExtendedAttribute(const std::int32_t fileDescriptor, const st
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::makeDirectory(const std::string_view path, const mode_t mode) -> internal::AsyncWaiter {
+auto coContext::makeDirectory(const std::filesystem::path &path, const mode_t mode) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.makeDirectory(path, mode);
 
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::makeDirectory(const std::int32_t directoryFileDescriptor, const std::string_view path,
+auto coContext::makeDirectory(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
                               const mode_t mode) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.makeDirectory(directoryFileDescriptor, path, mode);
@@ -690,15 +690,16 @@ auto coContext::makeDirectory(const std::int32_t directoryFileDescriptor, const 
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::rename(const std::string_view oldPath, const std::string_view newPath) -> internal::AsyncWaiter {
+auto coContext::rename(const std::filesystem::path &oldPath, const std::filesystem::path &newPath)
+    -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.rename(oldPath, newPath);
 
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::rename(const std::int32_t oldDirectoryFileDescriptor, const std::string_view oldPath,
-                       const std::int32_t newDirectoryFileDescriptor, const std::string_view newPath,
+auto coContext::rename(const std::int32_t oldDirectoryFileDescriptor, const std::filesystem::path &oldPath,
+                       const std::int32_t newDirectoryFileDescriptor, const std::filesystem::path &newPath,
                        const std::uint32_t flags) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.rename(oldDirectoryFileDescriptor, oldPath, newDirectoryFileDescriptor, newPath, flags);
@@ -706,15 +707,16 @@ auto coContext::rename(const std::int32_t oldDirectoryFileDescriptor, const std:
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::link(const std::string_view oldPath, const std::string_view newPath) -> internal::AsyncWaiter {
+auto coContext::link(const std::filesystem::path &oldPath, const std::filesystem::path &newPath)
+    -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.link(oldPath, newPath, 0);
 
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::link(const std::int32_t oldDirectoryFileDescriptor, const std::string_view oldPath,
-                     const std::int32_t newDirectoryFileDescriptor, const std::string_view newPath,
+auto coContext::link(const std::int32_t oldDirectoryFileDescriptor, const std::filesystem::path &oldPath,
+                     const std::int32_t newDirectoryFileDescriptor, const std::filesystem::path &newPath,
                      const std::int32_t flags) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.link(oldDirectoryFileDescriptor, oldPath, newDirectoryFileDescriptor, newPath, flags);
@@ -722,7 +724,8 @@ auto coContext::link(const std::int32_t oldDirectoryFileDescriptor, const std::s
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::symbolicLink(const std::string_view target, const std::string_view linkPath) -> internal::AsyncWaiter {
+auto coContext::symbolicLink(const std::string_view target, const std::filesystem::path &linkPath)
+    -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.symbolicLink(target, linkPath);
 
@@ -730,21 +733,21 @@ auto coContext::symbolicLink(const std::string_view target, const std::string_vi
 }
 
 auto coContext::symbolicLink(const std::string_view target, const std::int32_t newDirectoryFileDescriptor,
-                             const std::string_view linkPath) -> internal::AsyncWaiter {
+                             const std::filesystem::path &linkPath) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.symbolicLink(target, newDirectoryFileDescriptor, linkPath);
 
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::unlink(const std::string_view path) -> internal::AsyncWaiter {
+auto coContext::unlink(const std::filesystem::path &path) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.unlink(path, 0);
 
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::unlink(const std::int32_t directoryFileDescriptor, const std::string_view path,
+auto coContext::unlink(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
                        const std::int32_t flags) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
     submission.unlink(directoryFileDescriptor, path, flags);

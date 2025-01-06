@@ -202,21 +202,23 @@ namespace coContext {
     [[nodiscard]] auto tee(std::int32_t inFileDescriptor, std::int32_t outFileDescriptor, std::uint32_t length,
                            std::uint32_t flags) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto open(std::string_view path, std::int32_t flags, mode_t mode = {}) -> internal::AsyncWaiter;
+    [[nodiscard]] auto open(const std::filesystem::path &path, std::int32_t flags, mode_t mode = {})
+        -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
+    [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, const std::filesystem::path &path, std::int32_t flags,
                             mode_t mode = {}) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, std::string_view path, open_how &openHow)
+    [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, const std::filesystem::path &path, open_how &openHow)
         -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto openDirect(std::string_view path, std::int32_t flags, mode_t mode = {}) -> internal::AsyncWaiter;
-
-    [[nodiscard]] auto openDirect(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
-                                  mode_t mode = {}) -> internal::AsyncWaiter;
-
-    [[nodiscard]] auto openDirect(std::int32_t directoryFileDescriptor, std::string_view path, open_how &openHow)
+    [[nodiscard]] auto openDirect(const std::filesystem::path &path, std::int32_t flags, mode_t mode = {})
         -> internal::AsyncWaiter;
+
+    [[nodiscard]] auto openDirect(std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
+                                  std::int32_t flags, mode_t mode = {}) -> internal::AsyncWaiter;
+
+    [[nodiscard]] auto openDirect(std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
+                                  open_how &openHow) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto read(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::uint64_t offset = -1)
         -> internal::AsyncWaiter;
@@ -253,47 +255,50 @@ namespace coContext {
     [[nodiscard]] auto allocateFile(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
                                     std::uint64_t length) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto status(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags,
-                              std::uint32_t mask, struct statx &buffer) -> internal::AsyncWaiter;
+    [[nodiscard]] auto status(std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
+                              std::int32_t flags, std::uint32_t mask, struct statx &buffer) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto getExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value)
-        -> internal::AsyncWaiter;
+    [[nodiscard]] auto getExtendedAttribute(const std::filesystem::path &path, std::string_view name,
+                                            std::span<char> value) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value)
         -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto setExtendedAttribute(std::string_view path, std::string_view name, std::span<char> value,
-                                            std::int32_t flags) -> internal::AsyncWaiter;
+    [[nodiscard]] auto setExtendedAttribute(const std::filesystem::path &path, std::string_view name,
+                                            std::span<char> value, std::int32_t flags) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto setExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value,
                                             std::int32_t flags) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto makeDirectory(std::string_view path, mode_t mode) -> internal::AsyncWaiter;
+    [[nodiscard]] auto makeDirectory(const std::filesystem::path &path, mode_t mode) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto makeDirectory(std::int32_t directoryFileDescriptor, std::string_view path, mode_t mode)
+    [[nodiscard]] auto makeDirectory(std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
+                                     mode_t mode) -> internal::AsyncWaiter;
+
+    [[nodiscard]] auto rename(const std::filesystem::path &oldPath, const std::filesystem::path &newPath)
         -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto rename(std::string_view oldPath, std::string_view newPath) -> internal::AsyncWaiter;
-
-    [[nodiscard]] auto rename(std::int32_t oldDirectoryFileDescriptor, std::string_view oldPath,
-                              std::int32_t newDirectoryFileDescriptor, std::string_view newPath,
+    [[nodiscard]] auto rename(std::int32_t oldDirectoryFileDescriptor, const std::filesystem::path &oldPath,
+                              std::int32_t newDirectoryFileDescriptor, const std::filesystem::path &newPath,
                               std::uint32_t flags = {}) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto link(std::string_view oldPath, std::string_view newPath) -> internal::AsyncWaiter;
-
-    [[nodiscard]] auto link(std::int32_t oldDirectoryFileDescriptor, std::string_view oldPath,
-                            std::int32_t newDirectoryFileDescriptor, std::string_view newPath, std::int32_t flags)
+    [[nodiscard]] auto link(const std::filesystem::path &oldPath, const std::filesystem::path &newPath)
         -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto symbolicLink(std::string_view target, std::string_view linkPath) -> internal::AsyncWaiter;
+    [[nodiscard]] auto link(std::int32_t oldDirectoryFileDescriptor, const std::filesystem::path &oldPath,
+                            std::int32_t newDirectoryFileDescriptor, const std::filesystem::path &newPath,
+                            std::int32_t flags) -> internal::AsyncWaiter;
+
+    [[nodiscard]] auto symbolicLink(std::string_view target, const std::filesystem::path &linkPath)
+        -> internal::AsyncWaiter;
 
     [[nodiscard]] auto symbolicLink(std::string_view target, std::int32_t newDirectoryFileDescriptor,
-                                    std::string_view linkPath) -> internal::AsyncWaiter;
+                                    const std::filesystem::path &linkPath) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto unlink(std::string_view path) -> internal::AsyncWaiter;
+    [[nodiscard]] auto unlink(const std::filesystem::path &path) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto unlink(std::int32_t directoryFileDescriptor, std::string_view path, std::int32_t flags)
-        -> internal::AsyncWaiter;
+    [[nodiscard]] auto unlink(std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
+                              std::int32_t flags) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) -> internal::AsyncWaiter;
 
