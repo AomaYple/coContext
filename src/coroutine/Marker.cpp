@@ -23,8 +23,8 @@ auto coContext::internal::Marker::executeAction() -> void {
 }
 
 auto coContext::internal::operator|(Marker lhs, Marker rhs) -> Marker {
-    rhs.addFlags(lhs.getFlags());
-    rhs.setAction(std::move(lhs.getAction()));
+    lhs.addFlags(rhs.getFlags());
+    lhs.setAction(std::move(rhs.getAction()));
 
     return rhs;
 }
