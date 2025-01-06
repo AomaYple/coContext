@@ -28,9 +28,9 @@ auto coContext::internal::Context::run() -> void {
     while (this->isRunning) {
         this->ring->submitAndWait(1);
         this->ringBuffer.advance(this->ring->poll([this](const io_uring_cqe *const completion) {
-            const auto findResult{this->schedulingCoroutines.find(completion->user_data)};
-            Coroutine coroutine{std::move(findResult->second)};
-            this->schedulingCoroutines.erase(findResult);
+            const auto result{this->schedulingCoroutines.find(completion->user_data)};
+            Coroutine coroutine{std::move(result->second)};
+            this->schedulingCoroutines.erase(result);
 
             coroutine.promise().setResult(completion->res);
             coroutine.promise().setFlags(completion->flags);
@@ -101,10 +101,10 @@ auto coContext::internal::Context::scheduleCoroutine(Coroutine coroutine) -> voi
         this->schedulingCoroutines.emplace(id, std::move(coroutine));
 
         if (static_cast<bool>(childCoroutine)) this->scheduleCoroutine(std::move(childCoroutine));
-    } else if (const auto findResult{this->schedulingCoroutines.find(coroutine.promise().getParentCoroutineId())};
-               findResult != std::cend(this->schedulingCoroutines)) {
-        Coroutine parentCoroutine{std::move(findResult->second)};
-        this->schedulingCoroutines.erase(findResult);
+    } else if (const auto result{this->schedulingCoroutines.find(coroutine.promise().getParentCoroutineId())};
+               result != std::cend(this->schedulingCoroutines)) {
+        Coroutine parentCoroutine{std::move(result->second)};
+        this->schedulingCoroutines.erase(result);
 
         this->scheduleCoroutine(std::move(parentCoroutine));
     }
