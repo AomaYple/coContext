@@ -189,11 +189,11 @@ namespace coContext {
 
     [[nodiscard]] auto zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
                                     std::int32_t socketFileDescriptor, std::span<const std::byte> buffer,
-                                    std::int32_t flags, internal::Marker marker = internal::Marker{}) -> Task<>;
+                                    std::int32_t flags, internal::Marker marker = none()) -> Task<>;
 
     [[nodiscard]] auto zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
                                     std::int32_t socketFileDescriptor, const msghdr &message, std::int32_t flags,
-                                    internal::Marker marker = internal::Marker{}) -> Task<>;
+                                    internal::Marker marker = none()) -> Task<>;
 
     [[nodiscard]] auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset,
                               std::int32_t outFileDescriptor, std::int64_t outFileDescriptorOffset,
