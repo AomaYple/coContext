@@ -2,13 +2,12 @@
 
 #include "coContext/memory/memoryResource.hpp"
 
-auto coContext::internal::BasePromise::operator new(const std::size_t numberOfBytes) -> void * {
-    return allocator.allocate_bytes(numberOfBytes);
+auto coContext::internal::BasePromise::operator new(const std::size_t bytes) -> void * {
+    return allocator.allocate_bytes(bytes);
 }
 
-auto coContext::internal::BasePromise::operator delete(void *const pointer, const std::size_t numberOfBytes) noexcept
-    -> void {
-    allocator.deallocate_bytes(pointer, numberOfBytes);
+auto coContext::internal::BasePromise::operator delete(void *const pointer, const std::size_t bytes) noexcept -> void {
+    allocator.deallocate_bytes(pointer, bytes);
 }
 
 auto coContext::internal::BasePromise::swap(BasePromise &other) noexcept -> void {
