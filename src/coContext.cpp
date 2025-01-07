@@ -138,7 +138,7 @@ auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> 
         rawSleep(seconds, nanoseconds, setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT) | std::move(marker)};
 
     do action(co_await asyncWaiter);
-    while ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0);
+    while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
 auto coContext::poll(const std::int32_t fileDescriptor, const std::uint32_t mask) -> internal::AsyncWaiter {
@@ -164,7 +164,7 @@ auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> a
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
 
     do action(co_await asyncWaiter);
-    while ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0);
+    while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
 auto coContext::close(const std::int32_t fileDescriptor) -> internal::AsyncWaiter {
@@ -284,7 +284,7 @@ auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void>
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
 
     do action(co_await asyncWaiter);
-    while ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0);
+    while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
 auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)->void> action,
@@ -299,7 +299,7 @@ auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)-
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
 
     do action(co_await asyncWaiter);
-    while ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0);
+    while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
 auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr address, const socklen_t addressLength)
@@ -353,7 +353,7 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
 
         internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
 
-        std::uint32_t asyncWaitResumeFlags;
+        std::uint32_t resumeFlags;
         do {
             const std::int32_t result{co_await asyncWaiter};
             if (result == -ENOBUFS) {
@@ -363,19 +363,18 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
                 break;
             }
 
-            asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
+            resumeFlags = asyncWaiter.getResumeFlags();
 
             std::span<const std::byte> data;
-            if ((asyncWaitResumeFlags & IORING_CQE_F_BUFFER) != 0) {
-                const std::uint32_t bufferId{asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT};
+            if ((resumeFlags & IORING_CQE_F_BUFFER) != 0) {
+                const std::uint32_t bufferId{resumeFlags >> IORING_CQE_BUFFER_SHIFT};
                 data = context.getRingBuffer().readData(bufferId, result);
 
-                if ((asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0)
-                    context.getRingBuffer().markBufferUsed(bufferId);
+                if ((resumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.getRingBuffer().markBufferUsed(bufferId);
             }
 
             action(result, data);
-        } while ((asyncWaitResumeFlags & IORING_CQE_F_MORE) != 0);
+        } while ((resumeFlags & IORING_CQE_F_MORE) != 0);
     } while (isRestart);
 }
 
@@ -421,7 +420,7 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
 
     const std::int32_t result{co_await asyncWaiter};
-    if ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
+    if ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
 
     action(result);
 }
@@ -439,7 +438,7 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
 
     const std::int32_t result{co_await asyncWaiter};
-    if ((asyncWaiter.getAsyncWaitResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
+    if ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
 
     action(result);
 }
@@ -546,7 +545,7 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
 
         internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
 
-        std::uint32_t asyncWaitResumeFlags;
+        std::uint32_t resumeFlags;
         do {
             const std::int32_t result{co_await asyncWaiter};
             if (result == -ENOBUFS) {
@@ -556,19 +555,18 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
                 break;
             }
 
-            asyncWaitResumeFlags = asyncWaiter.getAsyncWaitResumeFlags();
+            resumeFlags = asyncWaiter.getResumeFlags();
 
             std::span<const std::byte> data;
-            if ((asyncWaitResumeFlags & IORING_CQE_F_BUFFER) != 0) {
-                const std::uint32_t bufferId{asyncWaitResumeFlags >> IORING_CQE_BUFFER_SHIFT};
+            if ((resumeFlags & IORING_CQE_F_BUFFER) != 0) {
+                const std::uint32_t bufferId{resumeFlags >> IORING_CQE_BUFFER_SHIFT};
                 data = context.getRingBuffer().readData(bufferId, result);
 
-                if ((asyncWaitResumeFlags & IORING_CQE_F_BUF_MORE) == 0)
-                    context.getRingBuffer().markBufferUsed(bufferId);
+                if ((resumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.getRingBuffer().markBufferUsed(bufferId);
             }
 
             action(result, data);
-        } while ((asyncWaitResumeFlags & IORING_CQE_F_MORE) != 0);
+        } while ((resumeFlags & IORING_CQE_F_MORE) != 0);
     } while (isRestart);
 }
 

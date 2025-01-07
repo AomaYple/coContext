@@ -32,7 +32,7 @@ namespace coContext::internal {
 
         [[nodiscard]] auto await_resume() const -> std::int32_t;
 
-        [[nodiscard]] auto getAsyncWaitResumeFlags() const -> std::uint32_t;
+        [[nodiscard]] auto getResumeFlags() const -> std::uint32_t;
 
     private:
         Submission submission;

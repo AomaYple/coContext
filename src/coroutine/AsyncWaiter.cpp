@@ -36,6 +36,6 @@ auto coContext::internal::AsyncWaiter::await_resume() const -> std::int32_t {
     return this->coroutineHandle.promise().getResult();
 }
 
-auto coContext::internal::AsyncWaiter::getAsyncWaitResumeFlags() const -> std::uint32_t {
+auto coContext::internal::AsyncWaiter::getResumeFlags() const -> std::uint32_t {
     return this->coroutineHandle.promise().getFlags();
 }
