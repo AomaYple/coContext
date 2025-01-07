@@ -80,17 +80,19 @@ auto coContext::direct() noexcept -> internal::Marker { return internal::Marker{
 
 auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                         const ClockSource clockSource) -> internal::Marker {
-    return internal::Marker{
-        IOSQE_IO_LINK, [seconds, nanoseconds, clockSource] {
-            const internal::Submission submission{context.getSubmission()};
-            internal::AsyncWaiter asyncWaiter{submission};
+    return internal::Marker{IOSQE_IO_LINK, [seconds, nanoseconds, clockSource] {
+                                spawn([seconds, nanoseconds, clockSource] -> Task<> {
+                                    const internal::Submission submission{context.getSubmission()};
+                                    internal::AsyncWaiter asyncWaiter{submission};
 
-            asyncWaiter.setTimeSpecification(std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
-            submission.linkTimeout(*asyncWaiter.getTimeSpecification(), setClockSource(clockSource));
+                                    asyncWaiter.setTimeSpecification(
+                                        std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
+                                    submission.linkTimeout(*asyncWaiter.getTimeSpecification(),
+                                                           setClockSource(clockSource));
 
-            spawn([](internal::AsyncWaiter timeoutAsyncWaiter) -> Task<> { co_await timeoutAsyncWaiter; },
-                  std::move(asyncWaiter));
-        }};
+                                    co_await asyncWaiter;
+                                });
+                            }};
 }
 
 auto coContext::cancel(const std::uint64_t taskId) -> internal::AsyncWaiter {
