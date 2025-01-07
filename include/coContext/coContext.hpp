@@ -84,7 +84,7 @@ namespace coContext {
 
     [[nodiscard]] auto toDirect(std::span<std::int32_t> fileDescriptors) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto installDirect(std::int32_t directFileDescriptor, bool isSetCloseOnExecute = true)
+    [[nodiscard]] auto installDirect(std::int32_t directFileDescriptor, bool isCloseOnExecute = true)
         -> internal::AsyncWaiter;
 
     [[nodiscard]] auto none() noexcept -> internal::Marker;

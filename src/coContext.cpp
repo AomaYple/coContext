@@ -66,10 +66,10 @@ auto coContext::toDirect(const std::span<std::int32_t> fileDescriptors) -> inter
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::installDirect(const std::int32_t directFileDescriptor, const bool isSetCloseOnExecute)
+auto coContext::installDirect(const std::int32_t directFileDescriptor, const bool isCloseOnExecute)
     -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
-    submission.installDirect(directFileDescriptor, isSetCloseOnExecute ? 0 : IORING_FIXED_FD_NO_CLOEXEC);
+    submission.installDirect(directFileDescriptor, isCloseOnExecute ? 0 : IORING_FIXED_FD_NO_CLOEXEC);
 
     return internal::AsyncWaiter{submission};
 }
