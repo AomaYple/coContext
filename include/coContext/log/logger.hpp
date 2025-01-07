@@ -3,8 +3,6 @@
 #include "Log.hpp"
 
 namespace coContext {
-    class Log;
-
     auto onLogging() -> void;
 
     auto offLogging() noexcept -> void;
