@@ -83,7 +83,7 @@ namespace coContext::internal {
         auto multipleAcceptDirect(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
                                   std::int32_t flags) const noexcept -> void;
 
-        auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength) const noexcept
+        auto connect(std::int32_t socketFileDescriptor, sockaddr address, socklen_t addressLength) const noexcept
             -> void;
 
         auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) const noexcept -> void;
@@ -100,7 +100,7 @@ namespace coContext::internal {
                   std::int32_t flags) const noexcept -> void;
 
         auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
-                  const sockaddr &destinationAddress, socklen_t destinationAddressLength) const noexcept -> void;
+                  sockaddr destinationAddress, socklen_t destinationAddressLength) const noexcept -> void;
 
         auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags) const noexcept -> void;
 

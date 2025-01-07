@@ -161,7 +161,7 @@ namespace coContext {
                                             socklen_t *addressLength, std::int32_t flags = {},
                                             internal::Marker marker = none()) -> Task<>;
 
-    [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength)
+    [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, sockaddr address, socklen_t addressLength)
         -> internal::AsyncWaiter;
 
     [[nodiscard]] auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) -> internal::AsyncWaiter;
@@ -181,8 +181,7 @@ namespace coContext {
         -> internal::AsyncWaiter;
 
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
-                            const sockaddr &destinationAddress, socklen_t destinationAddressLength)
-        -> internal::AsyncWaiter;
+                            sockaddr destinationAddress, socklen_t destinationAddressLength) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags)
         -> internal::AsyncWaiter;
