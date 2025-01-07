@@ -10,7 +10,7 @@ namespace coContext::internal {
         using Action = std::move_only_function<auto()->void>;
 
     public:
-        explicit Marker(std::uint32_t flags = {}, Action action = {});
+        explicit Marker(std::uint32_t flags = {}, Action action = {}) noexcept;
 
         Marker(const Marker &) = delete;
 

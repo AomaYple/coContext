@@ -2,7 +2,7 @@
 
 #include "coContext/coroutine/AsyncWaiter.hpp"
 
-coContext::internal::Marker::Marker(const std::uint32_t flags, Action action) :
+coContext::internal::Marker::Marker(const std::uint32_t flags, Action action) noexcept :
     flags{flags}, action{std::move(action)} {}
 
 auto coContext::internal::Marker::swap(Marker &other) noexcept -> void {
