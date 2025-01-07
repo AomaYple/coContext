@@ -3,11 +3,11 @@
 #include "coContext/memory/memoryResource.hpp"
 
 auto coContext::internal::BasePromise::operator new(const std::size_t bytes) -> void * {
-    return getMemoryResource()->allocate(bytes);
+    return getUnSyncMemoryResource()->allocate(bytes);
 }
 
 auto coContext::internal::BasePromise::operator delete(void *const pointer, const std::size_t bytes) noexcept -> void {
-    getMemoryResource()->deallocate(pointer, bytes);
+    getUnSyncMemoryResource()->deallocate(pointer, bytes);
 }
 
 auto coContext::internal::BasePromise::swap(BasePromise &other) noexcept -> void {

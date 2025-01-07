@@ -74,7 +74,7 @@ auto coContext::internal::Context::getFileDescriptorLimit(const std::source_loca
     if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
         throw Exception{
             Log{Log::Level::fatal,
-                std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getMemoryResource()},
+                std::pmr::string{std::error_code{errno, std::generic_category()}.message(), getSyncMemoryResource()},
                 sourceLocation}
         };
     }

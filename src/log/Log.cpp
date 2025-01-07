@@ -7,7 +7,7 @@ using namespace std::string_view_literals;
 
 coContext::Log::Log(const Level level, std::pmr::string message, const std::source_location sourceLocation,
                     const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) noexcept :
-    level{level}, message{std::move(message), internal::getMemoryResource()}, sourceLocation{sourceLocation},
+    level{level}, message{std::move(message), internal::getSyncMemoryResource()}, sourceLocation{sourceLocation},
     timestamp{timestamp}, threadId{threadId} {}
 
 auto coContext::Log::swap(Log &other) noexcept -> void {
@@ -28,12 +28,12 @@ auto coContext::Log::toString() const -> std::pmr::string {
                                         this->timestamp, this->threadId, this->sourceLocation.file_name(),
                                         this->sourceLocation.line(), this->sourceLocation.column(),
                                         this->sourceLocation.function_name(), this->message),
-                            internal::getMemoryResource()};
+                            internal::getSyncMemoryResource()};
 }
 
 auto coContext::Log::toBytes() const -> std::pmr::vector<std::byte> {
     const auto log{this->toString()};
     const auto bytes{std::as_bytes(std::span{log})};
 
-    return {std::cbegin(bytes), std::cend(bytes), internal::getMemoryResource()};
+    return {std::cbegin(bytes), std::cend(bytes), internal::getSyncMemoryResource()};
 }

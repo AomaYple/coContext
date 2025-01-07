@@ -13,7 +13,7 @@ coContext::internal::Ring::Ring(const std::uint32_t entries, io_uring_params &pa
             throw Exception{
                 Log{Log::Level::fatal,
                     std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                     getMemoryResource()},
+                                     getSyncMemoryResource()},
                     sourceLocation}
             };
         }
@@ -45,7 +45,7 @@ auto coContext::internal::Ring::registerSelfFileDescriptor(const std::source_loc
         throw Exception{
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                 getMemoryResource()},
+                                 getSyncMemoryResource()},
                 sourceLocation}
         };
     }
@@ -57,7 +57,7 @@ auto coContext::internal::Ring::registerSparseFileDescriptor(const std::uint32_t
         throw Exception{
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                 getMemoryResource()},
+                                 getSyncMemoryResource()},
                 sourceLocation}
         };
     }
@@ -73,7 +73,7 @@ auto coContext::internal::Ring::setupRingBuffer(const std::uint32_t entries, con
         throw Exception{
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(error), std::generic_category()}.message(),
-                                 getMemoryResource()},
+                                 getSyncMemoryResource()},
                 sourceLocation}
         };
     }
@@ -89,7 +89,7 @@ auto coContext::internal::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuff
         throw Exception{
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                 getMemoryResource()},
+                                 getSyncMemoryResource()},
                 sourceLocation}
         };
     }
@@ -99,7 +99,8 @@ auto coContext::internal::Ring::getSubmission(const std::source_location sourceL
     io_uring_sqe *const submission{io_uring_get_sqe(std::addressof(this->handle))};
     if (submission == nullptr) {
         throw Exception{
-            Log{Log::Level::error, std::pmr::string{"no submission available"sv, getMemoryResource()}, sourceLocation}
+            Log{Log::Level::error, std::pmr::string{"no submission available"sv, getSyncMemoryResource()},
+                sourceLocation}
         };
     }
 
@@ -112,7 +113,7 @@ auto coContext::internal::Ring::submitAndWait(const std::uint32_t count, const s
         throw Exception{
             Log{Log::Level::error,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                 getMemoryResource()},
+                                 getSyncMemoryResource()},
                 sourceLocation}
         };
     }
@@ -144,7 +145,7 @@ auto coContext::internal::Ring::syncCancel(io_uring_sync_cancel_reg &parameters,
         throw Exception{
             Log{Log::Level::warn,
                 std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                 getMemoryResource()},
+                                 getSyncMemoryResource()},
                 sourceLocation}
         };
     }
