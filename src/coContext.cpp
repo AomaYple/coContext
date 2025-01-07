@@ -3,7 +3,11 @@
 #include "context/Context.hpp"
 
 namespace coContext::internal {
-    thread_local Context context;
+    thread_local Context context{[] {
+        onLogging();
+
+        return Context{};
+    }()};
 
     [[nodiscard]] constexpr auto setClockSource(const ClockSource clockSource) noexcept {
         std::uint32_t flags{};
