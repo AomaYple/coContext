@@ -357,8 +357,8 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
         do {
             const std::int32_t result{co_await asyncWaiter};
             if (result == -ENOBUFS) {
-                isRestart = true;
                 context.getRingBuffer().expandBuffer();
+                isRestart = true;
 
                 break;
             }
@@ -550,8 +550,8 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
         do {
             const std::int32_t result{co_await asyncWaiter};
             if (result == -ENOBUFS) {
-                isRestart = true;
                 context.getRingBuffer().expandBuffer();
+                isRestart = true;
 
                 break;
             }
