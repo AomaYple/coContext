@@ -5,7 +5,6 @@
 #include "coContext/coroutine/Coroutine.hpp"
 
 #include <queue>
-#include <sys/resource.h>
 
 namespace coContext::internal {
     class Submission;
@@ -40,9 +39,6 @@ namespace coContext::internal {
                                       __kernel_timespec timeSpecification) const -> std::int32_t;
 
     private:
-        [[nodiscard]] static auto
-            getFileDescriptorLimit(std::source_location sourceLocation = std::source_location::current()) -> rlim_t;
-
         auto scheduleUnscheduledCoroutines() -> void;
 
         auto scheduleCoroutine(Coroutine coroutine) -> void;
