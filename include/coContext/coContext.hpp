@@ -87,9 +87,9 @@ namespace coContext {
     [[nodiscard]] auto installDirect(std::int32_t directFileDescriptor, bool isSetCloseOnExecute = true)
         -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto none() -> internal::Marker;
+    [[nodiscard]] auto none() noexcept -> internal::Marker;
 
-    [[nodiscard]] auto direct() -> internal::Marker;
+    [[nodiscard]] auto direct() noexcept -> internal::Marker;
 
     [[nodiscard]] auto timeout(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
                                ClockSource clockSource = {}) -> internal::Marker;
