@@ -83,7 +83,7 @@ auto coContext::setLevel(const Log::Level level) noexcept -> void {
 }
 
 auto coContext::writeLog(Log log) -> void {
-    if (internal::isOn.test(std::memory_order::relaxed) ||
+    if (!internal::isOn.test(std::memory_order::relaxed) ||
         log.getLevel() < internal::level.load(std::memory_order::relaxed))
         return;
 
