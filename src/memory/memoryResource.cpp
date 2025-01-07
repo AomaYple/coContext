@@ -3,9 +3,9 @@
 #ifdef NDEBUG
     #include "MiMallocResource.hpp"
 
-namespace {
-    constinit coContext::internal::MiMallocResource miMallocResource;
-}    // namespace
+namespace coContext::internal {
+    constinit MiMallocResource miMallocResource;
+}    // namespace coContext::internal
 #endif    // NDEBUG
 
 auto coContext::internal::getUnSyncMemoryResource() -> std::pmr::memory_resource * {
