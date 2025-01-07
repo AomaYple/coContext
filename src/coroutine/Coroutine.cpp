@@ -28,7 +28,7 @@ auto coContext::internal::Coroutine::get() const noexcept -> Handle { return thi
 
 coContext::internal::Coroutine::operator bool() const noexcept { return static_cast<bool>(this->handle); }
 
-auto coContext::internal::Coroutine::promise() const -> BasePromise & { return this->handle.promise(); }
+auto coContext::internal::Coroutine::getPromise() const -> BasePromise & { return this->handle.promise(); }
 
 auto coContext::internal::Coroutine::operator()() const -> void { this->handle(); }
 

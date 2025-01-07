@@ -13,7 +13,7 @@ auto coContext::internal::BaseTask::await_ready() const noexcept -> bool { retur
 auto coContext::internal::BaseTask::await_suspend(const std::coroutine_handle<> genericCoroutineHandle) -> void {
     const auto parentCoroutineHandle{Coroutine::Handle::from_address(genericCoroutineHandle.address())};
 
-    this->coroutine.promise().setParentCoroutineId(std::hash<Coroutine::Handle>{}(parentCoroutineHandle));
+    this->coroutine.getPromise().setParentCoroutineId(std::hash<Coroutine::Handle>{}(parentCoroutineHandle));
     parentCoroutineHandle.promise().setChildCoroutine(std::move(this->coroutine));
 }
 

@@ -27,7 +27,7 @@ namespace coContext::internal {
 
         explicit operator bool() const noexcept;
 
-        [[nodiscard]] auto promise() const -> BasePromise &;
+        [[nodiscard]] auto getPromise() const -> BasePromise &;
 
         auto operator()() const -> void;
 

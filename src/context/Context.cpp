@@ -32,8 +32,8 @@ auto coContext::internal::Context::run() -> void {
             Coroutine coroutine{std::move(result->second)};
             this->schedulingCoroutines.erase(result);
 
-            coroutine.promise().setResult(completion->res);
-            coroutine.promise().setFlags(completion->flags);
+            coroutine.getPromise().setResult(completion->res);
+            coroutine.getPromise().setFlags(completion->flags);
 
             this->scheduleCoroutine(std::move(coroutine));
         }));
@@ -95,13 +95,13 @@ auto coContext::internal::Context::scheduleCoroutine(Coroutine coroutine) -> voi
     coroutine();
 
     if (!coroutine.done()) {
-        Coroutine childCoroutine{std::move(coroutine.promise().getChildCoroutine())};
+        Coroutine childCoroutine{std::move(coroutine.getPromise().getChildCoroutine())};
 
         const std::uint64_t id{std::hash<Coroutine>{}(coroutine)};
         this->schedulingCoroutines.emplace(id, std::move(coroutine));
 
         if (static_cast<bool>(childCoroutine)) this->scheduleCoroutine(std::move(childCoroutine));
-    } else if (const auto result{this->schedulingCoroutines.find(coroutine.promise().getParentCoroutineId())};
+    } else if (const auto result{this->schedulingCoroutines.find(coroutine.getPromise().getParentCoroutineId())};
                result != std::cend(this->schedulingCoroutines)) {
         Coroutine parentCoroutine{std::move(result->second)};
         this->schedulingCoroutines.erase(result);
