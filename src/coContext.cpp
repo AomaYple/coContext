@@ -24,8 +24,8 @@ namespace coContext::internal {
         return flags;
     }
 
-    [[nodiscard]] constexpr auto rawSleep(const std::chrono::seconds seconds,
-                                          const std::chrono::nanoseconds nanoseconds, const std::uint32_t flags) {
+    [[nodiscard]] constexpr auto sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
+                                       const std::uint32_t flags) {
         const Submission submission{context.getSubmission()};
         AsyncWaiter asyncWaiter{submission};
 
@@ -118,7 +118,7 @@ auto coContext::cancelAny() -> internal::AsyncWaiter {
 
 auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                       const ClockSource clockSource) -> internal::AsyncWaiter {
-    return internal::rawSleep(seconds, nanoseconds, internal::setClockSource(clockSource));
+    return internal::sleep(seconds, nanoseconds, internal::setClockSource(clockSource));
 }
 
 auto coContext::updateSleep(const std::uint64_t taskId, const std::chrono::seconds seconds,
@@ -137,7 +137,7 @@ auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> 
                               const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                               const ClockSource clockSource, internal::Marker marker) -> Task<> {
     internal::AsyncWaiter asyncWaiter{
-        internal::rawSleep(seconds, nanoseconds, internal::setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT) |
+        internal::sleep(seconds, nanoseconds, internal::setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT) |
         std::move(marker)};
 
     do action(co_await asyncWaiter);
