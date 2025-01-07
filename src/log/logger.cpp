@@ -46,9 +46,7 @@ namespace coContext::internal {
 }    // namespace coContext::internal
 
 auto coContext::onLogging() -> void {
-    if (internal::isOn.test(std::memory_order::relaxed)) return;
-
-    internal::isOn.test_and_set(std::memory_order::relaxed);
+    if (internal::isOn.test_and_set(std::memory_order::relaxed)) return;
 
     startLogging();
 }
