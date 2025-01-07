@@ -30,7 +30,7 @@ namespace coContext::internal {
 
         auto addFlags(std::uint32_t flags) noexcept -> void;
 
-        auto setAction(Action action) -> void;
+        auto setAction(Action action) noexcept -> void;
 
         auto executeAction() -> void;
 
@@ -39,7 +39,7 @@ namespace coContext::internal {
         Action action;
     };
 
-    [[nodiscard]] auto operator|(Marker, Marker) -> Marker;
+    [[nodiscard]] auto operator|(Marker, Marker) noexcept -> Marker;
 
     [[nodiscard]] auto operator|(AsyncWaiter, Marker) -> AsyncWaiter;
 }    // namespace coContext::internal

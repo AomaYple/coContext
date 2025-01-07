@@ -16,13 +16,13 @@ auto coContext::internal::Marker::getAction() noexcept -> Action & { return this
 
 auto coContext::internal::Marker::addFlags(const std::uint32_t flags) noexcept -> void { this->flags |= flags; }
 
-auto coContext::internal::Marker::setAction(Action action) -> void { this->action = std::move(action); }
+auto coContext::internal::Marker::setAction(Action action) noexcept -> void { this->action = std::move(action); }
 
 auto coContext::internal::Marker::executeAction() -> void {
     if (static_cast<bool>(this->action)) this->action();
 }
 
-auto coContext::internal::operator|(Marker lhs, Marker rhs) -> Marker {
+auto coContext::internal::operator|(Marker lhs, Marker rhs) noexcept -> Marker {
     lhs.addFlags(rhs.getFlags());
     lhs.setAction(std::move(rhs.getAction()));
 
