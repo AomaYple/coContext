@@ -3,11 +3,11 @@
 #include "coContext/memory/memoryResource.hpp"
 
 auto coContext::internal::BasePromise::operator new(const std::size_t bytes) -> void * {
-    return allocator.allocate_bytes(bytes);
+    return getMemoryResource()->allocate(bytes);
 }
 
 auto coContext::internal::BasePromise::operator delete(void *const pointer, const std::size_t bytes) noexcept -> void {
-    allocator.deallocate_bytes(pointer, bytes);
+    getMemoryResource()->deallocate(pointer, bytes);
 }
 
 auto coContext::internal::BasePromise::swap(BasePromise &other) noexcept -> void {
@@ -44,5 +44,3 @@ auto coContext::internal::BasePromise::initial_suspend() const noexcept -> std::
 auto coContext::internal::BasePromise::final_suspend() const noexcept -> std::suspend_always { return {}; }
 
 auto coContext::internal::BasePromise::unhandled_exception() const -> void { throw; }
-
-thread_local std::pmr::polymorphic_allocator<> coContext::internal::BasePromise::allocator{getMemoryResource()};

@@ -49,8 +49,6 @@ namespace coContext::internal {
         constexpr BasePromise() noexcept = default;
 
     private:
-        static thread_local std::pmr::polymorphic_allocator<> allocator;
-
         std::int32_t result{};
         std::uint32_t flags{};
         std::uint64_t parentCoroutineId{std::hash<Coroutine>{}(Coroutine{nullptr})};
