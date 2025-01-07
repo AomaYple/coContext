@@ -22,12 +22,6 @@ namespace coContext::internal {
     std::atomic_flag isOn, notifyVariable;
     std::atomic<Node *> list;
     std::atomic level{Log::Level::info};
-    std::jthread worker;
-
-    constexpr auto notify() noexcept {
-        notifyVariable.test_and_set(std::memory_order::relaxed);
-        notifyVariable.notify_one();
-    }
 
     constexpr auto output() {
         Node *node{list.exchange(nullptr, std::memory_order::relaxed)};
@@ -43,12 +37,32 @@ namespace coContext::internal {
 
         for (const auto &log : logs | std::views::reverse) std::print("{}"sv, log.toString());
     }
+
+    constexpr auto work(const std::stop_token token) {
+        output();
+
+        while (isOn.test(std::memory_order::relaxed) && !token.stop_requested()) {
+            notifyVariable.wait(false, std::memory_order::relaxed);
+            notifyVariable.clear(std::memory_order::relaxed);
+
+            output();
+        }
+    }
+
+    std::jthread worker{[] {
+        isOn.test_and_set(std::memory_order::relaxed);
+
+        return std::jthread{work};
+    }()};
+
+    constexpr auto notify() noexcept {
+        notifyVariable.test_and_set(std::memory_order::relaxed);
+        notifyVariable.notify_one();
+    }
 }    // namespace coContext::internal
 
 auto coContext::onLogging() -> void {
-    if (internal::isOn.test_and_set(std::memory_order::relaxed)) return;
-
-    startLogging();
+    if (!internal::isOn.test_and_set(std::memory_order::relaxed)) startLogging();
 }
 
 auto coContext::offLogging() noexcept -> void {
@@ -58,18 +72,8 @@ auto coContext::offLogging() noexcept -> void {
 }
 
 auto coContext::startLogging() -> void {
-    if (internal::worker.joinable()) return;
-
-    internal::worker = std::jthread{[](const std::stop_token token) {
-        internal::output();
-
-        while (internal::isOn.test(std::memory_order::relaxed) && !token.stop_requested()) {
-            internal::notifyVariable.wait(false, std::memory_order::relaxed);
-            internal::notifyVariable.clear(std::memory_order::relaxed);
-
-            internal::output();
-        }
-    }};
+    if (internal::isOn.test(std::memory_order::relaxed) && !internal::worker.joinable())
+        internal::worker = std::jthread{internal::work};
 }
 
 auto coContext::stopLogging() noexcept -> void {
@@ -79,7 +83,7 @@ auto coContext::stopLogging() noexcept -> void {
 }
 
 auto coContext::setLevel(const Log::Level level) noexcept -> void {
-    internal::level.store(level, std::memory_order::relaxed);
+    if (internal::isOn.test(std::memory_order::relaxed)) internal::level.store(level, std::memory_order::relaxed);
 }
 
 auto coContext::writeLog(Log log) -> void {
