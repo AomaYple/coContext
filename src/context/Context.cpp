@@ -94,7 +94,7 @@ auto coContext::internal::Context::scheduleUnscheduledCoroutines() -> void {
 auto coContext::internal::Context::scheduleCoroutine(Coroutine coroutine) -> void {
     coroutine();
 
-    if (!coroutine.done()) {
+    if (!coroutine.isDone()) {
         Coroutine childCoroutine{std::move(coroutine.getPromise().getChildCoroutine())};
 
         const std::uint64_t id{std::hash<Coroutine>{}(coroutine)};

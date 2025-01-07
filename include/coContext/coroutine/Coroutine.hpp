@@ -31,7 +31,7 @@ namespace coContext::internal {
 
         auto operator()() const -> void;
 
-        [[nodiscard]] auto done() const noexcept -> bool;
+        [[nodiscard]] auto isDone() const noexcept -> bool;
 
     private:
         Handle handle;

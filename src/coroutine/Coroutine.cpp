@@ -32,4 +32,4 @@ auto coContext::internal::Coroutine::getPromise() const -> BasePromise & { retur
 
 auto coContext::internal::Coroutine::operator()() const -> void { this->handle(); }
 
-auto coContext::internal::Coroutine::done() const noexcept -> bool { return this->handle.done(); }
+auto coContext::internal::Coroutine::isDone() const noexcept -> bool { return this->handle.done(); }
