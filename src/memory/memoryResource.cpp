@@ -20,9 +20,9 @@ auto coContext::internal::getUnSyncMemoryResource() -> std::pmr::memory_resource
 
 auto coContext::internal::getSyncMemoryResource() -> std::pmr::memory_resource * {
 #ifndef NDEBUG
-    thread_local std::pmr::synchronized_pool_resource resource;
+    static std::pmr::synchronized_pool_resource resource;
 #else     // NDEBUG
-    thread_local std::pmr::synchronized_pool_resource resource{std::addressof(miMallocResource)};
+    static std::pmr::synchronized_pool_resource resource{std::addressof(miMallocResource)};
 #endif    // NDEBUG
 
     return std::addressof(resource);
