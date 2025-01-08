@@ -30,3 +30,5 @@ auto coContext::Log::toString() const -> std::pmr::string {
                                         this->sourceLocation.function_name(), this->message),
                             internal::getSyncMemoryResource()};
 }
+
+auto coContext::operator<<(std::ostream &stream, const Log &log) -> std::ostream & { return stream << log.toString(); }
