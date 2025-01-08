@@ -145,7 +145,7 @@ auto main() -> int {
 
 ```c++
 [[nodiscard]] auto func() -> coContext::Task<> {
-    std::println("{}"sv, co_await coContext::sleep(1s));
+    std::println("{}", co_await coContext::sleep(1s));
 }    // 打印1秒定时的结果
 ```
 
