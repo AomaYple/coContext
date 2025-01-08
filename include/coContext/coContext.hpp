@@ -32,7 +32,7 @@ namespace coContext {
 
     auto run() -> void;
 
-    auto stop() noexcept -> void;
+    auto stop() -> void;
 
     template<std::movable T, typename F, typename... Args>
         requires std::is_invocable_r_v<Task<T>, F, Args...>

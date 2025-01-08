@@ -40,7 +40,7 @@ auto coContext::internal::spawn(Coroutine coroutine) -> void { context.spawn(std
 
 auto coContext::run() -> void { context.run(); }
 
-auto coContext::stop() noexcept -> void { context.stop(); }
+auto coContext::stop() -> void { context.stop(); }
 
 auto coContext::syncCancel(const std::uint64_t taskId, const std::chrono::seconds seconds,
                            const std::chrono::nanoseconds nanoseconds) -> std::int32_t {
