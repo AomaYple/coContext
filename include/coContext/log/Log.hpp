@@ -30,7 +30,7 @@ namespace coContext {
         std::thread::id threadId;
     };
 
-    [[nodiscard]] auto operator<<(std::ostream &stream, const Log &log) -> std::ostream &;
+    auto operator<<(std::ostream &stream, const Log &log) -> std::ostream &;
 }    // namespace coContext
 
 template<>
