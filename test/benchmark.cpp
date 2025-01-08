@@ -62,8 +62,11 @@ constexpr auto execute() {
 }
 
 auto main() -> int {
-    std::array<std::jthread, 15> workers;
-    for (auto &worker : workers) worker = std::jthread{execute};
+    coContext::logger::stop();
+    coContext::logger::disableWrite();
+
+    std::pmr::vector<std::jthread> workers;
+    for (std::uint8_t i{}; i != std::thread::hardware_concurrency() - 1; ++i) workers.emplace_back(execute);
 
     execute();
 }
