@@ -70,3 +70,5 @@ install(EXPORT ${installTargets}
 install(DIRECTORY include/
         DESTINATION include
 )
+
+add_subdirectory(test)
