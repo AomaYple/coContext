@@ -363,7 +363,7 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
                 isRestart = true;
 
                 logger::write(Log{
-                    Log::Level::debug,
+                    Log::Level::warn,
                     std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                      internal::getSyncMemoryResource()}
                 });
@@ -561,7 +561,7 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
                 isRestart = true;
 
                 logger::write(Log{
-                    Log::Level::debug,
+                    Log::Level::warn,
                     std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                      internal::getSyncMemoryResource()}
                 });
