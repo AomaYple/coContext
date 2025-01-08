@@ -281,7 +281,7 @@ constexpr auto writeLog(const std::source_location sourceLocation = std::source_
         co_await coContext::openDirect("file"sv, O_RDONLY)};    // 以只读方式打开"file"文件, 并返回直接文件描述符
     std::println("open direct result: {}"sv, directFileDescriptor);    // 输出打开文件结果
 
-    std::vector<std::byte> buffer{1024};
+    std::pmr::vector<std::byte> buffer{1024};
     const std::int32_t result{
         co_await (coContext::read(directFileDescriptor, buffer) |
                   coContext::direct())};    // 使用"coContext::direct()"标记以直接文件描述符方式读取文件
