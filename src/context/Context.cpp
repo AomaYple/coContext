@@ -65,6 +65,11 @@ auto coContext::internal::Context::run(const std::source_location sourceLocation
 
         this->scheduleUnscheduledCoroutines();
     }
+
+    logger::write(Log{
+        Log::Level::info, std::pmr::string{"context stopped"sv, getSyncMemoryResource()},
+         sourceLocation
+    });
 }
 
 auto coContext::internal::Context::stop(const std::source_location sourceLocation) -> void {
