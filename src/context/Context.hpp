@@ -29,7 +29,7 @@ namespace coContext::internal {
 
         auto run() -> void;
 
-        auto stop() noexcept -> void;
+        auto stop(std::source_location sourceLocation = std::source_location::current()) -> void;
 
         auto spawn(Coroutine coroutine) -> void;
 

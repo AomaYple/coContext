@@ -7,6 +7,8 @@
 
 #include <sys/resource.h>
 
+using namespace std::string_view_literals;
+
 coContext::internal::Context::Context() {
     try {
         this->ring->registerSelfFileDescriptor();
@@ -60,7 +62,14 @@ auto coContext::internal::Context::run() -> void {
     }
 }
 
-auto coContext::internal::Context::stop() noexcept -> void { this->isRunning = false; }
+auto coContext::internal::Context::stop(const std::source_location sourceLocation) -> void {
+    this->isRunning = false;
+
+    logger::write(Log{
+        Log::Level::info, std::pmr::string{"context stopping"sv, getSyncMemoryResource()},
+         sourceLocation
+    });
+}
 
 auto coContext::internal::Context::spawn(Coroutine coroutine) -> void {
     this->unscheduledCoroutines.emplace(std::move(coroutine));
