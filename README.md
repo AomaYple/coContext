@@ -114,6 +114,7 @@ auto main() -> int {
 ```
 
 <details>
+
 <summary>定时器</summary>
 
 ```c++
@@ -123,7 +124,9 @@ auto main() -> int {
 ```
 
 </details>
+
 <details>
+
 <summary>IO超时控制</summary>
 
 ```c++
@@ -137,7 +140,9 @@ auto main() -> int {
 ```
 
 </details>
+
 <details>
+
 <summary>取消IO</summary>
 
 - 基于`taskId`取消任务中正在运行的io
@@ -168,7 +173,9 @@ auto main() -> int {
 
 并且，支持同步取消版本`syncCancel`，用法与`cancel`相同
 </details>
+
 <details>
+
 <summary>任意嵌套任意返回值的协程</summary>
 
 ```c++
@@ -187,7 +194,9 @@ auto main() -> int {
 ```
 
 </details>
+
 <details>
+
 <summary>多线程</summary>
 
 ```c++
@@ -210,6 +219,8 @@ auto main() -> int {
 }
 ```
 
+</details> 
+
 <details>
 
 <summary>日志系统</summary>
@@ -230,9 +241,8 @@ constexpr auto writeLog(const std::source_location sourceLocation = std::source_
 
 </details>
 
-</details>
-
 <details>
+
 <summary>直接文件描述符</summary>
 
 - 优点
