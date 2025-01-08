@@ -2,6 +2,7 @@
 
 #include "../memory/memoryResource.hpp"
 
+#include <chrono>
 #include <source_location>
 #include <thread>
 
@@ -14,7 +15,7 @@ namespace coContext {
                      std::pmr::string message = std::pmr::string{internal::getSyncMemoryResource()},
                      std::source_location sourceLocation = std::source_location::current(),
                      std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now(),
-                     std::thread::id threadId = std::this_thread::get_id()) noexcept;
+                     std::thread::id threadId = std::this_thread::get_id());
 
         auto swap(Log &other) noexcept -> void;
 
@@ -30,8 +31,6 @@ namespace coContext {
 
         [[nodiscard]] auto getMessage() const noexcept -> std::string_view;
 
-        [[nodiscard]] auto toString() const -> std::pmr::string;
-
     private:
         Level level;
         std::chrono::system_clock::time_point timestamp;
@@ -45,3 +44,18 @@ template<>
 constexpr auto std::swap(coContext::Log &lhs, coContext::Log &rhs) noexcept -> void {
     lhs.swap(rhs);
 }
+
+template<>
+struct std::formatter<coContext::Log> {
+    [[nodiscard]] constexpr auto parse(const std::format_parse_context &context) const noexcept {
+        return std::begin(context);
+    }
+
+    [[nodiscard]] constexpr auto format(const coContext::Log &log, std::format_context &context) const {
+        const std::source_location sourceLocation{log.getSourceLocation()};
+
+        return std::format_to(context.out(), "{} {} {} {}:{}:{}:{} {}"sv, log.getFormattedLevel(), log.getTimeStamp(),
+                              log.getThreadId(), sourceLocation.file_name(), sourceLocation.line(),
+                              sourceLocation.column(), sourceLocation.function_name(), log.getMessage());
+    }
+};

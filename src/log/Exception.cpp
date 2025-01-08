@@ -1,6 +1,8 @@
 #include "Exception.hpp"
 
-coContext::internal::Exception::Exception(Log log) : message{log.toString()}, log{std::move(log)} {}
+using namespace std::string_view_literals;
+
+coContext::internal::Exception::Exception(Log log) : message{std::format("{}"sv, log)}, log{std::move(log)} {}
 
 auto coContext::internal::Exception::swap(Exception &other) noexcept -> void {
     std::swap(this->message, other.message);

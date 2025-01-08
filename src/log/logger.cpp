@@ -36,7 +36,7 @@ namespace {
             node = next;
         }
 
-        for (const auto &log : logs | std::views::reverse) std::print(*outputStream, "{}"sv, log.toString());
+        for (const auto &log : logs | std::views::reverse) std::print(*outputStream, "{}\n"sv, log);
     }
 
     constexpr auto work(const std::stop_token token) {

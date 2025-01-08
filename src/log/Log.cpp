@@ -1,12 +1,11 @@
 #include "coContext/log/Log.hpp"
 
-#include <chrono>
 #include <utility>
 
 using namespace std::string_view_literals;
 
 coContext::Log::Log(const Level level, std::pmr::string message, const std::source_location sourceLocation,
-                    const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) noexcept :
+                    const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) :
     level{level}, timestamp{timestamp}, threadId{threadId}, sourceLocation{sourceLocation},
     message{std::move(message), internal::getSyncMemoryResource()} {}
 
@@ -34,14 +33,3 @@ auto coContext::Log::getThreadId() const noexcept -> std::thread::id { return th
 auto coContext::Log::getSourceLocation() const noexcept -> std::source_location { return this->sourceLocation; }
 
 auto coContext::Log::getMessage() const noexcept -> std::string_view { return this->message; }
-
-auto coContext::Log::toString() const -> std::pmr::string {
-    static constexpr std::array<const std::string_view, 6> levels{"trace"sv, "debug"sv, "info"sv,
-                                                                  "warn"sv,  "error"sv, "fatal"sv};
-
-    return std::pmr::string{std::format("{} {} {} {}:{}:{}:{} {}\n"sv, levels[std::to_underlying(this->level)],
-                                        this->timestamp, this->threadId, this->sourceLocation.file_name(),
-                                        this->sourceLocation.line(), this->sourceLocation.column(),
-                                        this->sourceLocation.function_name(), this->message),
-                            internal::getSyncMemoryResource()};
-}
