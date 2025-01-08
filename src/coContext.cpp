@@ -429,6 +429,11 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
 
     const std::int32_t result{co_await asyncWaiter};
     if ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
+    else {
+        logger::write(Log{
+            Log::Level::warn, std::pmr::string{"no notification", internal::getSyncMemoryResource()}
+        });
+    }
 
     action(result);
 }
@@ -447,6 +452,11 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
 
     const std::int32_t result{co_await asyncWaiter};
     if ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
+    else {
+        logger::write(Log{
+            Log::Level::warn, std::pmr::string{"no notification", internal::getSyncMemoryResource()}
+        });
+    }
 
     action(result);
 }
