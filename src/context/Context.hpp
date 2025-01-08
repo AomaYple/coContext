@@ -27,7 +27,7 @@ namespace coContext::internal {
 
         [[nodiscard]] auto getRingBuffer() noexcept -> RingBuffer &;
 
-        auto run() -> void;
+        auto run(std::source_location sourceLocation = std::source_location::current()) -> void;
 
         auto stop(std::source_location sourceLocation = std::source_location::current()) -> void;
 

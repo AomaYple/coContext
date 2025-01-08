@@ -40,7 +40,12 @@ auto coContext::internal::Context::swap(Context &other) noexcept -> void {
 
 auto coContext::internal::Context::getRingBuffer() noexcept -> RingBuffer & { return this->ringBuffer; }
 
-auto coContext::internal::Context::run() -> void {
+auto coContext::internal::Context::run(const std::source_location sourceLocation) -> void {
+    logger::write(Log{
+        Log::Level::info, std::pmr::string{"context running"sv, getSyncMemoryResource()},
+         sourceLocation
+    });
+
     this->isRunning = true;
 
     this->scheduleUnscheduledCoroutines();
