@@ -362,7 +362,7 @@ constexpr auto acceptAction(const std::int32_t socket, const std::int32_t result
 
 ```c++
 constexpr auto zeroCopySendAction(const std::int32_t result) {
-    std::println("zero copy send result: {}", result);    // 打印零拷贝发送结果
+    std::println("zero copy send result: {}"sv, result);    // 打印零拷贝发送结果
 }
 
 [[nodiscard]] auto zeroCopySend(const std::int32_t socket, const std::span<const std::byte> data) -> coContext::Task<> {
