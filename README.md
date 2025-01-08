@@ -157,7 +157,7 @@ auto main() -> int {
 
 ```c++
 [[nodiscard]] auto func(const std::int32_t socketFileDescriptor) -> coContext::Task<> {
-    std::vector<std::byte> buffer{1024};
+    std::pmr::vector<std::byte> buffer{1024};
     const std::int32_t result{
         co_await (coContext::receive(socketFileDescriptor, buffer, 0) | coContext::timeout(3s))};    // 限时3秒
 
