@@ -107,6 +107,17 @@ auto coContext::internal::Ring::getSubmission(const std::source_location sourceL
     return submission;
 }
 
+auto coContext::internal::Ring::submit(const std::source_location sourceLocation) -> void {
+    if (const std::int32_t result{io_uring_submit(std::addressof(this->handle))}; result < 0) {
+        throw Exception{
+            Log{Log::Level::error,
+                std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                 getSyncMemoryResource()},
+                sourceLocation}
+        };
+    }
+}
+
 auto coContext::internal::Ring::submitAndWait(const std::uint32_t count, const std::source_location sourceLocation)
     -> void {
     if (const std::int32_t result{io_uring_submit_and_wait(std::addressof(this->handle), count)}; result < 0) {

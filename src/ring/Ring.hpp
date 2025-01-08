@@ -37,6 +37,8 @@ namespace coContext::internal {
         [[nodiscard]] auto getSubmission(std::source_location sourceLocation = std::source_location::current())
             -> io_uring_sqe *;
 
+        auto submit(std::source_location sourceLocation = std::source_location::current()) -> void;
+
         auto submitAndWait(std::uint32_t count, std::source_location sourceLocation = std::source_location::current())
             -> void;
 
