@@ -30,10 +30,3 @@ auto coContext::Log::toString() const -> std::pmr::string {
                                         this->sourceLocation.function_name(), this->message),
                             internal::getSyncMemoryResource()};
 }
-
-auto coContext::Log::toBytes() const -> std::pmr::vector<std::byte> {
-    const auto log{this->toString()};
-    const auto bytes{std::as_bytes(std::span{log})};
-
-    return {std::cbegin(bytes), std::cend(bytes), internal::getSyncMemoryResource()};
-}
