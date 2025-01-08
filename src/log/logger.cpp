@@ -1,6 +1,6 @@
 #include "coContext/log/logger.hpp"
 
-#include <print>
+#include <iostream>
 #include <ranges>
 
 using namespace std::string_view_literals;
@@ -22,6 +22,7 @@ namespace coContext::internal {
     std::atomic<Node *> list;
     std::atomic level{Log::Level::info};
     std::atomic_flag notifyVariable, isDisable;
+    std::ostream *outStream{std::addressof(std::cout)};
 
     constexpr auto output() {
         Node *node{list.exchange(nullptr, std::memory_order::relaxed)};
@@ -35,7 +36,7 @@ namespace coContext::internal {
             node = next;
         }
 
-        for (const auto &log : logs | std::views::reverse) std::print("{}"sv, log.toString());
+        for (const auto &log : logs | std::views::reverse) std::print(*outStream, "{}"sv, log.toString());
     }
 
     constexpr auto work(const std::stop_token token) {
@@ -87,4 +88,8 @@ auto coContext::writeLog(Log log) -> void {
                                                  std::memory_order::relaxed));
 
     internal::notify();
+}
+
+auto coContext::setOutputStream(std::ostream &outStream) noexcept -> void {
+    internal::outStream = std::addressof(outStream);
 }

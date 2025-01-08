@@ -14,4 +14,6 @@ namespace coContext {
     auto disableWriteLog() noexcept -> void;
 
     auto writeLog(Log log) -> void;
+
+    auto setOutputStream(std::ostream &outStream) noexcept -> void;
 }    // namespace coContext
