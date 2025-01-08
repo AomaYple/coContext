@@ -81,7 +81,7 @@ target_link_libraries(your_target
 
 ## 更多示例
 
-### 请注意！！！用户只能使用coContext命名空间下的函数和类，coContext::internal命名空间下的函数和类是内部使用的
+### 请注意！！！用户只能使用coContext和coContext::logger命名空间下的函数和类，coContext::internal命名空间下的函数和类是内部使用的
 
 ### 启动和停止
 
