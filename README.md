@@ -79,6 +79,33 @@ target_link_libraries(your_target
 )
 ```
 
+## 性能
+
+环境：
+
+- `11th Gen Intel(R) Core(TM) i7-11800H (16) @ 2.30 GHz`
+- `8GB x 2 （DDR4 3200MHz）`
+- `Arch WSL` `6.12.8`
+- `gcc (GCC) 14.2.1 20240910`
+
+测试：
+
+使用[wrk](https://github.com/wg/wrk)
+进行压力测试[test/benchmark.cpp](https://github.com/AomaYple/coContext/blob/main/test/benchmark.cpp)
+
+```
+❯ wrk -t 16 -c 1024 http://localhost:8080
+Running 10s test @ http://localhost:8080
+  16 threads and 1024 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.04ms    1.50ms  22.28ms   84.55%
+    Req/Sec    80.99k    10.64k  147.06k    87.76%
+  12920020 requests in 10.07s, 468.22MB read
+  Socket errors: connect 21, read 0, write 0, timeout 0
+Requests/sec: 1282388.57
+Transfer/sec:     46.47MB
+```
+
 ## 更多示例
 
 ### 请注意！！！用户只能使用coContext和coContext::logger命名空间下的函数和类，coContext::internal命名空间下的函数和类是内部使用的
