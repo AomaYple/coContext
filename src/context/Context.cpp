@@ -51,14 +51,7 @@ auto coContext::internal::Context::run(const std::source_location sourceLocation
     this->scheduleUnscheduledCoroutines();
 
     while (this->isRunning) {
-        try {
-            this->ring->submitAndWait(1);
-        } catch (Exception &exception) {
-            logger::write(Log{std::move(exception.getLog())});
-
-            this->ring->submitAndWait(1);
-        }
-
+        this->ring->submitAndWait(1);
         this->ringBuffer.advance(this->ring->poll([this](const io_uring_cqe *const completion) {
             const auto result{this->schedulingCoroutines.find(completion->user_data)};
             Coroutine coroutine{std::move(result->second)};
