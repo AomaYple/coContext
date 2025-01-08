@@ -119,7 +119,6 @@ Transfer/sec:     46.47MB
 ```c++
 #include <coContext/coContext.hpp>
 #include <print>
-#include <thread>
 
 using namespace std::string_view_literals;
 
