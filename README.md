@@ -10,6 +10,7 @@
 - IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
 - 嵌套**任意数量**的**任意返回值**的协程
 - 多线程
+- **异步高性能**且**多级别**的日志系统
 - 直接文件描述符，可以与普通文件描述符**相互转换**
 - 多发射IO
 - 零拷贝发送
@@ -208,6 +209,26 @@ auto main() -> int {
     coContext::run();
 }
 ```
+
+<details>
+
+<summary>日志系统</summary>
+
+- `Log`类为核心，支持流式运算符`<<`，支持`std::format`
+- 多级别日志，`trace` `debug` `info` `warn` `error` `fatal`，默认为`info`
+- `logger::write`写入日志，`enableWrite`开启写入，`disableWrite`关闭写入
+- `logger::setLevel`设置日志级别，小于该级别的日志将不会被写入
+- `logger::setOutputStream`设置输出流，可以是`std::cout` `std::cerr` `std::clog` `std::ofstream`等
+- `logger::run`启动日志系统，`logger::stop`停止日志系统
+
+```c++
+constexpr auto writeLog(const std::source_location sourceLocation = std::source_location::current()) {
+    coContext::logger::write(
+        coContext::Log{coContext::Log::Level::info, std::pmr::string{"Hello, coContext!"sv}, sourceLocation});
+}
+```
+
+</details>
 
 </details>
 
