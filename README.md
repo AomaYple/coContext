@@ -23,7 +23,7 @@
 #include <coContext/coContext.hpp> 
 ```
 
-简单示例，同步地执行异步的close系统调用
+简单示例，向调度器添加`func`协程，启动调度器；`func`协程发起`close`操作
 
 ```c++
 #include <coContext/coContext.hpp>
