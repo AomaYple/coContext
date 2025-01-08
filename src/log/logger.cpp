@@ -71,6 +71,10 @@ auto coContext::setLevel(const Log::Level level) noexcept -> void {
     internal::level.store(level, std::memory_order::relaxed);
 }
 
+auto coContext::enableWriteLog() noexcept -> void { internal::isDisable.clear(std::memory_order::relaxed); }
+
+auto coContext::disableWriteLog() noexcept -> void { internal::isDisable.test_and_set(std::memory_order::relaxed); }
+
 auto coContext::writeLog(Log log) -> void {
     if (internal::isDisable.test(std::memory_order::relaxed) ||
         log.getLevel() < internal::level.load(std::memory_order::relaxed))
@@ -84,7 +88,3 @@ auto coContext::writeLog(Log log) -> void {
 
     internal::notify();
 }
-
-auto coContext::enableWriteLog() noexcept -> void { internal::isDisable.clear(std::memory_order::relaxed); }
-
-auto coContext::disableWriteLog() noexcept -> void { internal::isDisable.test_and_set(std::memory_order::relaxed); }

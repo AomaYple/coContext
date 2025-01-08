@@ -9,9 +9,9 @@ namespace coContext {
 
     auto setLevel(Log::Level level) noexcept -> void;
 
-    auto writeLog(Log log) -> void;
-
     auto enableWriteLog() noexcept -> void;
 
     auto disableWriteLog() noexcept -> void;
+
+    auto writeLog(Log log) -> void;
 }    // namespace coContext
