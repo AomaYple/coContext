@@ -76,6 +76,8 @@ auto coContext::logger::enableWrite() noexcept -> void { isDisableWrite.clear(st
 
 auto coContext::logger::disableWrite() noexcept -> void { isDisableWrite.test_and_set(std::memory_order::relaxed); }
 
+auto coContext::logger::getLevel() noexcept -> Log::Level { return level.load(std::memory_order::relaxed); }
+
 auto coContext::logger::setLevel(const Log::Level newLevel) noexcept -> void {
     level.store(newLevel, std::memory_order::relaxed);
 }
