@@ -2,12 +2,15 @@
 
 #include "../log/Exception.hpp"
 #include "coContext/coroutine/BasePromise.hpp"
+#include "coContext/log/logger.hpp"
 #include "coContext/ring/Submission.hpp"
 
 #include <sys/resource.h>
 
 coContext::internal::Context::Context() {
-    this->ring->registerSelfFileDescriptor();
+    try {
+        this->ring->registerSelfFileDescriptor();
+    } catch (Exception &exception) { logger::write(Log{std::move(exception.getLog())}); }
 
     this->ring->registerSparseFileDescriptor(
         [](const std::source_location sourceLocation = std::source_location::current()) {
