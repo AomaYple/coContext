@@ -362,6 +362,12 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
                 context.getRingBuffer().expandBuffer();
                 isRestart = true;
 
+                logger::write(Log{
+                    Log::Level::debug,
+                    std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                     internal::getSyncMemoryResource()}
+                });
+
                 break;
             }
 
@@ -553,6 +559,12 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
             if (result == -ENOBUFS) {
                 context.getRingBuffer().expandBuffer();
                 isRestart = true;
+
+                logger::write(Log{
+                    Log::Level::debug,
+                    std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                     internal::getSyncMemoryResource()}
+                });
 
                 break;
             }
