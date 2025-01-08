@@ -19,9 +19,9 @@ namespace coContext::internal {
         Node *next;
     };
 
-    std::atomic_flag isOn, notifyVariable;
     std::atomic<Node *> list;
     std::atomic level{Log::Level::info};
+    std::atomic_flag notifyVariable, isDisable;
 
     constexpr auto output() {
         Node *node{list.exchange(nullptr, std::memory_order::relaxed)};
@@ -41,7 +41,7 @@ namespace coContext::internal {
     constexpr auto work(const std::stop_token token) {
         output();
 
-        while (isOn.test(std::memory_order::relaxed) && !token.stop_requested()) {
+        while (!token.stop_requested()) {
             notifyVariable.wait(false, std::memory_order::relaxed);
             notifyVariable.clear(std::memory_order::relaxed);
 
@@ -49,11 +49,7 @@ namespace coContext::internal {
         }
     }
 
-    std::jthread worker{[] {
-        isOn.test_and_set(std::memory_order::relaxed);
-
-        return std::jthread{work};
-    }()};
+    std::jthread worker{work};
 
     constexpr auto notify() noexcept {
         notifyVariable.test_and_set(std::memory_order::relaxed);
@@ -61,19 +57,8 @@ namespace coContext::internal {
     }
 }    // namespace coContext::internal
 
-auto coContext::onLogging() -> void {
-    if (!internal::isOn.test_and_set(std::memory_order::relaxed)) startLogging();
-}
-
-auto coContext::offLogging() noexcept -> void {
-    internal::isOn.clear(std::memory_order::relaxed);
-
-    stopLogging();
-}
-
 auto coContext::startLogging() -> void {
-    if (internal::isOn.test(std::memory_order::relaxed) && !internal::worker.joinable())
-        internal::worker = std::jthread{internal::work};
+    if (!internal::worker.joinable()) internal::worker = std::jthread{internal::work};
 }
 
 auto coContext::stopLogging() noexcept -> void {
@@ -83,11 +68,11 @@ auto coContext::stopLogging() noexcept -> void {
 }
 
 auto coContext::setLevel(const Log::Level level) noexcept -> void {
-    if (internal::isOn.test(std::memory_order::relaxed)) internal::level.store(level, std::memory_order::relaxed);
+    internal::level.store(level, std::memory_order::relaxed);
 }
 
 auto coContext::writeLog(Log log) -> void {
-    if (!internal::isOn.test(std::memory_order::relaxed) ||
+    if (internal::isDisable.test(std::memory_order::relaxed) ||
         log.getLevel() < internal::level.load(std::memory_order::relaxed))
         return;
 
@@ -100,3 +85,6 @@ auto coContext::writeLog(Log log) -> void {
     internal::notify();
 }
 
+auto coContext::enableWriteLog() noexcept -> void { internal::isDisable.clear(std::memory_order::relaxed); }
+
+auto coContext::disableWriteLog() noexcept -> void { internal::isDisable.test_and_set(std::memory_order::relaxed); }

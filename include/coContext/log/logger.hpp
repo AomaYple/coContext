@@ -3,10 +3,6 @@
 #include "Log.hpp"
 
 namespace coContext {
-    auto onLogging() -> void;
-
-    auto offLogging() noexcept -> void;
-
     auto startLogging() -> void;
 
     auto stopLogging() noexcept -> void;
@@ -14,4 +10,8 @@ namespace coContext {
     auto setLevel(Log::Level level) noexcept -> void;
 
     auto writeLog(Log log) -> void;
+
+    auto enableWriteLog() noexcept -> void;
+
+    auto disableWriteLog() noexcept -> void;
 }    // namespace coContext
