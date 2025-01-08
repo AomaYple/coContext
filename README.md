@@ -229,7 +229,7 @@ auto main() -> int {
 - 多级别日志，`trace` `debug` `info` `warn` `error` `fatal`，默认为`info`
 - `logger::write`写入日志，`enableWrite`开启写入，`disableWrite`关闭写入
 - `logger::setLevel`设置日志级别，小于该级别的日志将不会被写入
-- `logger::setOutputStream`设置输出流，可以是`std::cout` `std::cerr` `std::clog` `std::ofstream`等
+- `logger::setOutputStream`设置输出流，类型为`std::ostream`, 默认为`std::clog`
 - `logger::run`启动日志系统，`logger::stop`停止日志系统
 
 ```c++
