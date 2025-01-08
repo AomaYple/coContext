@@ -319,9 +319,10 @@ constexpr auto writeLog(const std::source_location sourceLocation = std::source_
 }
 
 [[nodiscard]] constexpr auto receiveAction(const std::int32_t socket, const std::int32_t result,
-                                           const std::span<const std::byte> data) {
-    if (result > 0) spawn(normalSend, socket, data);    // 如果result大于0，就调用normalSend协程，将data作为参数传入
-    else spawn(normalClose, socket);    // 否则调用normalClose协程，将socket作为参数传入
+                                           const std::span<const std::byte> receivedData) {
+    if (result > 0)
+        spawn(normalSend, socket, receivedData);    // 如果result大于0，就调用normalSend协程，将data作为参数传入
+    else spawn(normalClose, socket);                // 否则调用normalClose协程，将socket作为参数传入
 }
 
 constexpr auto acceptAction(const std::int32_t socket, const std::int32_t result) {
