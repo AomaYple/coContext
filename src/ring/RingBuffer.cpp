@@ -1,8 +1,11 @@
 #include "RingBuffer.hpp"
 
 #include "Ring.hpp"
+#include "coContext/log/logger.hpp"
 
 #include <utility>
+
+using namespace std::string_view_literals;
 
 coContext::internal::RingBuffer::RingBuffer(std::shared_ptr<Ring> ring, const std::uint32_t entries,
                                             const std::int32_t id, const std::uint32_t flags) :
@@ -61,8 +64,15 @@ auto coContext::internal::RingBuffer::markBufferUsed(const std::uint16_t bufferI
     this->buffers[bufferId].offset = 0;
 }
 
-auto coContext::internal::RingBuffer::expandBuffer() -> void {
-    if (std::size(this->buffers) == this->entries) return;
+auto coContext::internal::RingBuffer::expandBuffer(const std::source_location sourceLocation) -> void {
+    if (std::size(this->buffers) == this->entries) {
+        logger::write(Log{
+            Log::Level::warn, std::pmr::string{"number of buffer has reached the limit"sv, getSyncMemoryResource()},
+            sourceLocation
+        });
+
+        return;
+    }
 
     this->buffers.emplace_back();
     this->addBuffer(std::size(this->buffers) - 1);

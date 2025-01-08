@@ -4,6 +4,7 @@
 
 #include <liburing/io_uring.h>
 #include <memory>
+#include <source_location>
 
 namespace coContext::internal {
     class Ring;
@@ -38,7 +39,7 @@ namespace coContext::internal {
 
         auto markBufferUsed(std::uint16_t bufferId) noexcept -> void;
 
-        auto expandBuffer() -> void;
+        auto expandBuffer(std::source_location sourceLocation = std::source_location::current()) -> void;
 
     private:
         auto addBuffer(std::uint16_t bufferId) noexcept -> void;
