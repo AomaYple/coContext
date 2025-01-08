@@ -5,29 +5,29 @@
 
 using namespace std::string_view_literals;
 
-namespace coContext::internal {
+namespace {
     struct Node {
         [[nodiscard]] auto operator new(const std::size_t bytes) -> void * {
-            return getSyncMemoryResource()->allocate(bytes);
+            return coContext::internal::getSyncMemoryResource()->allocate(bytes);
         }
 
         auto operator delete(void *const pointer, const std::size_t bytes) noexcept -> void {
-            getSyncMemoryResource()->deallocate(pointer, bytes);
+            coContext::internal::getSyncMemoryResource()->deallocate(pointer, bytes);
         }
 
-        Log log;
+        coContext::Log log;
         Node *next;
     };
 
     std::atomic<Node *> list;
-    std::atomic level{Log::Level::info};
-    std::atomic_flag notifyVariable, isDisable;
-    std::ostream *outStream{std::addressof(std::cout)};
+    std::ostream *outputStream{std::addressof(std::cout)};
+    std::atomic_flag notifyVariable, isDisableWrite;
+    std::atomic level{coContext::Log::Level::info};
 
     constexpr auto output() {
         Node *node{list.exchange(nullptr, std::memory_order::relaxed)};
 
-        std::pmr::vector<Log> logs{getUnSyncMemoryResource()};
+        std::pmr::vector<coContext::Log> logs{coContext::internal::getUnSyncMemoryResource()};
         while (node != nullptr) {
             logs.emplace_back(std::move(node->log));
 
@@ -36,7 +36,7 @@ namespace coContext::internal {
             node = next;
         }
 
-        for (const auto &log : logs | std::views::reverse) std::print(*outStream, "{}"sv, log.toString());
+        for (const auto &log : logs | std::views::reverse) std::print(*outputStream, "{}"sv, log.toString());
     }
 
     constexpr auto work(const std::stop_token token) {
@@ -56,40 +56,38 @@ namespace coContext::internal {
         notifyVariable.test_and_set(std::memory_order::relaxed);
         notifyVariable.notify_one();
     }
-}    // namespace coContext::internal
+}    // namespace
 
-auto coContext::startLogging() -> void {
-    if (!internal::worker.joinable()) internal::worker = std::jthread{internal::work};
+auto coContext::logger::run() -> void {
+    if (!worker.joinable()) worker = std::jthread{work};
 }
 
-auto coContext::stopLogging() noexcept -> void {
-    internal::worker.request_stop();
+auto coContext::logger::stop() noexcept -> void {
+    worker.request_stop();
 
-    internal::notify();
+    notify();
 }
 
-auto coContext::setLevel(const Log::Level level) noexcept -> void {
-    internal::level.store(level, std::memory_order::relaxed);
+auto coContext::logger::setOutputStream(std::ostream &newOutputStream) noexcept -> void {
+    outputStream = std::addressof(newOutputStream);
 }
 
-auto coContext::enableWriteLog() noexcept -> void { internal::isDisable.clear(std::memory_order::relaxed); }
+auto coContext::logger::enableWrite() noexcept -> void { isDisableWrite.clear(std::memory_order::relaxed); }
 
-auto coContext::disableWriteLog() noexcept -> void { internal::isDisable.test_and_set(std::memory_order::relaxed); }
+auto coContext::logger::disableWrite() noexcept -> void { isDisableWrite.test_and_set(std::memory_order::relaxed); }
 
-auto coContext::writeLog(Log log) -> void {
-    if (internal::isDisable.test(std::memory_order::relaxed) ||
-        log.getLevel() < internal::level.load(std::memory_order::relaxed))
+auto coContext::logger::setLevel(const Log::Level newLevel) noexcept -> void {
+    level.store(newLevel, std::memory_order::relaxed);
+}
+
+auto coContext::logger::write(Log log) -> void {
+    if (isDisableWrite.test(std::memory_order::relaxed) || log.getLevel() < level.load(std::memory_order::relaxed))
         return;
 
     auto *const node{
-        new internal::Node{std::move(log), internal::list.load(std::memory_order::relaxed)}
+        new Node{std::move(log), list.load(std::memory_order::relaxed)}
     };
-    while (!internal::list.compare_exchange_weak(node->next, node, std::memory_order::release,
-                                                 std::memory_order::relaxed));
+    while (!list.compare_exchange_weak(node->next, node, std::memory_order::release, std::memory_order::relaxed));
 
-    internal::notify();
-}
-
-auto coContext::setOutputStream(std::ostream &outStream) noexcept -> void {
-    internal::outStream = std::addressof(outStream);
+    notify();
 }

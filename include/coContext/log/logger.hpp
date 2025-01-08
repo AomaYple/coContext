@@ -2,18 +2,19 @@
 
 #include "Log.hpp"
 
-namespace coContext {
-    auto startLogging() -> void;
+namespace coContext::logger {
+    auto run() -> void;
 
-    auto stopLogging() noexcept -> void;
+    auto stop() noexcept -> void;
 
-    auto setLevel(Log::Level level) noexcept -> void;
+    auto setOutputStream(std::ostream &newOutputStream) noexcept -> void;
 
-    auto enableWriteLog() noexcept -> void;
+    auto enableWrite() noexcept -> void;
 
-    auto disableWriteLog() noexcept -> void;
+    auto disableWrite() noexcept -> void;
 
-    auto writeLog(Log log) -> void;
+    auto setLevel(Log::Level newLevel) noexcept -> void;
 
-    auto setOutputStream(std::ostream &outStream) noexcept -> void;
-}    // namespace coContext
+    auto write(Log log) -> void;
+
+}    // namespace coContext::logger
