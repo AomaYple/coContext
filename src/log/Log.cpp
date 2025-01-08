@@ -7,18 +7,33 @@ using namespace std::string_view_literals;
 
 coContext::Log::Log(const Level level, std::pmr::string message, const std::source_location sourceLocation,
                     const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) noexcept :
-    level{level}, message{std::move(message), internal::getSyncMemoryResource()}, sourceLocation{sourceLocation},
-    timestamp{timestamp}, threadId{threadId} {}
+    level{level}, timestamp{timestamp}, threadId{threadId}, sourceLocation{sourceLocation},
+    message{std::move(message), internal::getSyncMemoryResource()} {}
 
 auto coContext::Log::swap(Log &other) noexcept -> void {
     std::swap(this->level, other.level);
-    std::swap(this->message, other.message);
-    std::swap(this->sourceLocation, other.sourceLocation);
     std::swap(this->timestamp, other.timestamp);
     std::swap(this->threadId, other.threadId);
+    std::swap(this->sourceLocation, other.sourceLocation);
+    std::swap(this->message, other.message);
 }
 
 auto coContext::Log::getLevel() const noexcept -> Level { return this->level; }
+
+auto coContext::Log::getFormattedLevel() const noexcept -> std::string_view {
+    static constexpr std::array<const std::string_view, 6> levels{"trace"sv, "debug"sv, "info"sv,
+                                                                  "warn"sv,  "error"sv, "fatal"sv};
+
+    return levels[std::to_underlying(this->level)];
+}
+
+auto coContext::Log::getTimeStamp() const noexcept -> std::chrono::system_clock::time_point { return this->timestamp; }
+
+auto coContext::Log::getThreadId() const noexcept -> std::thread::id { return this->threadId; }
+
+auto coContext::Log::getSourceLocation() const noexcept -> std::source_location { return this->sourceLocation; }
+
+auto coContext::Log::getMessage() const noexcept -> std::string_view { return this->message; }
 
 auto coContext::Log::toString() const -> std::pmr::string {
     static constexpr std::array<const std::string_view, 6> levels{"trace"sv, "debug"sv, "info"sv,
@@ -30,5 +45,3 @@ auto coContext::Log::toString() const -> std::pmr::string {
                                         this->sourceLocation.function_name(), this->message),
                             internal::getSyncMemoryResource()};
 }
-
-auto coContext::operator<<(std::ostream &stream, const Log &log) -> std::ostream & { return stream << log.toString(); }

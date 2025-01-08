@@ -20,17 +20,25 @@ namespace coContext {
 
         [[nodiscard]] auto getLevel() const noexcept -> Level;
 
+        [[nodiscard]] auto getFormattedLevel() const noexcept -> std::string_view;
+
+        [[nodiscard]] auto getTimeStamp() const noexcept -> std::chrono::system_clock::time_point;
+
+        [[nodiscard]] auto getThreadId() const noexcept -> std::thread::id;
+
+        [[nodiscard]] auto getSourceLocation() const noexcept -> std::source_location;
+
+        [[nodiscard]] auto getMessage() const noexcept -> std::string_view;
+
         [[nodiscard]] auto toString() const -> std::pmr::string;
 
     private:
         Level level;
-        std::pmr::string message;
-        std::source_location sourceLocation;
         std::chrono::system_clock::time_point timestamp;
         std::thread::id threadId;
+        std::source_location sourceLocation;
+        std::pmr::string message;
     };
-
-    auto operator<<(std::ostream &stream, const Log &log) -> std::ostream &;
 }    // namespace coContext
 
 template<>
