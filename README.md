@@ -1,10 +1,10 @@
 ## 介绍
 
-本项目是Linux上一个基于**协程**和**io_uring**的异步高并发库，让你可以以**同步**的方式实现**异步**逻辑，轻松实现高性能的高并发程序
+本项目是`Linux`上一个基于**协程**和`io_uring`的异步高并发库，让你可以以**同步**的方式实现**异步**逻辑，轻松实现高性能的高并发程序
 
 ## 特性
 
-- io_uring支持的所有系统调用`accept` `send` `recv` `read` `write`等
+- `io_uring`支持的所有系统调用`accept` `send` `recv` `read` `write`等
 - 纳秒级别的定时器`sleep(1s, 1ns)`
 - IO超时`recv(socketFileDescriptor, buffer, 0) | timeout(1s)`
 - IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
