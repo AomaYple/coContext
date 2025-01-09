@@ -61,7 +61,7 @@ ninja
 
 额外CMake选项
 
-- `-DCO_CONTEXT_NATIVE=ON` 启用本机指令集（只在`Release`下生效）
+- `-DNATIVE=ON` 启用本机指令集（只在`Release`下生效）
 
 ## 安装
 

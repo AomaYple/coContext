@@ -38,7 +38,7 @@ target_compile_options(${PROJECT_NAME}
         $<$<CONFIG:Release>:-Ofast>
 )
 
-if (CMAKE_BUILD_TYPE STREQUAL "Release" AND DEFINED CO_CONTEXT_NATIVE AND CO_CONTEXT_NATIVE)
+if (CMAKE_BUILD_TYPE STREQUAL "Release" AND DEFINED NATIVE AND NATIVE)
     target_compile_options(${PROJECT_NAME}
             PRIVATE
             -march=native
