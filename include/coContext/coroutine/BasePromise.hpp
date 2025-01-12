@@ -1,8 +1,9 @@
 #pragma once
 
+#include "../memory/memoryResource.hpp"
 #include "Coroutine.hpp"
 
-#include <memory_resource>
+#include <memory>
 
 namespace coContext::internal {
     class BasePromise {
@@ -31,6 +32,8 @@ namespace coContext::internal {
 
         auto setFlags(std::uint32_t flags) noexcept -> void;
 
+        [[nodiscard]] auto getExceptionPointer() const noexcept -> const std::shared_ptr<std::exception_ptr> &;
+
         [[nodiscard]] auto getParentCoroutineId() const noexcept -> std::uint64_t;
 
         auto setParentCoroutineId(std::uint64_t id) noexcept -> void;
@@ -43,7 +46,7 @@ namespace coContext::internal {
 
         [[nodiscard]] auto final_suspend() const noexcept -> std::suspend_always;
 
-        auto unhandled_exception() const -> void;
+        auto unhandled_exception() const noexcept -> void;
 
     protected:
         constexpr BasePromise() noexcept = default;
@@ -51,6 +54,8 @@ namespace coContext::internal {
     private:
         std::int32_t result{};
         std::uint32_t flags{};
+        std::shared_ptr<std::exception_ptr> exceptionPointer{std::allocate_shared<std::exception_ptr>(
+            std::pmr::polymorphic_allocator<std::exception_ptr>{getUnSyncMemoryResource()})};
         std::uint64_t parentCoroutineId{std::hash<Coroutine>{}(Coroutine{nullptr})};
         Coroutine childCoroutine{nullptr};
     };
