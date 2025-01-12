@@ -38,7 +38,8 @@ target_compile_options(${PROJECT_NAME}
         $<$<CONFIG:Release>:-Ofast>
 )
 
-if (CMAKE_BUILD_TYPE STREQUAL "Release" AND DEFINED NATIVE AND NATIVE)
+option(NATIVE "Enable native optimization")
+if (CMAKE_BUILD_TYPE STREQUAL "Release" AND NATIVE)
     target_compile_options(${PROJECT_NAME}
             PRIVATE
             -march=native
