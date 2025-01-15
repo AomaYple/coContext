@@ -54,10 +54,18 @@ struct std::formatter<coContext::Log> {
     }
 
     [[nodiscard]] constexpr auto format(const coContext::Log &log, std::format_context &context) const {
-        const std::source_location sourceLocation{log.getSourceLocation()};
+        auto output{std::format_to(context.out(), "{} {} {}"sv, log.getTimeStamp(), log.getThreadId(),
+                                   log.getFormattedLevel())};
 
-        return std::format_to(context.out(), "{} {} {} {}:{}:{}:{} {}"sv, log.getFormattedLevel(), log.getTimeStamp(),
-                              log.getThreadId(), sourceLocation.file_name(), sourceLocation.line(),
-                              sourceLocation.column(), sourceLocation.function_name(), log.getMessage());
+        if (const std::source_location sourceLocation{log.getSourceLocation()};
+            !std::empty(std::string_view{sourceLocation.file_name()})) {
+            output = std::format_to(output, " {}:{}:{}:{}"sv, sourceLocation.file_name(), sourceLocation.line(),
+                                    sourceLocation.column(), sourceLocation.function_name());
+        }
+
+        if (const std::string_view message{log.getMessage()}; !std::empty(message))
+            output = std::format_to(output, " {}"sv, message);
+
+        return output;
     }
 };
