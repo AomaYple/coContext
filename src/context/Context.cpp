@@ -111,16 +111,15 @@ auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, 
     parameters.flags |= flags;
     parameters.timeout = timeSpecification;
 
-    std::int32_t result;
     try {
-        result = this->ring->syncCancel(parameters);
+        return this->ring->syncCancel(parameters);
     } catch (Exception &exception) {
-        result = -std::stoi(std::string{exception.getLog().getMessage()});
+        const std::int32_t result{-std::stoi(std::string{exception.getLog().getMessage()})};
 
         logger::write(Log{std::move(exception.getLog())});
-    }
 
-    return result;
+        return result;
+    }
 }
 
 auto coContext::internal::Context::scheduleUnscheduledCoroutines() -> void {
