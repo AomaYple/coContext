@@ -86,17 +86,15 @@ auto coContext::internal::Context::spawn(Coroutine coroutine) -> void {
 }
 
 auto coContext::internal::Context::getSubmission() const -> Submission {
-    Submission submission{nullptr};
     try {
-        submission = Submission{this->ring->getSubmission()};
+        return Submission{this->ring->getSubmission()};
     } catch (Exception &exception) {
         logger::write(Log{std::move(exception.getLog())});
 
         this->ring->submit();
-        submission = Submission{this->ring->getSubmission()};
-    }
 
-    return submission;
+        return Submission{this->ring->getSubmission()};
+    }
 }
 
 auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, std::int32_t> id,
