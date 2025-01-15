@@ -15,7 +15,7 @@ coContext::internal::Context::Context() {
     } catch (Exception &exception) { logger::write(Log{std::move(exception.getLog())}); }
 
     this->ring->registerSparseFileDescriptor(
-        [](const std::source_location sourceLocation = std::source_location::current()) {
+        [](const std::source_location sourceLocation = std::source_location::current()) constexpr {
             rlimit limit{};
             if (getrlimit(RLIMIT_NOFILE, std::addressof(limit)) == -1) {
                 throw Exception{
@@ -52,7 +52,7 @@ auto coContext::internal::Context::run(const std::source_location sourceLocation
 
     while (this->isRunning) {
         this->ring->submitAndWait(1);
-        this->bufferRing.advance(this->ring->poll([this](const io_uring_cqe *const completion) {
+        this->bufferRing.advance(this->ring->poll([this](const io_uring_cqe *const completion) constexpr {
             const auto result{this->schedulingCoroutines.find(completion->user_data)};
             Coroutine coroutine{std::move(result->second)};
             this->schedulingCoroutines.erase(result);

@@ -45,7 +45,7 @@ namespace coContext::internal {
 
         static constexpr std::uint16_t entries{32768};
 
-        std::shared_ptr<Ring> ring{[] {
+        std::shared_ptr<Ring> ring{[] constexpr {
             io_uring_params parameters{};
             parameters.flags = IORING_SETUP_SUBMIT_ALL | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_TASKRUN_FLAG |
                                IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN;

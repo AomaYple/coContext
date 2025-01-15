@@ -5,21 +5,22 @@
 using namespace std::string_view_literals;
 
 coContext::internal::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) :
-    handle{[entries, &parameters](const std::source_location sourceLocation = std::source_location::current()) {
-        io_uring handle;
-        if (const std::int32_t result{
-                io_uring_queue_init_params(entries, std::addressof(handle), std::addressof(parameters))};
-            result != 0) {
-            throw Exception{
-                Log{Log::Level::fatal,
-                    std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                     getSyncMemoryResource()},
-                    sourceLocation}
-            };
-        }
+    handle{
+        [entries, &parameters](const std::source_location sourceLocation = std::source_location::current()) constexpr {
+            io_uring handle;
+            if (const std::int32_t result{
+                    io_uring_queue_init_params(entries, std::addressof(handle), std::addressof(parameters))};
+                result != 0) {
+                throw Exception{
+                    Log{Log::Level::fatal,
+                        std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
+                                         getSyncMemoryResource()},
+                        sourceLocation}
+                };
+            }
 
-        return handle;
-    }()} {}
+            return handle;
+        }()} {}
 
 coContext::internal::Ring::Ring(Ring &&other) noexcept : handle{other.handle} { other.handle.ring_fd = -1; }
 

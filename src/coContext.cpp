@@ -80,7 +80,7 @@ auto coContext::direct() noexcept -> internal::Marker { return internal::Marker{
 
 auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                         const ClockSource clockSource) -> internal::Marker {
-    return internal::Marker{IOSQE_IO_LINK, [seconds, nanoseconds, clockSource] {
+    return internal::Marker{IOSQE_IO_LINK, [seconds, nanoseconds, clockSource] constexpr {
                                 spawn([seconds, nanoseconds, clockSource] -> Task<> {
                                     const internal::Submission submission{context.getSubmission()};
                                     internal::AsyncWaiter asyncWaiter{submission};
