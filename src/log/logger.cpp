@@ -19,8 +19,8 @@ namespace {
         Node *next;
     };
 
-    std::atomic<Node *> list;
     std::ostream *outputStream{std::addressof(std::clog)};
+    std::atomic<Node *> list;
     std::atomic_flag notifyVariable, isDisableWrite;
     std::atomic level{coContext::Log::Level::info};
 
