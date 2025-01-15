@@ -27,11 +27,11 @@ namespace coContext::internal {
                                           std::source_location sourceLocation = std::source_location::current())
             -> void;
 
-        [[nodiscard]] auto setupRingBuffer(std::uint32_t entries, std::int32_t id, std::uint32_t flags,
+        [[nodiscard]] auto setupBufferRing(std::uint32_t entries, std::int32_t id, std::uint32_t flags,
                                            std::source_location sourceLocation = std::source_location::current())
             -> io_uring_buf_ring *;
 
-        auto freeRingBuffer(io_uring_buf_ring *ringBuffer, std::uint32_t entries, std::int32_t id,
+        auto freeBufferRing(io_uring_buf_ring *bufferRing, std::uint32_t entries, std::int32_t id,
                             std::source_location sourceLocation = std::source_location::current()) -> void;
 
         [[nodiscard]] auto getSubmission(std::source_location sourceLocation = std::source_location::current())
@@ -44,7 +44,7 @@ namespace coContext::internal {
 
         [[nodiscard]] auto poll(std::move_only_function<auto(const io_uring_cqe *)->void> action) const -> std::int32_t;
 
-        auto advance(io_uring_buf_ring *ringBuffer, std::int32_t completionCount, std::int32_t bufferCount) noexcept
+        auto advance(io_uring_buf_ring *bufferRing, std::int32_t completionCount, std::int32_t bufferCount) noexcept
             -> void;
 
         [[nodiscard]] auto syncCancel(io_uring_sync_cancel_reg &parameters,

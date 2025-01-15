@@ -351,7 +351,7 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
 
         submission.addFlags(IOSQE_BUFFER_SELECT);
         submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
-        submission.setBufferGroup(context.getRingBuffer().getId());
+        submission.setBufferGroup(context.getBufferRing().getId());
 
         internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
 
@@ -359,7 +359,7 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
         do {
             const std::int32_t result{co_await asyncWaiter};
             if (result == -ENOBUFS) {
-                context.getRingBuffer().expandBuffer();
+                context.getBufferRing().expandBuffer();
                 isRestart = true;
 
                 logger::write(Log{
@@ -376,9 +376,9 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
             std::span<const std::byte> data;
             if ((resumeFlags & IORING_CQE_F_BUFFER) != 0) {
                 const std::uint32_t bufferId{resumeFlags >> IORING_CQE_BUFFER_SHIFT};
-                data = context.getRingBuffer().readData(bufferId, result);
+                data = context.getBufferRing().readData(bufferId, result);
 
-                if ((resumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.getRingBuffer().markBufferUsed(bufferId);
+                if ((resumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.getBufferRing().markBufferUsed(bufferId);
             }
 
             action(result, data);
@@ -559,7 +559,7 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
         isRestart = false;
 
         const internal::Submission submission{context.getSubmission()};
-        submission.multipleRead(fileDescriptor, 0, offset, context.getRingBuffer().getId());
+        submission.multipleRead(fileDescriptor, 0, offset, context.getBufferRing().getId());
 
         internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
 
@@ -567,7 +567,7 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
         do {
             const std::int32_t result{co_await asyncWaiter};
             if (result == -ENOBUFS) {
-                context.getRingBuffer().expandBuffer();
+                context.getBufferRing().expandBuffer();
                 isRestart = true;
 
                 logger::write(Log{
@@ -584,9 +584,9 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
             std::span<const std::byte> data;
             if ((resumeFlags & IORING_CQE_F_BUFFER) != 0) {
                 const std::uint32_t bufferId{resumeFlags >> IORING_CQE_BUFFER_SHIFT};
-                data = context.getRingBuffer().readData(bufferId, result);
+                data = context.getBufferRing().readData(bufferId, result);
 
-                if ((resumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.getRingBuffer().markBufferUsed(bufferId);
+                if ((resumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.getBufferRing().markBufferUsed(bufferId);
             }
 
             action(result, data);

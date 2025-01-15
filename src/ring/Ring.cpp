@@ -63,7 +63,7 @@ auto coContext::internal::Ring::registerSparseFileDescriptor(const std::uint32_t
     }
 }
 
-auto coContext::internal::Ring::setupRingBuffer(const std::uint32_t entries, const std::int32_t id,
+auto coContext::internal::Ring::setupBufferRing(const std::uint32_t entries, const std::int32_t id,
                                                 const std::uint32_t flags, const std::source_location sourceLocation)
     -> io_uring_buf_ring * {
     std::int32_t error;
@@ -81,10 +81,10 @@ auto coContext::internal::Ring::setupRingBuffer(const std::uint32_t entries, con
     return handle;
 }
 
-auto coContext::internal::Ring::freeRingBuffer(io_uring_buf_ring *const ringBuffer, const std::uint32_t entries,
+auto coContext::internal::Ring::freeBufferRing(io_uring_buf_ring *const bufferRing, const std::uint32_t entries,
                                                const std::int32_t id, const std::source_location sourceLocation)
     -> void {
-    if (const std::int32_t result{io_uring_free_buf_ring(std::addressof(this->handle), ringBuffer, entries, id)};
+    if (const std::int32_t result{io_uring_free_buf_ring(std::addressof(this->handle), bufferRing, entries, id)};
         result != 0) {
         throw Exception{
             Log{Log::Level::error,
@@ -144,9 +144,9 @@ auto coContext::internal::Ring::poll(std::move_only_function<auto(const io_uring
     return count;
 }
 
-auto coContext::internal::Ring::advance(io_uring_buf_ring *const ringBuffer, const std::int32_t completionCount,
+auto coContext::internal::Ring::advance(io_uring_buf_ring *const bufferRing, const std::int32_t completionCount,
                                         const std::int32_t bufferCount) noexcept -> void {
-    __io_uring_buf_ring_cq_advance(std::addressof(this->handle), ringBuffer, completionCount, bufferCount);
+    __io_uring_buf_ring_cq_advance(std::addressof(this->handle), bufferRing, completionCount, bufferCount);
 }
 
 auto coContext::internal::Ring::syncCancel(io_uring_sync_cancel_reg &parameters,

@@ -9,26 +9,26 @@
 namespace coContext::internal {
     class Ring;
 
-    class RingBuffer {
+    class BufferRing {
         struct Buffer {
             std::pmr::vector<std::byte> data{1024, getUnSyncMemoryResource()};
             std::size_t offset{};
         };
 
     public:
-        RingBuffer(std::shared_ptr<Ring> ring, std::uint32_t entries, std::int32_t id, std::uint32_t flags);
+        BufferRing(std::shared_ptr<Ring> ring, std::uint32_t entries, std::int32_t id, std::uint32_t flags);
 
-        RingBuffer(const RingBuffer &) = delete;
+        BufferRing(const BufferRing &) = delete;
 
-        auto operator=(const RingBuffer &) -> RingBuffer & = delete;
+        auto operator=(const BufferRing &) -> BufferRing & = delete;
 
-        RingBuffer(RingBuffer &&) noexcept;
+        BufferRing(BufferRing &&) noexcept;
 
-        auto operator=(RingBuffer &&) noexcept -> RingBuffer &;
+        auto operator=(BufferRing &&) noexcept -> BufferRing &;
 
-        ~RingBuffer();
+        ~BufferRing();
 
-        auto swap(RingBuffer &other) noexcept -> void;
+        auto swap(BufferRing &other) noexcept -> void;
 
         [[nodiscard]] auto getId() const noexcept -> std::int32_t;
 
@@ -53,6 +53,6 @@ namespace coContext::internal {
 }    // namespace coContext::internal
 
 template<>
-constexpr auto std::swap(coContext::internal::RingBuffer &lhs, coContext::internal::RingBuffer &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::internal::BufferRing &lhs, coContext::internal::BufferRing &rhs) noexcept -> void {
     lhs.swap(rhs);
 }

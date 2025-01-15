@@ -32,13 +32,13 @@ coContext::internal::Context::Context() {
 
 auto coContext::internal::Context::swap(Context &other) noexcept -> void {
     std::swap(this->ring, other.ring);
-    std::swap(this->ringBuffer, other.ringBuffer);
+    std::swap(this->bufferRing, other.bufferRing);
     std::swap(this->unscheduledCoroutines, other.unscheduledCoroutines);
     std::swap(this->schedulingCoroutines, other.schedulingCoroutines);
     std::swap(this->isRunning, other.isRunning);
 }
 
-auto coContext::internal::Context::getRingBuffer() noexcept -> RingBuffer & { return this->ringBuffer; }
+auto coContext::internal::Context::getBufferRing() noexcept -> BufferRing & { return this->bufferRing; }
 
 auto coContext::internal::Context::run(const std::source_location sourceLocation) -> void {
     logger::write(Log{
@@ -52,7 +52,7 @@ auto coContext::internal::Context::run(const std::source_location sourceLocation
 
     while (this->isRunning) {
         this->ring->submitAndWait(1);
-        this->ringBuffer.advance(this->ring->poll([this](const io_uring_cqe *const completion) {
+        this->bufferRing.advance(this->ring->poll([this](const io_uring_cqe *const completion) {
             const auto result{this->schedulingCoroutines.find(completion->user_data)};
             Coroutine coroutine{std::move(result->second)};
             this->schedulingCoroutines.erase(result);

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../ring/BufferRing.hpp"
 #include "../ring/Ring.hpp"
-#include "../ring/RingBuffer.hpp"
 #include "coContext/coroutine/Coroutine.hpp"
 
 #include <queue>
@@ -25,7 +25,7 @@ namespace coContext::internal {
 
         auto swap(Context &other) noexcept -> void;
 
-        [[nodiscard]] auto getRingBuffer() noexcept -> RingBuffer &;
+        [[nodiscard]] auto getBufferRing() noexcept -> BufferRing &;
 
         auto run(std::source_location sourceLocation = std::source_location::current()) -> void;
 
@@ -53,7 +53,7 @@ namespace coContext::internal {
             return std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getUnSyncMemoryResource()}, entries,
                                               parameters);
         }()};
-        RingBuffer ringBuffer{this->ring, entries, 0, IOU_PBUF_RING_INC};
+        BufferRing bufferRing{this->ring, entries, 0, IOU_PBUF_RING_INC};
         std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getUnSyncMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getUnSyncMemoryResource()};
         bool isRunning{};
