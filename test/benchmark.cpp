@@ -27,7 +27,7 @@ constexpr auto receiveAction(const std::int32_t socket, const std::int32_t resul
 constexpr auto acceptAction(const std::int32_t socket) {
     spawn(
         coContext::multipleReceive,
-        [socket](const std::int32_t result, const std::span<const std::byte> data) {
+        [socket](const std::int32_t result, const std::span<const std::byte> data) constexpr {
             receiveAction(socket, result, data);
         },
         socket, 0, coContext::direct());
