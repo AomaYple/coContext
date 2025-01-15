@@ -194,9 +194,9 @@ namespace coContext {
                                     std::int32_t socketFileDescriptor, const msghdr &message, std::int32_t flags,
                                     internal::Marker marker = none()) -> Task<>;
 
-    [[nodiscard]] auto splice(std::int32_t inFileDescriptor, std::int64_t inFileDescriptorOffset,
-                              std::int32_t outFileDescriptor, std::int64_t outFileDescriptorOffset,
-                              std::uint32_t length, std::uint32_t flags) -> internal::AsyncWaiter;
+    [[nodiscard]] auto splice(std::int32_t inFileDescriptor, std::int64_t inOffset, std::int32_t outFileDescriptor,
+                              std::int64_t outOffset, std::uint32_t length, std::uint32_t flags)
+        -> internal::AsyncWaiter;
 
     [[nodiscard]] auto tee(std::int32_t inFileDescriptor, std::int32_t outFileDescriptor, std::uint32_t length,
                            std::uint32_t flags) -> internal::AsyncWaiter;

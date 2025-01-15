@@ -461,12 +461,11 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
     action(result);
 }
 
-auto coContext::splice(const std::int32_t inFileDescriptor, const std::int64_t inFileDescriptorOffset,
-                       const std::int32_t outFileDescriptor, const std::int64_t outFileDescriptorOffset,
-                       const std::uint32_t length, const std::uint32_t flags) -> internal::AsyncWaiter {
+auto coContext::splice(const std::int32_t inFileDescriptor, const std::int64_t inOffset,
+                       const std::int32_t outFileDescriptor, const std::int64_t outOffset, const std::uint32_t length,
+                       const std::uint32_t flags) -> internal::AsyncWaiter {
     const internal::Submission submission{context.getSubmission()};
-    submission.splice(inFileDescriptor, inFileDescriptorOffset, outFileDescriptor, outFileDescriptorOffset, length,
-                      flags);
+    submission.splice(inFileDescriptor, inOffset, outFileDescriptor, outOffset, length, flags);
 
     return internal::AsyncWaiter{submission};
 }

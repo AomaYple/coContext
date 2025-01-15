@@ -196,13 +196,11 @@ auto coContext::internal::Submission::zeroCopySend(const std::int32_t socketFile
     io_uring_prep_sendmsg_zc(this->handle, socketFileDescriptor, std::addressof(message), flags);
 }
 
-auto coContext::internal::Submission::splice(const std::int32_t inFileDescriptor,
-                                             const std::int64_t inFileDescriptorOffset,
-                                             const std::int32_t outFileDescriptor,
-                                             const std::int64_t outFileDescriptorOffset, const std::uint32_t length,
-                                             const std::uint32_t flags) const noexcept -> void {
-    io_uring_prep_splice(this->handle, inFileDescriptor, inFileDescriptorOffset, outFileDescriptor,
-                         outFileDescriptorOffset, length, flags);
+auto coContext::internal::Submission::splice(const std::int32_t inFileDescriptor, const std::int64_t inOffset,
+                                             const std::int32_t outFileDescriptor, const std::int64_t outOffset,
+                                             const std::uint32_t length, const std::uint32_t flags) const noexcept
+    -> void {
+    io_uring_prep_splice(this->handle, inFileDescriptor, inOffset, outFileDescriptor, outOffset, length, flags);
 }
 
 auto coContext::internal::Submission::tee(const std::int32_t inFileDescriptor, const std::int32_t outFileDescriptor,
