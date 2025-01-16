@@ -29,7 +29,7 @@ auto coContext::internal::operator|(Marker lhs, Marker rhs) noexcept -> Marker {
     return rhs;
 }
 
-auto coContext::internal::operator|(AsyncWaiter asyncWaiter, Marker marker) -> AsyncWaiter {
+auto coContext::internal::operator|(AsyncWaiter asyncWaiter, Marker &&marker) -> AsyncWaiter {
     asyncWaiter.getSubmission().addFlags(marker.getFlags());
     marker.executeAction();
 

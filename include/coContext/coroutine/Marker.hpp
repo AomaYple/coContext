@@ -41,7 +41,7 @@ namespace coContext::internal {
 
     [[nodiscard]] auto operator|(Marker, Marker) noexcept -> Marker;
 
-    [[nodiscard]] auto operator|(AsyncWaiter, Marker) -> AsyncWaiter;
+    [[nodiscard]] auto operator|(AsyncWaiter, Marker &&) -> AsyncWaiter;
 }    // namespace coContext::internal
 
 template<>
