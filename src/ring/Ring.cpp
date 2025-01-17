@@ -38,7 +38,7 @@ coContext::internal::Ring::Ring(const std::uint32_t entries, io_uring_params &pa
             };
         }
 
-        buffer = buffer.first(result);
+        buffer = buffer.last(std::size(buffer) - result);
 
         return handle;
     }()} {}
