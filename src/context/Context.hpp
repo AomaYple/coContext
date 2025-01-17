@@ -51,7 +51,7 @@ namespace coContext::internal {
             return std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getUnSyncMemoryResource()}, entries,
                                               parameters);
         }()};
-        BufferRing bufferRing{this->ring, entries, 0, IOU_PBUF_RING_INC};
+        BufferRing bufferRing{ring, entries, 0, IOU_PBUF_RING_INC};
         std::pmr::vector<Coroutine> unscheduledCoroutines{getUnSyncMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getUnSyncMemoryResource()};
         bool isRunning{};
