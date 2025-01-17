@@ -1,6 +1,7 @@
 #include "coContext/coContext.hpp"
 
 #include "context/Context.hpp"
+#include "log/Exception.hpp"
 
 namespace {
     thread_local coContext::internal::Context context;
@@ -359,8 +360,11 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
         do {
             const std::int32_t result{co_await asyncWaiter};
             if (result == -ENOBUFS) {
-                context.getBufferRing().expandBuffer();
                 isRestart = true;
+
+                try {
+                    context.getBufferRing().expandBuffer();
+                } catch (internal::Exception &exception) { logger::write(std::move(exception.getLog())); }
 
                 logger::write(Log{
                     Log::Level::warn,
@@ -566,8 +570,11 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
         do {
             const std::int32_t result{co_await asyncWaiter};
             if (result == -ENOBUFS) {
-                context.getBufferRing().expandBuffer();
                 isRestart = true;
+
+                try {
+                    context.getBufferRing().expandBuffer();
+                } catch (internal::Exception &exception) { logger::write(std::move(exception.getLog())); }
 
                 logger::write(Log{
                     Log::Level::warn,

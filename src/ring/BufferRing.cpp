@@ -1,7 +1,7 @@
 #include "BufferRing.hpp"
 
+#include "../log/Exception.hpp"
 #include "Ring.hpp"
-#include "coContext/log/logger.hpp"
 
 #include <utility>
 
@@ -66,12 +66,10 @@ auto coContext::internal::BufferRing::markBufferUsed(const std::uint16_t bufferI
 
 auto coContext::internal::BufferRing::expandBuffer(const std::source_location sourceLocation) -> void {
     if (std::size(this->buffers) == this->entries) {
-        logger::write(Log{
-            Log::Level::warn, std::pmr::string{"number of buffer has reached the limit"sv, getSyncMemoryResource()},
-            sourceLocation
-        });
-
-        return;
+        throw Exception{
+            Log{Log::Level::warn, std::pmr::string{"number of buffer has reached the limit"sv, getSyncMemoryResource()},
+                sourceLocation}
+        };
     }
 
     this->buffers.emplace_back();
