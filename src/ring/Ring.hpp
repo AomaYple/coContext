@@ -3,14 +3,11 @@
 #include <functional>
 #include <liburing.h>
 #include <source_location>
-#include <span>
 
 namespace coContext::internal {
     class Ring {
     public:
         Ring(std::uint32_t entries, io_uring_params &parameters);
-
-        Ring(std::uint32_t entries, io_uring_params &parameters, std::span<std::byte> &buffer);
 
         Ring(const Ring &) = delete;
 
