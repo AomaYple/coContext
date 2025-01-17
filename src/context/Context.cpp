@@ -82,7 +82,7 @@ auto coContext::internal::Context::stop(const std::source_location sourceLocatio
 }
 
 auto coContext::internal::Context::spawn(Coroutine coroutine) -> void {
-    this->unscheduledCoroutines.emplace(std::move(coroutine));
+    this->unscheduledCoroutines.emplace_back(std::move(coroutine));
 }
 
 auto coContext::internal::Context::getSubmission() const -> Submission {
@@ -123,12 +123,9 @@ auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, 
 }
 
 auto coContext::internal::Context::scheduleUnscheduledCoroutines() -> void {
-    while (!std::empty(this->unscheduledCoroutines)) {
-        Coroutine coroutine{std::move(this->unscheduledCoroutines.front())};
-        this->unscheduledCoroutines.pop();
+    for (auto &coroutine : this->unscheduledCoroutines) this->scheduleCoroutine(std::move(coroutine));
 
-        this->scheduleCoroutine(std::move(coroutine));
-    }
+    this->unscheduledCoroutines.clear();
 }
 
 auto coContext::internal::Context::scheduleCoroutine(Coroutine coroutine) -> void {

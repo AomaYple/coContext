@@ -4,8 +4,6 @@
 #include "../ring/Ring.hpp"
 #include "coContext/coroutine/Coroutine.hpp"
 
-#include <queue>
-
 namespace coContext::internal {
     class Submission;
 
@@ -54,7 +52,7 @@ namespace coContext::internal {
                                               parameters);
         }()};
         BufferRing bufferRing{this->ring, entries, 0, IOU_PBUF_RING_INC};
-        std::queue<Coroutine, std::pmr::deque<Coroutine>> unscheduledCoroutines{getUnSyncMemoryResource()};
+        std::pmr::vector<Coroutine> unscheduledCoroutines{getUnSyncMemoryResource()};
         std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getUnSyncMemoryResource()};
         bool isRunning{};
     };
