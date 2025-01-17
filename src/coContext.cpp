@@ -360,17 +360,17 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
         do {
             const std::int32_t result{co_await asyncWaiter};
             if (result == -ENOBUFS) {
-                isRestart = true;
-
-                try {
-                    context.getBufferRing().expandBuffer();
-                } catch (internal::Exception &exception) { logger::write(std::move(exception.getLog())); }
-
                 logger::write(Log{
                     Log::Level::warn,
                     std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                      internal::getSyncMemoryResource()}
                 });
+
+                try {
+                    context.getBufferRing().expandBuffer();
+                } catch (internal::Exception &exception) { logger::write(std::move(exception.getLog())); }
+
+                isRestart = true;
 
                 break;
             }
@@ -570,17 +570,17 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
         do {
             const std::int32_t result{co_await asyncWaiter};
             if (result == -ENOBUFS) {
-                isRestart = true;
-
-                try {
-                    context.getBufferRing().expandBuffer();
-                } catch (internal::Exception &exception) { logger::write(std::move(exception.getLog())); }
-
                 logger::write(Log{
                     Log::Level::warn,
                     std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
                                      internal::getSyncMemoryResource()}
                 });
+
+                try {
+                    context.getBufferRing().expandBuffer();
+                } catch (internal::Exception &exception) { logger::write(std::move(exception.getLog())); }
+
+                isRestart = true;
 
                 break;
             }
