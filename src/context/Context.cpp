@@ -123,7 +123,8 @@ auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, 
 }
 
 auto coContext::internal::Context::scheduleUnscheduledCoroutines() -> void {
-    for (auto &coroutine : this->unscheduledCoroutines) this->scheduleCoroutine(std::move(coroutine));
+    for (std::size_t i{}; i != std::size(this->unscheduledCoroutines); ++i)
+        this->scheduleCoroutine(std::move(this->unscheduledCoroutines[i]));
 
     this->unscheduledCoroutines.clear();
 }
