@@ -42,12 +42,18 @@ auto main() -> int {
 
 ## 依赖
 
-- [Linux 内核](https://www.kernel.org) >= 6.12
-- [GCC](https://gcc.gnu.org) >= 14
-- [CMake](https://cmake.org) >= 3.30
-- [Ninja](https://ninja-build.org) >= 1.8.2
-- [liburing](https://github.com/axboe/liburing) >= 2.8
-- [mimalloc](https://github.com/microsoft/mimalloc)
+- 编译
+    - [Linux 内核](https://www.kernel.org) >= 6.12
+    - [GCC](https://gcc.gnu.org) >= 14
+    - [CMake](https://cmake.org) >= 3.30
+    - [Ninja](https://ninja-build.org) >= 1.8.2
+    - [liburing](https://github.com/axboe/liburing) >= 2.8
+    - [mimalloc](https://github.com/microsoft/mimalloc)
+- 运行
+    - [Linux 内核](https://www.kernel.org) >= 6.12
+    - [GCC](https://gcc.gnu.org) >= 14
+    - [liburing](https://github.com/axboe/liburing) >= 2.8
+    - [mimalloc](https://github.com/microsoft/mimalloc)
 
 建议使用[Arch Linux](https://archlinux.org)
 
