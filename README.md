@@ -91,7 +91,7 @@ target_link_libraries(your_target
 
 - `11th Gen Intel(R) Core(TM) i7-11800H (16) @ 2.30 GHz`
 - `8GB x 2 （DDR4 3200MHz）`
-- `Arch WSL` `6.12.8`
+- `Arch Linux` `6.12.10`
 - `gcc (GCC) 14.2.1 20240910`
 
 测试：
@@ -104,12 +104,12 @@ target_link_libraries(your_target
 Running 10s test @ http://localhost:8080
   16 threads and 1024 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency     1.04ms    1.50ms  22.28ms   84.55%
-    Req/Sec    80.99k    10.64k  147.06k    87.76%
-  12920020 requests in 10.07s, 468.22MB read
-  Socket errors: connect 21, read 0, write 0, timeout 0
-Requests/sec: 1282388.57
-Transfer/sec:     46.47MB
+    Latency   742.97us    0.97ms  12.60ms   86.50%
+    Req/Sec   108.82k     9.82k  158.86k    69.31%
+  17364688 requests in 10.04s, 629.29MB read
+  Socket errors: connect 19, read 0, write 0, timeout 0
+Requests/sec: 1729068.90
+Transfer/sec:     62.66MB
 ```
 
 ## 更多示例
