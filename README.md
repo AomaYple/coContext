@@ -91,7 +91,7 @@ target_link_libraries(your_target
 环境：
 
 - `11th Gen Intel(R) Core(TM) i7-11800H (16) @ 2.30 GHz`
-- `8GB x 2` `（DDR4 3200MHz）`
+- `8GB x 2` `DDR4 3200MHz`
 - `Arch Linux` `6.12.10`
 - `gcc (GCC) 14.2.1 20240910`
 
