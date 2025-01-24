@@ -4,7 +4,7 @@
 
 ## 特性
 
-- `io_uring`支持的所有系统调用`accept` `send` `recv` `read` `write`等
+- 绝大部分系统调用，如`read` `write` `send` `recv`等
 - 纳秒级别的定时器`sleep(1s, 1ns)`
 - IO超时`recv(socketFileDescriptor, buffer, 0) | timeout(1s)`
 - IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
@@ -14,6 +14,7 @@
 - 直接文件描述符，可以与普通文件描述符**相互转换**
 - 多发射IO
 - **零拷贝**发送
+- **百万**级并发
 
 ## 基础用法
 
