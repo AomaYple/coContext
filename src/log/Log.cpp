@@ -33,7 +33,3 @@ auto coContext::Log::getThreadId() const noexcept -> std::thread::id { return th
 auto coContext::Log::getSourceLocation() const noexcept -> std::source_location { return this->sourceLocation; }
 
 auto coContext::Log::getMessage() const noexcept -> std::string_view { return this->message; }
-
-auto coContext::operator<<(std::ostream &outputStream, const Log &log) -> std::ostream & {
-    return outputStream << std::format("{}"sv, log);
-}

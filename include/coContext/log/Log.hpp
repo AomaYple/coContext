@@ -38,8 +38,6 @@ namespace coContext {
         std::source_location sourceLocation;
         std::pmr::string message;
     };
-
-    auto operator<<(std::ostream &, const Log &) -> std::ostream &;
 }    // namespace coContext
 
 template<>
