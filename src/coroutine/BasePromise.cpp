@@ -11,6 +11,7 @@ auto coContext::internal::BasePromise::operator delete(void *const pointer, cons
 auto coContext::internal::BasePromise::swap(BasePromise &other) noexcept -> void {
     std::swap(this->result, other.result);
     std::swap(this->flags, other.flags);
+    std::swap(this->exceptionPointer, other.exceptionPointer);
     std::swap(this->parentCoroutineId, other.parentCoroutineId);
     std::swap(this->childCoroutine, other.childCoroutine);
 }
