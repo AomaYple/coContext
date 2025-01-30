@@ -68,8 +68,8 @@ auto coContext::logger::stop() noexcept -> void {
     notify();
 }
 
-auto coContext::logger::setOutputStream(std::ostream &newOutputStream) noexcept -> void {
-    outputStream = std::addressof(newOutputStream);
+auto coContext::logger::setOutputStream(std::ostream *const newOutputStream) noexcept -> void {
+    outputStream = newOutputStream;
 }
 
 auto coContext::logger::enableWrite() noexcept -> void { isDisableWrite.clear(std::memory_order::relaxed); }

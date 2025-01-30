@@ -7,7 +7,7 @@ namespace coContext::logger {
 
     auto stop() noexcept -> void;
 
-    auto setOutputStream(std::ostream &newOutputStream) noexcept -> void;
+    auto setOutputStream(std::ostream *newOutputStream) noexcept -> void;
 
     auto enableWrite() noexcept -> void;
 
