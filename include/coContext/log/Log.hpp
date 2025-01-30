@@ -11,6 +11,8 @@ namespace coContext {
     public:
         enum class Level : std::uint8_t { trace, debug, info, warn, error, fatal };
 
+        [[nodiscard]] static auto formatLevel(Level level) noexcept -> std::string_view;
+
         explicit Log(Level level = Level::info,
                      std::pmr::string message = std::pmr::string{internal::getSyncMemoryResource()},
                      std::source_location sourceLocation = std::source_location::current(),
@@ -20,8 +22,6 @@ namespace coContext {
         auto swap(Log &other) noexcept -> void;
 
         [[nodiscard]] auto getLevel() const noexcept -> Level;
-
-        [[nodiscard]] auto getFormattedLevel() const noexcept -> std::string_view;
 
         [[nodiscard]] auto getTimeStamp() const noexcept -> std::chrono::system_clock::time_point;
 
@@ -48,14 +48,24 @@ constexpr auto std::swap(coContext::Log &lhs, coContext::Log &rhs) noexcept -> v
 }
 
 template<>
+struct std::formatter<coContext::Log::Level> {
+    [[nodiscard]] constexpr auto parse(const std::format_parse_context &context) const noexcept {
+        return std::begin(context);
+    }
+
+    [[nodiscard]] constexpr auto format(const coContext::Log::Level level, std::format_context &context) const {
+        return std::format_to(context.out(), "{}"sv, coContext::Log::formatLevel(level));
+    }
+};
+
+template<>
 struct std::formatter<coContext::Log> {
     [[nodiscard]] constexpr auto parse(const std::format_parse_context &context) const noexcept {
         return std::begin(context);
     }
 
     [[nodiscard]] constexpr auto format(const coContext::Log &log, std::format_context &context) const {
-        auto output{std::format_to(context.out(), "{} {} {}"sv, log.getTimeStamp(), log.getThreadId(),
-                                   log.getFormattedLevel())};
+        auto output{std::format_to(context.out(), "{} {} {}"sv, log.getTimeStamp(), log.getThreadId(), log.getLevel())};
 
         if (const std::source_location sourceLocation{log.getSourceLocation()};
             !std::empty(std::string_view{sourceLocation.file_name()})) {
