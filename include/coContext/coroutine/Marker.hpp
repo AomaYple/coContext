@@ -7,14 +7,14 @@ namespace coContext::internal {
     class AsyncWaiter;
 
     class Marker {
-        using Action = std::move_only_function<auto()->void>;
+        using Action = std::function<auto()->void>;
 
     public:
         explicit Marker(std::uint32_t flags = {}, Action action = {}) noexcept;
 
-        Marker(const Marker &) = delete;
+        Marker(const Marker &) = default;
 
-        auto operator=(const Marker &) -> Marker & = delete;
+        auto operator=(const Marker &) -> Marker & = default;
 
         Marker(Marker &&) noexcept = default;
 
@@ -32,7 +32,7 @@ namespace coContext::internal {
 
         auto setAction(Action action) noexcept -> void;
 
-        auto executeAction() -> void;
+        auto executeAction() const -> void;
 
     private:
         std::uint32_t flags;
@@ -41,7 +41,7 @@ namespace coContext::internal {
 
     [[nodiscard]] auto operator|(Marker, Marker) noexcept -> Marker;
 
-    [[nodiscard]] auto operator|(AsyncWaiter, Marker &&) -> AsyncWaiter;
+    [[nodiscard]] auto operator|(AsyncWaiter, const Marker &) -> AsyncWaiter;
 }    // namespace coContext::internal
 
 template<>

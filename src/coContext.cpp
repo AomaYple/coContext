@@ -136,9 +136,9 @@ auto coContext::updateSleep(const std::uint64_t taskId, const std::chrono::secon
 
 auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> action,
                               const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
-                              const ClockSource clockSource, internal::Marker marker) -> Task<> {
+                              const ClockSource clockSource, const internal::Marker &marker) -> Task<> {
     internal::AsyncWaiter asyncWaiter{
-        rawSleep(seconds, nanoseconds, setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT) | std::move(marker)};
+        rawSleep(seconds, nanoseconds, setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT) | marker};
 
     do action(co_await asyncWaiter);
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
@@ -159,12 +159,12 @@ auto coContext::updatePoll(const std::uint64_t taskId, const std::uint32_t mask)
 }
 
 auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> action,
-                             const std::int32_t fileDescriptor, const std::uint32_t mask, internal::Marker marker)
-    -> Task<> {
+                             const std::int32_t fileDescriptor, const std::uint32_t mask,
+                             const internal::Marker &marker) -> Task<> {
     const internal::Submission submission{context.getSubmission()};
     submission.multiplePoll(fileDescriptor, mask);
 
-    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
+    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
 
     do action(co_await asyncWaiter);
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
@@ -277,14 +277,14 @@ auto coContext::acceptDirect(const std::int32_t socketFileDescriptor, sockaddr *
 
 auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void> action,
                                const std::int32_t socketFileDescriptor, sockaddr *const address,
-                               socklen_t *const addressLength, const std::int32_t flags, internal::Marker marker)
+                               socklen_t *const addressLength, const std::int32_t flags, const internal::Marker &marker)
     -> Task<> {
     const internal::Submission submission{context.getSubmission()};
     submission.multipleAccept(socketFileDescriptor, address, addressLength, flags);
 
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
-    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
+    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
 
     do action(co_await asyncWaiter);
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
@@ -292,14 +292,14 @@ auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void>
 
 auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)->void> action,
                                      const std::int32_t socketFileDescriptor, sockaddr *const address,
-                                     socklen_t *const addressLength, const std::int32_t flags, internal::Marker marker)
-    -> Task<> {
+                                     socklen_t *const addressLength, const std::int32_t flags,
+                                     const internal::Marker &marker) -> Task<> {
     const internal::Submission submission{context.getSubmission()};
     submission.multipleAcceptDirect(socketFileDescriptor, address, addressLength, flags);
 
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
-    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
+    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
 
     do action(co_await asyncWaiter);
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
@@ -342,7 +342,7 @@ auto coContext::receive(const std::int32_t socketFileDescriptor, msghdr &message
 
 auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
                                 const std::int32_t socketFileDescriptor, const std::int32_t flags,
-                                internal::Marker marker) -> Task<> {
+                                const internal::Marker &marker) -> Task<> {
     bool isRestart;
     do {
         isRestart = false;
@@ -354,7 +354,7 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
         submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
         submission.setBufferGroup(context.getBufferRing().getId());
 
-        internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
+        internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
 
         std::uint32_t resumeFlags;
         do {
@@ -423,13 +423,13 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr &mess
 
 auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
                              const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
-                             std::int32_t flags, internal::Marker marker) -> Task<> {
+                             std::int32_t flags, const internal::Marker &marker) -> Task<> {
     if ((marker.getFlags() & IOSQE_IO_LINK) != 0) flags |= MSG_WAITALL;
 
     const internal::Submission submission{context.getSubmission()};
     submission.zeroCopySend(socketFileDescriptor, buffer, flags, IORING_RECVSEND_POLL_FIRST);
 
-    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
+    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
 
     const std::int32_t result{co_await asyncWaiter};
     if ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
@@ -444,7 +444,7 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
 
 auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
                              const std::int32_t socketFileDescriptor, const msghdr &message, std::int32_t flags,
-                             internal::Marker marker) -> Task<> {
+                             const internal::Marker &marker) -> Task<> {
     if ((marker.getFlags() & IOSQE_IO_LINK) != 0) flags |= MSG_WAITALL;
 
     const internal::Submission submission{context.getSubmission()};
@@ -452,7 +452,7 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
 
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
-    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
+    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
 
     const std::int32_t result{co_await asyncWaiter};
     if ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
@@ -555,8 +555,8 @@ auto coContext::read(const std::int32_t fileDescriptor, const std::span<const io
 }
 
 auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
-                             const std::int32_t fileDescriptor, const std::int32_t offset, internal::Marker marker)
-    -> Task<> {
+                             const std::int32_t fileDescriptor, const std::int32_t offset,
+                             const internal::Marker &marker) -> Task<> {
     bool isRestart;
     do {
         isRestart = false;
@@ -564,7 +564,7 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
         const internal::Submission submission{context.getSubmission()};
         submission.multipleRead(fileDescriptor, 0, offset, context.getBufferRing().getId());
 
-        internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | std::move(marker)};
+        internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
 
         std::uint32_t resumeFlags;
         do {
