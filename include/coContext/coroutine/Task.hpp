@@ -71,19 +71,17 @@ namespace coContext {
         [[nodiscard]] constexpr auto getReturnValue() noexcept -> std::future<T> & { return this->returnValue; }
 
         [[nodiscard]] constexpr auto await_resume() {
-            if (const std::exception_ptr exceptionPointer{*this->exceptionPointer}; static_cast<bool>(exceptionPointer))
-                std::rethrow_exception(exceptionPointer);
+            this->throwException();
 
             return this->returnValue.get();
         }
 
     private:
         explicit constexpr Task(const CoroutineHandle coroutineHandle) :
-            BaseTask{internal::Coroutine{internal::Coroutine::Handle::from_address(coroutineHandle.address())}},
-            exceptionPointer{coroutineHandle.promise().getExceptionPointer()},
+            BaseTask{internal::Coroutine{internal::Coroutine::Handle::from_address(coroutineHandle.address())},
+                     coroutineHandle.promise().getException()},
             returnValue{coroutineHandle.promise().getReturnValue()} {}
 
-        std::shared_ptr<std::exception_ptr> exceptionPointer;
         std::future<T> returnValue;
     };
 
@@ -143,19 +141,17 @@ namespace coContext {
         [[nodiscard]] constexpr auto getReturnValue() noexcept -> std::future<T &> & { return this->returnValue; }
 
         [[nodiscard]] constexpr auto await_resume() -> T & {
-            if (const std::exception_ptr exceptionPointer{*this->exceptionPointer}; static_cast<bool>(exceptionPointer))
-                std::rethrow_exception(exceptionPointer);
+            this->throwException();
 
             return this->returnValue.get();
         }
 
     private:
         explicit constexpr Task(const CoroutineHandle coroutineHandle) :
-            BaseTask{internal::Coroutine{internal::Coroutine::Handle::from_address(coroutineHandle.address())}},
-            exceptionPointer{coroutineHandle.promise().getExceptionPointer()},
+            BaseTask{internal::Coroutine{internal::Coroutine::Handle::from_address(coroutineHandle.address())},
+                     coroutineHandle.promise().getException()},
             returnValue{coroutineHandle.promise().getReturnValue()} {}
 
-        std::shared_ptr<std::exception_ptr> exceptionPointer;
         std::future<T &> returnValue;
     };
 
@@ -214,18 +210,14 @@ namespace coContext {
 
         [[nodiscard]] constexpr auto getReturnValue() noexcept -> std::future<void> & { return this->returnValue; }
 
-        constexpr auto await_resume() const {
-            if (const std::exception_ptr exceptionPointer{*this->exceptionPointer}; static_cast<bool>(exceptionPointer))
-                std::rethrow_exception(exceptionPointer);
-        }
+        constexpr auto await_resume() const { this->throwException(); }
 
     private:
         explicit constexpr Task(const CoroutineHandle coroutineHandle) :
-            BaseTask{internal::Coroutine{internal::Coroutine::Handle::from_address(coroutineHandle.address())}},
-            exceptionPointer{coroutineHandle.promise().getExceptionPointer()},
+            BaseTask{internal::Coroutine{internal::Coroutine::Handle::from_address(coroutineHandle.address())},
+                     coroutineHandle.promise().getException()},
             returnValue{coroutineHandle.promise().getReturnValue()} {}
 
-        std::shared_ptr<std::exception_ptr> exceptionPointer;
         std::future<void> returnValue;
     };
 }    // namespace coContext

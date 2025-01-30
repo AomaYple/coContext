@@ -11,7 +11,7 @@ auto coContext::internal::BasePromise::operator delete(void *const pointer, cons
 auto coContext::internal::BasePromise::swap(BasePromise &other) noexcept -> void {
     std::swap(this->result, other.result);
     std::swap(this->flags, other.flags);
-    std::swap(this->exceptionPointer, other.exceptionPointer);
+    std::swap(this->exception, other.exception);
     std::swap(this->parentCoroutineId, other.parentCoroutineId);
     std::swap(this->childCoroutine, other.childCoroutine);
 }
@@ -24,9 +24,8 @@ auto coContext::internal::BasePromise::getFlags() const noexcept -> std::uint32_
 
 auto coContext::internal::BasePromise::setFlags(const std::uint32_t flags) noexcept -> void { this->flags = flags; }
 
-auto coContext::internal::BasePromise::getExceptionPointer() const noexcept
-    -> const std::shared_ptr<std::exception_ptr> & {
-    return this->exceptionPointer;
+auto coContext::internal::BasePromise::getException() const noexcept -> const std::shared_ptr<std::exception_ptr> & {
+    return this->exception;
 }
 
 auto coContext::internal::BasePromise::getParentCoroutineId() const noexcept -> std::uint64_t {
@@ -48,5 +47,5 @@ auto coContext::internal::BasePromise::initial_suspend() const noexcept -> std::
 auto coContext::internal::BasePromise::final_suspend() const noexcept -> std::suspend_always { return {}; }
 
 auto coContext::internal::BasePromise::unhandled_exception() const noexcept -> void {
-    *this->exceptionPointer = std::current_exception();
+    *this->exception = std::current_exception();
 }

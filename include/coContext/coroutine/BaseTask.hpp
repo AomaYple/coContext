@@ -2,6 +2,8 @@
 
 #include "Coroutine.hpp"
 
+#include <memory>
+
 namespace coContext::internal {
     class BaseTask {
     public:
@@ -19,15 +21,18 @@ namespace coContext::internal {
 
         [[nodiscard]] auto getCoroutine() noexcept -> Coroutine &;
 
+        auto throwException() const -> void;
+
         [[nodiscard]] auto await_ready() const noexcept -> bool;
 
         auto await_suspend(std::coroutine_handle<> genericCoroutineHandle) -> void;
 
     protected:
-        explicit BaseTask(Coroutine coroutine) noexcept;
+        BaseTask(Coroutine coroutine, std::shared_ptr<std::exception_ptr> exception) noexcept;
 
     private:
         Coroutine coroutine;
+        std::shared_ptr<std::exception_ptr> exception;
     };
 }    // namespace coContext::internal
 

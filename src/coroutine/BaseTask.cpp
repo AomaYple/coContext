@@ -4,9 +4,15 @@
 
 auto coContext::internal::BaseTask::swap(BaseTask &other) noexcept -> void {
     std::swap(this->coroutine, other.coroutine);
+    std::swap(this->exception, other.exception);
 }
 
 auto coContext::internal::BaseTask::getCoroutine() noexcept -> Coroutine & { return this->coroutine; }
+
+auto coContext::internal::BaseTask::throwException() const -> void {
+    if (const std::exception_ptr exception{*this->exception}; static_cast<bool>(exception))
+        std::rethrow_exception(exception);
+}
 
 auto coContext::internal::BaseTask::await_ready() const noexcept -> bool { return {}; }
 
@@ -17,4 +23,5 @@ auto coContext::internal::BaseTask::await_suspend(const std::coroutine_handle<> 
     parentCoroutineHandle.promise().setChildCoroutine(std::move(this->coroutine));
 }
 
-coContext::internal::BaseTask::BaseTask(Coroutine coroutine) noexcept : coroutine{std::move(coroutine)} {}
+coContext::internal::BaseTask::BaseTask(Coroutine coroutine, std::shared_ptr<std::exception_ptr> exception) noexcept :
+    coroutine{std::move(coroutine)}, exception{std::move(exception)} {}
