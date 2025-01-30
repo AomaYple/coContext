@@ -3,8 +3,6 @@
 #include "../log/Exception.hpp"
 #include "Ring.hpp"
 
-#include <utility>
-
 using namespace std::string_view_literals;
 
 coContext::internal::BufferRing::BufferRing(std::shared_ptr<Ring> ring, const std::uint32_t entries,

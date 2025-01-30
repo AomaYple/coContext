@@ -5,13 +5,12 @@
 #include <chrono>
 #include <source_location>
 #include <thread>
+#include <utility>
 
 namespace coContext {
     class Log {
     public:
         enum class Level : std::uint8_t { trace, debug, info, warn, error, fatal };
-
-        [[nodiscard]] static auto formatLevel(Level level) noexcept -> std::string_view;
 
         explicit Log(Level level = Level::info,
                      std::pmr::string message = std::pmr::string{internal::getSyncMemoryResource()},
@@ -52,7 +51,10 @@ struct std::formatter<coContext::Log::Level> {
     }
 
     [[nodiscard]] constexpr auto format(const coContext::Log::Level level, std::format_context &context) const {
-        return std::format_to(context.out(), "{}"sv, coContext::Log::formatLevel(level));
+        static constexpr std::array<const std::string_view, 6> levels{"trace"sv, "debug"sv, "info"sv,
+                                                                      "warn"sv,  "error"sv, "fatal"sv};
+
+        return std::format_to(context.out(), "{}"sv, levels[std::to_underlying(level)]);
     }
 };
 

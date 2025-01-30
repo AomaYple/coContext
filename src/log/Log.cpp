@@ -1,16 +1,5 @@
 #include "coContext/log/Log.hpp"
 
-#include <utility>
-
-using namespace std::string_view_literals;
-
-auto coContext::Log::formatLevel(const Level level) noexcept -> std::string_view {
-    static constexpr std::array<const std::string_view, 6> levels{"trace"sv, "debug"sv, "info"sv,
-                                                                  "warn"sv,  "error"sv, "fatal"sv};
-
-    return levels[std::to_underlying(level)];
-}
-
 coContext::Log::Log(const Level level, std::pmr::string message, const std::source_location sourceLocation,
                     const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) :
     level{level}, timestamp{timestamp}, threadId{threadId}, sourceLocation{sourceLocation},
