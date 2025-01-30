@@ -7,11 +7,11 @@ using namespace std::string_view_literals;
 
 namespace {
     struct Node {
-        [[nodiscard]] auto operator new(const std::size_t bytes) -> void * {
+        [[nodiscard]] constexpr auto operator new(const std::size_t bytes) -> void * {
             return coContext::internal::getSyncMemoryResource()->allocate(bytes);
         }
 
-        auto operator delete(void *const pointer, const std::size_t bytes) noexcept -> void {
+        constexpr auto operator delete(void *const pointer, const std::size_t bytes) noexcept -> void {
             coContext::internal::getSyncMemoryResource()->deallocate(pointer, bytes);
         }
 
