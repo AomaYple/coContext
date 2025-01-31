@@ -54,7 +54,7 @@ namespace coContext::internal {
     private:
         std::int32_t result{};
         std::uint32_t flags{};
-        std::shared_ptr<std::exception_ptr> exception{std::allocate_shared_for_overwrite<std::exception_ptr>(
+        std::shared_ptr<std::exception_ptr> exception{std::allocate_shared<std::exception_ptr>(
             std::pmr::polymorphic_allocator<std::exception_ptr>{getUnSyncMemoryResource()})};
         std::uint64_t parentCoroutineId{std::hash<Coroutine>{}(Coroutine{nullptr})};
         Coroutine childCoroutine{nullptr};
