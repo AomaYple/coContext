@@ -258,7 +258,7 @@ auto main() -> int {
 
 <summary>日志系统</summary>
 
-- `Log`类为核心，支持流式运算符`<<`，支持`std::format`
+- `Log`类为核心，支持`std::format`
 - 多级别日志，`trace` `debug` `info` `warn` `error` `fatal`
 - `logger::write`写入日志，`enableWrite`开启写入，`disableWrite`关闭写入
 - `logger::getLevel`获取日志级别；`logger::setLevel`设置日志级别，小于该级别的日志将不会被写入，默认为`info`
