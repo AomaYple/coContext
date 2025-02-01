@@ -15,11 +15,19 @@ set_target_properties(${PROJECT_NAME}
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
         src/*.cpp
 )
-if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    find_package(mimalloc REQUIRED)
+    target_link_libraries(${PROJECT_NAME}
+            PRIVATE
+            mimalloc
+    )
+else ()
     list(REMOVE_ITEM SOURCES
             ${CMAKE_CURRENT_SOURCE_DIR}/src/memory/MiMallocResource.cpp
     )
 endif ()
+
 target_sources(${PROJECT_NAME}
         PRIVATE
         ${SOURCES}
@@ -31,11 +39,14 @@ target_include_directories(${PROJECT_NAME}
         $<INSTALL_INTERFACE:include>
 )
 
+option(NATIVE "Enable native optimization")
+
 target_compile_options(${PROJECT_NAME}
         PRIVATE
         -Wall -Wextra -Wpedantic
         $<$<CONFIG:Debug>:-g3 -ggdb3 -Og -fsanitize=address -fsanitize=leak -fsanitize=undefined>
         $<$<CONFIG:Release>:-Ofast>
+        $<$<AND:$<CONFIG:Release>,$<BOOL:${NATIVE}>>:-march=native>
 )
 
 target_link_options(${PROJECT_NAME}
@@ -47,22 +58,6 @@ target_link_libraries(${PROJECT_NAME}
         PRIVATE
         uring
 )
-
-option(NATIVE "Enable native optimization")
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    find_package(mimalloc REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-            PRIVATE
-            mimalloc
-    )
-
-    if (NATIVE)
-        target_compile_options(${PROJECT_NAME}
-                PRIVATE
-                -march=native
-        )
-    endif ()
-endif ()
 
 set(installTargets ${PROJECT_NAME}Targets)
 install(TARGETS ${PROJECT_NAME}
