@@ -66,4 +66,8 @@ install(DIRECTORY include/
         DESTINATION include
 )
 
+install(FILES LICENSE
+        DESTINATION share/licenses/${PROJECT_NAME}
+)
+
 add_subdirectory(test)
