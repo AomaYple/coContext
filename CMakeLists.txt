@@ -38,25 +38,31 @@ target_compile_options(${PROJECT_NAME}
         $<$<CONFIG:Release>:-Ofast>
 )
 
-option(NATIVE "Enable native optimization")
-if (CMAKE_BUILD_TYPE STREQUAL "Release" AND NATIVE)
-    target_compile_options(${PROJECT_NAME}
-            PRIVATE
-            -march=native
-    )
-endif ()
-
 target_link_options(${PROJECT_NAME}
         PRIVATE
         $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=leak -fsanitize=undefined>
 )
 
-find_package(mimalloc REQUIRED)
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
         uring
-        $<$<CONFIG:Release>:mimalloc>
 )
+
+option(NATIVE "Enable native optimization")
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    find_package(mimalloc REQUIRED)
+    target_link_libraries(${PROJECT_NAME}
+            PRIVATE
+            mimalloc
+    )
+
+    if (NATIVE)
+        target_compile_options(${PROJECT_NAME}
+                PRIVATE
+                -march=native
+        )
+    endif ()
+endif ()
 
 set(installTargets ${PROJECT_NAME}Targets)
 install(TARGETS ${PROJECT_NAME}
