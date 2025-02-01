@@ -62,7 +62,7 @@ configure_package_config_file(cmake/${PROJECT_NAME}Config.cmake.in ${PROJECT_NAM
 )
 
 write_basic_package_version_file(${PROJECT_NAME}ConfigVersion.cmake
-        COMPATIBILITY SameMinorVersion
+        COMPATIBILITY SameMajorVersion
 )
 
 install(FILES
