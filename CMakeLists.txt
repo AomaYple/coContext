@@ -15,7 +15,9 @@ set_target_properties(${PROJECT_NAME}
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
         src/*.cpp
 )
-if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    find_package(mimalloc REQUIRED)
+else ()
     list(REMOVE_ITEM SOURCES
             ${CMAKE_CURRENT_SOURCE_DIR}/src/memory/MiMallocResource.cpp
     )
