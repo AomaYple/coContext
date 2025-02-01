@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 
-project(coContext)
+project(coContext VERSION 1.0.0)
 
 add_library(${PROJECT_NAME} SHARED)
 
@@ -52,22 +52,41 @@ target_link_libraries(${PROJECT_NAME}
         $<$<CONFIG:Release>:mimalloc>
 )
 
-set(installTargets ${PROJECT_NAME}Targets)
-install(TARGETS ${PROJECT_NAME}
-        EXPORT ${installTargets}
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(cmake/${PROJECT_NAME}Config.cmake.in ${PROJECT_NAME}Config.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROcJECT_NAME}
 )
 
-install(EXPORT ${installTargets}
-        FILE ${PROJECT_NAME}Config.cmake
-        DESTINATION lib/cmake/${PROJECT_NAME}
+write_basic_package_version_file(${PROJECT_NAME}ConfigVersion.cmake
+        COMPATIBILITY SameMinorVersion
+)
+
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+
+        DESTINATION
+        ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 install(DIRECTORY include/
-        DESTINATION include
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(FILES LICENSE
-        DESTINATION share/licenses/${PROJECT_NAME}
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/licenses/${PROJECT_NAME}
+)
+
+install(EXPORT ${PROJECT_NAME}Targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}Targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 add_subdirectory(test)
