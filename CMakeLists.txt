@@ -15,6 +15,7 @@ set_target_properties(${PROJECT_NAME}
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
         src/*.cpp
 )
+
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     find_package(mimalloc REQUIRED)
 else ()
