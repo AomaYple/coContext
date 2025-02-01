@@ -15,14 +15,7 @@ set_target_properties(${PROJECT_NAME}
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
         src/*.cpp
 )
-
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    find_package(mimalloc REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-            PRIVATE
-            mimalloc
-    )
-else ()
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")
     list(REMOVE_ITEM SOURCES
             ${CMAKE_CURRENT_SOURCE_DIR}/src/memory/MiMallocResource.cpp
     )
@@ -40,7 +33,6 @@ target_include_directories(${PROJECT_NAME}
 )
 
 option(NATIVE "Enable native optimization")
-
 target_compile_options(${PROJECT_NAME}
         PRIVATE
         -Wall -Wextra -Wpedantic
@@ -57,6 +49,7 @@ target_link_options(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
         uring
+        $<$<CONFIG:Release>:mimalloc>
 )
 
 set(installTargets ${PROJECT_NAME}Targets)
