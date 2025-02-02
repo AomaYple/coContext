@@ -98,7 +98,7 @@ target_link_libraries(your_target
 测试：
 
 使用 [wrk](https://github.com/wg/wrk)
-进行压力测试 [test/benchmark.cpp](https://github.com/AomaYple/coContext/blob/main/test/benchmark.cpp)
+进行压力测试 [example/benchmark.cpp](https://github.com/AomaYple/coContext/blob/main/example/benchmark.cpp)
 
 ```
 ❯ wrk -t 16 -c 1024 http://localhost:8080
