@@ -1,0 +1,17 @@
+#include <coContext/coContext.hpp>
+#include <print>
+
+[[nodiscard]] auto function() -> coContext::Task<> { std::println("{}", co_await coContext::close(-1)); }
+
+constexpr auto execute() {
+    spawn(function);
+
+    coContext::run();
+}
+
+auto main() -> int {
+    std::vector<std::jthread> workers;
+    for (std::uint32_t i{}; i != std::thread::hardware_concurrency() - 1; ++i) workers.emplace_back(execute);
+
+    execute();
+}
