@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <ranges>
+#include <syncstream>
 
 using namespace std::string_view_literals;
 
@@ -19,35 +20,32 @@ namespace {
         Node *next;
     };
 
-    std::ostream *outputStream{std::addressof(std::clog)};
+    std::atomic outputStream{std::addressof(std::clog)};
     std::atomic<Node *> head;
     std::atomic_flag notifyVariable, isDisableWrite;
     std::atomic level{coContext::Log::Level::info};
 
-    constexpr auto output() {
-        Node *node{head.exchange(nullptr, std::memory_order::relaxed)};
-
-        std::pmr::vector<coContext::Log> logs{coContext::internal::getUnSyncMemoryResource()};
-        while (node != nullptr) {
-            logs.emplace_back(std::move(node->log));
-
-            Node *const next{node->next};
-            delete node;
-            node = next;
-        }
-
-        for (const auto &log : logs | std::views::reverse) std::println(*outputStream, "{}"sv, log);
-    }
-
     constexpr auto work(const std::stop_token token) {
-        output();
+        do {
+            Node *node{head.exchange(nullptr, std::memory_order::relaxed)};
 
-        while (!token.stop_requested()) {
+            std::pmr::vector<coContext::Log> logs{coContext::internal::getUnSyncMemoryResource()};
+            while (node != nullptr) {
+                logs.emplace_back(std::move(node->log));
+
+                Node *const next{node->next};
+                delete node;
+                node = next;
+            }
+
+            for (const auto &log : logs | std::views::reverse) {
+                std::osyncstream syncOutputStream{*outputStream.load(std::memory_order::relaxed)};
+                std::println(syncOutputStream, "{}"sv, log);
+            }
+
             notifyVariable.wait(false, std::memory_order::relaxed);
             notifyVariable.clear(std::memory_order::relaxed);
-
-            output();
-        }
+        } while (!token.stop_requested());
     }
 
     std::jthread worker{work};
@@ -69,7 +67,7 @@ auto coContext::logger::stop() noexcept -> void {
 }
 
 auto coContext::logger::setOutputStream(std::ostream *const newOutputStream) noexcept -> void {
-    outputStream = newOutputStream;
+    outputStream.store(newOutputStream, std::memory_order::relaxed);
 }
 
 auto coContext::logger::enableWrite() noexcept -> void { isDisableWrite.clear(std::memory_order::relaxed); }
