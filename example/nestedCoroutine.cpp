@@ -12,7 +12,7 @@ using namespace std::string_view_literals;
 
     std::int32_t result{co_await functionB()};
 
-    result += co_await coContext::close(-1);
+    result += co_await coContext::noOperation();
 
     std::println("{}"sv, result);
 }
