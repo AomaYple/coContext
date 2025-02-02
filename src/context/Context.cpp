@@ -3,7 +3,6 @@
 #include "../log/Exception.hpp"
 #include "coContext/coroutine/BasePromise.hpp"
 #include "coContext/log/logger.hpp"
-#include "coContext/ring/Submission.hpp"
 
 #include <sys/resource.h>
 
@@ -85,15 +84,15 @@ auto coContext::internal::Context::spawn(Coroutine coroutine) -> void {
     this->unscheduledCoroutines.emplace_back(std::move(coroutine));
 }
 
-auto coContext::internal::Context::getSubmission() const -> Submission {
+auto coContext::internal::Context::getSubmission() const -> io_uring_sqe * {
     try {
-        return Submission{this->ring->getSubmission()};
+        return this->ring->getSubmission();
     } catch (Exception &exception) {
         logger::write(Log{std::move(exception.getLog())});
 
         this->ring->submit();
 
-        return Submission{this->ring->getSubmission()};
+        return this->ring->getSubmission();
     }
 }
 

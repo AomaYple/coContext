@@ -27,11 +27,11 @@ namespace {
 
     [[nodiscard]] constexpr auto rawSleep(const std::chrono::seconds seconds,
                                           const std::chrono::nanoseconds nanoseconds, const std::uint32_t flags) {
-        const coContext::internal::Submission submission{context.getSubmission()};
-        coContext::internal::AsyncWaiter asyncWaiter{submission};
+        auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
 
-        asyncWaiter.setTimeSpecification(std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
-        submission.timeout(*asyncWaiter.getTimeSpecification(), 0, flags);
+        coContext::internal::AsyncWaiter asyncWaiter{
+            coContext::internal::Submission::timeout(context.getSubmission(), *timeSpecification, 0, flags)};
+        asyncWaiter.setTimeSpecification(std::move(timeSpecification));
 
         return asyncWaiter;
     }
@@ -61,18 +61,14 @@ auto coContext::syncCancelAny(const std::chrono::seconds seconds, const std::chr
 }
 
 auto coContext::toDirect(const std::span<std::int32_t> fileDescriptors) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.updateFileDescriptors(fileDescriptors, IORING_FILE_INDEX_ALLOC);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::updateFileDescriptors(context.getSubmission(), fileDescriptors, IORING_FILE_INDEX_ALLOC)};
 }
 
 auto coContext::installDirect(const std::int32_t directFileDescriptor, const bool isCloseOnExecute)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.installDirect(directFileDescriptor, isCloseOnExecute ? 0 : IORING_FIXED_FD_NO_CLOEXEC);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::installDirect(
+        context.getSubmission(), directFileDescriptor, isCloseOnExecute ? 0 : IORING_FIXED_FD_NO_CLOEXEC)};
 }
 
 auto coContext::none() noexcept -> internal::Marker { return internal::Marker{}; }
@@ -83,13 +79,12 @@ auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::n
                         const ClockSource clockSource) -> internal::Marker {
     return internal::Marker{IOSQE_IO_LINK, [seconds, nanoseconds, clockSource] constexpr {
                                 spawn([seconds, nanoseconds, clockSource] -> Task<> {
-                                    const internal::Submission submission{context.getSubmission()};
-                                    internal::AsyncWaiter asyncWaiter{submission};
+                                    auto timeSpecification{
+                                        std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
 
-                                    asyncWaiter.setTimeSpecification(
-                                        std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
-                                    submission.linkTimeout(*asyncWaiter.getTimeSpecification(),
-                                                           setClockSource(clockSource));
+                                    internal::AsyncWaiter asyncWaiter{internal::Submission::linkTimeout(
+                                        context.getSubmission(), *timeSpecification, setClockSource(clockSource))};
+                                    asyncWaiter.setTimeSpecification(std::move(timeSpecification));
 
                                     co_await asyncWaiter;
                                 });
@@ -97,24 +92,17 @@ auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::n
 }
 
 auto coContext::cancel(const std::uint64_t taskId) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.cancel(taskId, 0);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::cancel(context.getSubmission(), taskId, 0)};
 }
 
 auto coContext::cancel(const std::int32_t fileDescriptor, const bool isMatchAll) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.cancel(fileDescriptor, isMatchAll ? IORING_ASYNC_CANCEL_ALL : 0);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::cancel(context.getSubmission(), fileDescriptor,
+                                                              isMatchAll ? IORING_ASYNC_CANCEL_ALL : 0)};
 }
 
 auto coContext::cancelAny() -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.cancel(std::uint64_t{}, std::int32_t{IORING_ASYNC_CANCEL_ANY});
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::cancel(context.getSubmission(), std::uint64_t{}, std::int32_t{IORING_ASYNC_CANCEL_ANY})};
 }
 
 auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
@@ -125,11 +113,11 @@ auto coContext::sleep(const std::chrono::seconds seconds, const std::chrono::nan
 auto coContext::updateSleep(const std::uint64_t taskId, const std::chrono::seconds seconds,
                             const std::chrono::nanoseconds nanoseconds, const ClockSource clockSource)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    internal::AsyncWaiter asyncWaiter{submission};
+    auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
 
-    asyncWaiter.setTimeSpecification(std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count()));
-    submission.updateTimeout(taskId, *asyncWaiter.getTimeSpecification(), setClockSource(clockSource));
+    internal::AsyncWaiter asyncWaiter{internal::Submission::updateTimeout(
+        context.getSubmission(), taskId, *timeSpecification, setClockSource(clockSource))};
+    asyncWaiter.setTimeSpecification(std::move(timeSpecification));
 
     return asyncWaiter;
 }
@@ -145,121 +133,88 @@ auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> 
 }
 
 auto coContext::poll(const std::int32_t fileDescriptor, const std::uint32_t mask) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.poll(fileDescriptor, mask);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::poll(context.getSubmission(), fileDescriptor, mask)};
 }
 
 auto coContext::updatePoll(const std::uint64_t taskId, const std::uint32_t mask) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.updatePoll(taskId, 0, mask, IORING_POLL_UPDATE_EVENTS);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::updatePoll(context.getSubmission(), taskId, 0, mask, IORING_POLL_UPDATE_EVENTS)};
 }
 
 auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> action,
                              const std::int32_t fileDescriptor, const std::uint32_t mask, const internal::Marker marker)
     -> Task<> {
-    const internal::Submission submission{context.getSubmission()};
-    submission.multiplePoll(fileDescriptor, mask);
-
-    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
+    internal::AsyncWaiter asyncWaiter{
+        internal::AsyncWaiter{internal::Submission::multiplePoll(context.getSubmission(), fileDescriptor, mask)} |
+        marker};
 
     do action(co_await asyncWaiter);
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
 auto coContext::close(const std::int32_t fileDescriptor) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.close(fileDescriptor);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::close(context.getSubmission(), fileDescriptor)};
 }
 
 auto coContext::closeDirect(const std::int32_t directFileDescriptor) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.closeDirect(directFileDescriptor);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::closeDirect(context.getSubmission(), directFileDescriptor)};
 }
 
 auto coContext::socket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.socket(domain, type, protocol, 0);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::socket(context.getSubmission(), domain, type, protocol, 0)};
 }
 
 auto coContext::directSocket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.directSocket(domain, type, protocol, 0);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::directSocket(context.getSubmission(), domain, type, protocol, 0)};
 }
 
 auto coContext::getSocketOption(const std::int32_t socketFileDescriptor, const std::int32_t level,
                                 const std::int32_t optionName, const std::span<std::byte> option)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.socketCommand(SOCKET_URING_OP_GETSOCKOPT, socketFileDescriptor, level, optionName, option);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::socketCommand(
+        context.getSubmission(), SOCKET_URING_OP_GETSOCKOPT, socketFileDescriptor, level, optionName, option)};
 }
 
 auto coContext::setSocketOption(const std::int32_t socketFileDescriptor, const std::int32_t level,
                                 const std::int32_t optionName, const std::span<std::byte> option)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.socketCommand(SOCKET_URING_OP_SETSOCKOPT, socketFileDescriptor, level, optionName, option);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::socketCommand(
+        context.getSubmission(), SOCKET_URING_OP_SETSOCKOPT, socketFileDescriptor, level, optionName, option)};
 }
 
 auto coContext::getSocketReceiveBufferUnreadDataSize(const std::int32_t socketFileDescriptor) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.socketCommand(SOCKET_URING_OP_SIOCINQ, socketFileDescriptor, 0, 0, std::span<std::byte>{});
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::socketCommand(
+        context.getSubmission(), SOCKET_URING_OP_SIOCINQ, socketFileDescriptor, 0, 0, std::span<std::byte>{})};
 }
 
 auto coContext::getSocketSendBufferUnsentDataSize(const std::int32_t socketFileDescriptor) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.socketCommand(SOCKET_URING_OP_SIOCOUTQ, socketFileDescriptor, 0, 0, std::span<std::byte>{});
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::socketCommand(
+        context.getSubmission(), SOCKET_URING_OP_SIOCOUTQ, socketFileDescriptor, 0, 0, std::span<std::byte>{})};
 }
 
 auto coContext::discardData(const std::int32_t fileDescriptor, const std::uint64_t offset, const std::uint64_t length)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.discardCommand(fileDescriptor, offset, length);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::discardCommand(context.getSubmission(), fileDescriptor, offset, length)};
 }
 
 auto coContext::bind(const std::int32_t socketFileDescriptor, sockaddr &address, const socklen_t addressLength)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.bind(socketFileDescriptor, address, addressLength);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::bind(context.getSubmission(), socketFileDescriptor, address, addressLength)};
 }
 
 auto coContext::listen(const std::int32_t socketFileDescriptor, const std::int32_t backlog) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.listen(socketFileDescriptor, backlog);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::listen(context.getSubmission(), socketFileDescriptor, backlog)};
 }
 
 auto coContext::accept(const std::int32_t socketFileDescriptor, sockaddr *const address, socklen_t *const addressLength,
                        const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.accept(socketFileDescriptor, address, addressLength, flags);
-
+    const internal::Submission submission{
+        internal::Submission::accept(context.getSubmission(), socketFileDescriptor, address, addressLength, flags)};
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -267,9 +222,8 @@ auto coContext::accept(const std::int32_t socketFileDescriptor, sockaddr *const 
 
 auto coContext::acceptDirect(const std::int32_t socketFileDescriptor, sockaddr *const address,
                              socklen_t *const addressLength, const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.acceptDirect(socketFileDescriptor, address, addressLength, flags, IORING_FILE_INDEX_ALLOC);
-
+    const internal::Submission submission{internal::Submission::acceptDirect(
+        context.getSubmission(), socketFileDescriptor, address, addressLength, flags, IORING_FILE_INDEX_ALLOC)};
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -279,9 +233,8 @@ auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void>
                                const std::int32_t socketFileDescriptor, sockaddr *const address,
                                socklen_t *const addressLength, const std::int32_t flags, const internal::Marker marker)
     -> Task<> {
-    const internal::Submission submission{context.getSubmission()};
-    submission.multipleAccept(socketFileDescriptor, address, addressLength, flags);
-
+    const internal::Submission submission{internal::Submission::multipleAccept(
+        context.getSubmission(), socketFileDescriptor, address, addressLength, flags)};
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
@@ -294,9 +247,8 @@ auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)-
                                      const std::int32_t socketFileDescriptor, sockaddr *const address,
                                      socklen_t *const addressLength, const std::int32_t flags,
                                      const internal::Marker marker) -> Task<> {
-    const internal::Submission submission{context.getSubmission()};
-    submission.multipleAcceptDirect(socketFileDescriptor, address, addressLength, flags);
-
+    const internal::Submission submission{internal::Submission::multipleAcceptDirect(
+        context.getSubmission(), socketFileDescriptor, address, addressLength, flags)};
     submission.addIoPriority(IORING_ACCEPT_POLL_FIRST);
 
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
@@ -307,24 +259,18 @@ auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)-
 
 auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr address, const socklen_t addressLength)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.connect(socketFileDescriptor, address, addressLength);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::connect(context.getSubmission(), socketFileDescriptor, address, addressLength)};
 }
 
 auto coContext::shutdown(const std::int32_t socketFileDescriptor, const std::int32_t how) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.shutdown(socketFileDescriptor, how);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::shutdown(context.getSubmission(), socketFileDescriptor, how)};
 }
 
 auto coContext::receive(const std::int32_t socketFileDescriptor, const std::span<std::byte> buffer,
                         const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.receive(socketFileDescriptor, buffer, flags);
-
+    const internal::Submission submission{
+        internal::Submission::receive(context.getSubmission(), socketFileDescriptor, buffer, flags)};
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -332,9 +278,8 @@ auto coContext::receive(const std::int32_t socketFileDescriptor, const std::span
 
 auto coContext::receive(const std::int32_t socketFileDescriptor, msghdr &message, const std::uint32_t flags)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.receive(socketFileDescriptor, message, flags);
-
+    const internal::Submission submission{
+        internal::Submission::receive(context.getSubmission(), socketFileDescriptor, message, flags)};
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -347,9 +292,8 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
     do {
         isRestart = false;
 
-        const internal::Submission submission{context.getSubmission()};
-        submission.multipleReceive(socketFileDescriptor, std::span<std::byte>{}, flags);
-
+        const internal::Submission submission{internal::Submission::multipleReceive(
+            context.getSubmission(), socketFileDescriptor, std::span<std::byte>{}, flags)};
         submission.addFlags(IOSQE_BUFFER_SELECT);
         submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
         submission.setBufferGroup(context.getBufferRing().getId());
@@ -392,9 +336,8 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
 
 auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
                      const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.send(socketFileDescriptor, buffer, flags);
-
+    const internal::Submission submission{
+        internal::Submission::send(context.getSubmission(), socketFileDescriptor, buffer, flags)};
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -403,9 +346,8 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<co
 auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
                      const std::int32_t flags, const sockaddr destinationAddress,
                      const socklen_t destinationAddressLength) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.send(socketFileDescriptor, buffer, flags, destinationAddress, destinationAddressLength);
-
+    const internal::Submission submission{internal::Submission::send(
+        context.getSubmission(), socketFileDescriptor, buffer, flags, destinationAddress, destinationAddressLength)};
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -413,9 +355,8 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<co
 
 auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr &message, const std::uint32_t flags)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.send(socketFileDescriptor, message, flags);
-
+    const internal::Submission submission{
+        internal::Submission::send(context.getSubmission(), socketFileDescriptor, message, flags)};
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     return internal::AsyncWaiter{submission};
@@ -426,10 +367,10 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
                              std::int32_t flags, const internal::Marker marker) -> Task<> {
     if ((marker.getFlags() & IOSQE_IO_LINK) != 0) flags |= MSG_WAITALL;
 
-    const internal::Submission submission{context.getSubmission()};
-    submission.zeroCopySend(socketFileDescriptor, buffer, flags, IORING_RECVSEND_POLL_FIRST);
-
-    internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
+    internal::AsyncWaiter asyncWaiter{
+        internal::AsyncWaiter{internal::Submission::zeroCopySend(context.getSubmission(), socketFileDescriptor, buffer,
+                                                                 flags, IORING_RECVSEND_POLL_FIRST)} |
+        marker};
 
     const std::int32_t result{co_await asyncWaiter};
     if ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
@@ -447,9 +388,8 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
                              const internal::Marker marker) -> Task<> {
     if ((marker.getFlags() & IOSQE_IO_LINK) != 0) flags |= MSG_WAITALL;
 
-    const internal::Submission submission{context.getSubmission()};
-    submission.zeroCopySend(socketFileDescriptor, message, flags);
-
+    const internal::Submission submission{
+        internal::Submission::zeroCopySend(context.getSubmission(), socketFileDescriptor, message, flags)};
     submission.addIoPriority(IORING_RECVSEND_POLL_FIRST);
 
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
@@ -468,90 +408,65 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
 auto coContext::splice(const std::int32_t inFileDescriptor, const std::int64_t inOffset,
                        const std::int32_t outFileDescriptor, const std::int64_t outOffset, const std::uint32_t length,
                        const std::uint32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.splice(inFileDescriptor, inOffset, outFileDescriptor, outOffset, length, flags);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::splice(context.getSubmission(), inFileDescriptor, inOffset,
+                                                              outFileDescriptor, outOffset, length, flags)};
 }
 
 auto coContext::tee(const std::int32_t inFileDescriptor, const std::int32_t outFileDescriptor,
                     const std::uint32_t length, const std::uint32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.tee(inFileDescriptor, outFileDescriptor, length, flags);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::tee(context.getSubmission(), inFileDescriptor, outFileDescriptor, length, flags)};
 }
 
 auto coContext::open(const std::filesystem::path &path, const std::int32_t flags, const mode_t mode)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.open(path, flags, mode);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::open(context.getSubmission(), path, flags, mode)};
 }
 
 auto coContext::open(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
                      const std::int32_t flags, const mode_t mode) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.open(directoryFileDescriptor, path, flags, mode);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::open(context.getSubmission(), directoryFileDescriptor, path, flags, mode)};
 }
 
 auto coContext::open(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path, open_how &openHow)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.open(directoryFileDescriptor, path, openHow);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::open(context.getSubmission(), directoryFileDescriptor, path, openHow)};
 }
 
 auto coContext::openDirect(const std::filesystem::path &path, const std::int32_t flags, const mode_t mode)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.openDirect(path, flags, mode, IORING_FILE_INDEX_ALLOC);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::openDirect(context.getSubmission(), path, flags, mode, IORING_FILE_INDEX_ALLOC)};
 }
 
 auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
                            const std::int32_t flags, const mode_t mode) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.openDirect(directoryFileDescriptor, path, flags, mode, IORING_FILE_INDEX_ALLOC);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::openDirect(context.getSubmission(), directoryFileDescriptor,
+                                                                  path, flags, mode, IORING_FILE_INDEX_ALLOC)};
 }
 
 auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
                            open_how &openHow) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.openDirect(directoryFileDescriptor, path, openHow, IORING_FILE_INDEX_ALLOC);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::openDirect(context.getSubmission(), directoryFileDescriptor,
+                                                                  path, openHow, IORING_FILE_INDEX_ALLOC)};
 }
 
 auto coContext::read(const std::int32_t fileDescriptor, const std::span<std::byte> buffer, const std::uint64_t offset)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.read(fileDescriptor, buffer, offset);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::read(context.getSubmission(), fileDescriptor, buffer, offset)};
 }
 
 auto coContext::read(const std::int32_t fileDescriptor, const std::span<const iovec> buffer, const std::uint64_t offset)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.read(fileDescriptor, buffer, offset);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::read(context.getSubmission(), fileDescriptor, buffer, offset)};
 }
 
 auto coContext::read(const std::int32_t fileDescriptor, const std::span<const iovec> buffer, const std::uint64_t offset,
                      const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.read(fileDescriptor, buffer, offset, flags);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::read(context.getSubmission(), fileDescriptor, buffer, offset, flags)};
 }
 
 auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
@@ -561,10 +476,10 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
     do {
         isRestart = false;
 
-        const internal::Submission submission{context.getSubmission()};
-        submission.multipleRead(fileDescriptor, 0, offset, context.getBufferRing().getId());
-
-        internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
+        internal::AsyncWaiter asyncWaiter{
+            internal::AsyncWaiter{internal::Submission::multipleRead(context.getSubmission(), fileDescriptor, 0, offset,
+                                                                     context.getBufferRing().getId())} |
+            marker};
 
         std::uint32_t resumeFlags;
         do {
@@ -602,221 +517,155 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
 
 auto coContext::write(const std::int32_t fileDescriptor, const std::span<const std::byte> buffer,
                       const std::uint64_t offset) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.write(fileDescriptor, buffer, offset);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::write(context.getSubmission(), fileDescriptor, buffer, offset)};
 }
 
 auto coContext::write(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
                       const std::uint64_t offset) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.write(fileDescriptor, buffer, offset);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::write(context.getSubmission(), fileDescriptor, buffer, offset)};
 }
 
 auto coContext::write(const std::int32_t fileDescriptor, const std::span<const iovec> buffer,
                       const std::uint64_t offset, const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.write(fileDescriptor, buffer, offset, flags);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::write(context.getSubmission(), fileDescriptor, buffer, offset, flags)};
 }
 
 auto coContext::syncFile(const std::int32_t fileDescriptor, const bool isSyncMetadata) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.syncFile(fileDescriptor, isSyncMetadata ? 0 : IORING_FSYNC_DATASYNC);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::syncFile(context.getSubmission(), fileDescriptor,
+                                                                isSyncMetadata ? 0 : IORING_FSYNC_DATASYNC)};
 }
 
 auto coContext::syncFile(const std::int32_t fileDescriptor, const std::uint64_t offset, const std::uint32_t length,
                          const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.syncFile(fileDescriptor, offset, length, flags);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::syncFile(context.getSubmission(), fileDescriptor, offset, length, flags)};
 }
 
 auto coContext::adviseFile(const std::int32_t fileDescriptor, const std::uint64_t offset, const off_t length,
                            const std::int32_t advice) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.adviseFile(fileDescriptor, offset, length, advice);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::adviseFile(context.getSubmission(), fileDescriptor, offset, length, advice)};
 }
 
 auto coContext::truncate(const std::int32_t fileDescriptor, const loff_t length) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.truncate(fileDescriptor, length);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::truncate(context.getSubmission(), fileDescriptor, length)};
 }
 
 auto coContext::allocateFile(const std::int32_t fileDescriptor, const std::int32_t mode, const std::uint64_t offset,
                              const std::uint64_t length) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.allocateFile(fileDescriptor, mode, offset, length);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::allocateFile(context.getSubmission(), fileDescriptor, mode, offset, length)};
 }
 
 auto coContext::status(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
                        const std::int32_t flags, const std::uint32_t mask, struct statx &buffer)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.status(directoryFileDescriptor, path, flags, mask, buffer);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::status(context.getSubmission(), directoryFileDescriptor, path, flags, mask, buffer)};
 }
 
 auto coContext::getExtendedAttribute(const std::filesystem::path &path, const std::string_view name,
                                      const std::span<char> value) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.getExtendedAttribute(path, name, value);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::getExtendedAttribute(context.getSubmission(), path, name, value)};
 }
 
 auto coContext::getExtendedAttribute(const std::int32_t fileDescriptor, const std::string_view name,
                                      const std::span<char> value) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.getExtendedAttribute(fileDescriptor, name, value);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::getExtendedAttribute(context.getSubmission(), fileDescriptor, name, value)};
 }
 
 auto coContext::setExtendedAttribute(const std::filesystem::path &path, const std::string_view name,
                                      const std::span<char> value, const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.setExtendedAttribute(path, name, value, flags);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::setExtendedAttribute(context.getSubmission(), path, name, value, flags)};
 }
 
 auto coContext::setExtendedAttribute(const std::int32_t fileDescriptor, const std::string_view name,
                                      const std::span<char> value, const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.setExtendedAttribute(fileDescriptor, name, value, flags);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::setExtendedAttribute(context.getSubmission(), fileDescriptor, name, value, flags)};
 }
 
 auto coContext::makeDirectory(const std::filesystem::path &path, const mode_t mode) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.makeDirectory(path, mode);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::makeDirectory(context.getSubmission(), path, mode)};
 }
 
 auto coContext::makeDirectory(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
                               const mode_t mode) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.makeDirectory(directoryFileDescriptor, path, mode);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::makeDirectory(context.getSubmission(), directoryFileDescriptor, path, mode)};
 }
 
 auto coContext::rename(const std::filesystem::path &oldPath, const std::filesystem::path &newPath)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.rename(oldPath, newPath);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::rename(context.getSubmission(), oldPath, newPath)};
 }
 
 auto coContext::rename(const std::int32_t oldDirectoryFileDescriptor, const std::filesystem::path &oldPath,
                        const std::int32_t newDirectoryFileDescriptor, const std::filesystem::path &newPath,
                        const std::uint32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.rename(oldDirectoryFileDescriptor, oldPath, newDirectoryFileDescriptor, newPath, flags);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::rename(context.getSubmission(), oldDirectoryFileDescriptor,
+                                                              oldPath, newDirectoryFileDescriptor, newPath, flags)};
 }
 
 auto coContext::link(const std::filesystem::path &oldPath, const std::filesystem::path &newPath)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.link(oldPath, newPath, 0);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::link(context.getSubmission(), oldPath, newPath, 0)};
 }
 
 auto coContext::link(const std::int32_t oldDirectoryFileDescriptor, const std::filesystem::path &oldPath,
                      const std::int32_t newDirectoryFileDescriptor, const std::filesystem::path &newPath,
                      const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.link(oldDirectoryFileDescriptor, oldPath, newDirectoryFileDescriptor, newPath, flags);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::link(context.getSubmission(), oldDirectoryFileDescriptor,
+                                                            oldPath, newDirectoryFileDescriptor, newPath, flags)};
 }
 
 auto coContext::symbolicLink(const std::string_view target, const std::filesystem::path &linkPath)
     -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.symbolicLink(target, linkPath);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::symbolicLink(context.getSubmission(), target, linkPath)};
 }
 
 auto coContext::symbolicLink(const std::string_view target, const std::int32_t newDirectoryFileDescriptor,
                              const std::filesystem::path &linkPath) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.symbolicLink(target, newDirectoryFileDescriptor, linkPath);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::symbolicLink(context.getSubmission(), target, newDirectoryFileDescriptor, linkPath)};
 }
 
 auto coContext::unlink(const std::filesystem::path &path) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.unlink(path, 0);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::unlink(context.getSubmission(), path, 0)};
 }
 
 auto coContext::unlink(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
                        const std::int32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.unlink(directoryFileDescriptor, path, flags);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::unlink(context.getSubmission(), directoryFileDescriptor, path, flags)};
 }
 
 auto coContext::adviseMemory(const std::span<std::byte> buffer, const std::int32_t advice) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.adviseMemory(buffer, advice);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::adviseMemory(context.getSubmission(), buffer, advice)};
 }
 
 auto coContext::wait(const idtype_t idType, const id_t id, siginfo_t *const signalInformation,
                      const std::int32_t options) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.wait(idType, id, signalInformation, options, 0);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::wait(context.getSubmission(), idType, id, signalInformation, options, 0)};
 }
 
 auto coContext::waitFutex(std::uint32_t &futex, const std::uint64_t value, const std::uint64_t mask,
                           const std::uint32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.waitFutex(futex, value, mask, flags, 0);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::waitFutex(context.getSubmission(), futex, value, mask, flags, 0)};
 }
 
 auto coContext::waitFutex(const std::span<futex_waitv> vectorizedFutexs) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.waitFutex(vectorizedFutexs, 0);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{internal::Submission::waitFutex(context.getSubmission(), vectorizedFutexs, 0)};
 }
 
 auto coContext::wakeFutex(std::uint32_t &futex, const std::uint64_t value, const std::uint64_t mask,
                           const std::uint32_t flags) -> internal::AsyncWaiter {
-    const internal::Submission submission{context.getSubmission()};
-    submission.wakeFutex(futex, value, mask, flags, 0);
-
-    return internal::AsyncWaiter{submission};
+    return internal::AsyncWaiter{
+        internal::Submission::waitFutex(context.getSubmission(), futex, value, mask, flags, 0)};
 }

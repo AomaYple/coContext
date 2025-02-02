@@ -6,6 +6,249 @@
 namespace coContext::internal {
     class Submission {
     public:
+        [[nodiscard]] static auto updateFileDescriptors(io_uring_sqe *handle, std::span<std::int32_t> fileDescriptors,
+                                                        std::int32_t offset) noexcept -> Submission;
+
+        [[nodiscard]] static auto installDirect(io_uring_sqe *handle, std::int32_t directFileDescriptor,
+                                                std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto linkTimeout(io_uring_sqe *handle, __kernel_timespec &timeSpecification,
+                                              std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto cancel(io_uring_sqe *handle, std::uint64_t userData, std::int32_t flags) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto cancel(io_uring_sqe *handle, std::int32_t fileDescriptor,
+                                         std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto timeout(io_uring_sqe *handle, __kernel_timespec &timeSpecification,
+                                          std::uint32_t count, std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto updateTimeout(io_uring_sqe *handle, std::uint64_t userData,
+                                                __kernel_timespec &timeSpecification, std::uint32_t flags) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto poll(io_uring_sqe *handle, std::int32_t fileDescriptor, std::uint32_t mask) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto updatePoll(io_uring_sqe *handle, std::uint64_t oldUserData, std::uint64_t newUserData,
+                                             std::uint32_t mask, std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto multiplePoll(io_uring_sqe *handle, std::int32_t fileDescriptor,
+                                               std::uint32_t mask) noexcept -> Submission;
+
+        [[nodiscard]] static auto close(io_uring_sqe *handle, std::int32_t fileDescriptor) noexcept -> Submission;
+
+        [[nodiscard]] static auto closeDirect(io_uring_sqe *handle, std::int32_t directFileDescriptor) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto socket(io_uring_sqe *handle, std::int32_t domain, std::int32_t type,
+                                         std::int32_t protocol, std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto directSocket(io_uring_sqe *handle, std::int32_t domain, std::int32_t type,
+                                               std::int32_t protocol, std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto socketCommand(io_uring_sqe *handle, std::int32_t operation,
+                                                std::int32_t socketFileDescriptor, std::int32_t level,
+                                                std::int32_t optionName, std::span<std::byte> option) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto discardCommand(io_uring_sqe *handle, std::int32_t fileDescriptor,
+                                                 std::uint64_t offset, std::uint64_t length) noexcept -> Submission;
+
+        [[nodiscard]] static auto bind(io_uring_sqe *handle, std::int32_t socketFileDescriptor, sockaddr &address,
+                                       socklen_t addressLength) noexcept -> Submission;
+
+        [[nodiscard]] static auto listen(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                         std::int32_t backlog) noexcept -> Submission;
+
+        [[nodiscard]] static auto accept(io_uring_sqe *handle, std::int32_t socketFileDescriptor, sockaddr *address,
+                                         socklen_t *addressLength, std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto acceptDirect(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                               sockaddr *address, socklen_t *addressLength, std::int32_t flags,
+                                               std::uint32_t fileDescriptorIndex) noexcept -> Submission;
+
+        [[nodiscard]] static auto multipleAccept(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                                 sockaddr *address, socklen_t *addressLength,
+                                                 std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto multipleAcceptDirect(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                                       sockaddr *address, socklen_t *addressLength,
+                                                       std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto connect(io_uring_sqe *handle, std::int32_t socketFileDescriptor, sockaddr address,
+                                          socklen_t addressLength) noexcept -> Submission;
+
+        [[nodiscard]] static auto shutdown(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                           std::int32_t how) noexcept -> Submission;
+
+        [[nodiscard]] static auto receive(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                          std::span<std::byte> buffer, std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto receive(io_uring_sqe *handle, std::int32_t socketFileDescriptor, msghdr &message,
+                                          std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto multipleReceive(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                                  std::span<std::byte> buffer, std::int32_t flags) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto send(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                       std::span<const std::byte> buffer, std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto send(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                       std::span<const std::byte> buffer, std::int32_t flags,
+                                       sockaddr destinationAddress, socklen_t destinationAddressLength) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto send(io_uring_sqe *handle, std::int32_t socketFileDescriptor, const msghdr &message,
+                                       std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto zeroCopySend(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                               std::span<const std::byte> buffer, std::int32_t flags,
+                                               std::uint32_t zeroCopyFlags) noexcept -> Submission;
+
+        [[nodiscard]] static auto zeroCopySend(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                               const msghdr &message, std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto splice(io_uring_sqe *handle, std::int32_t inFileDescriptor, std::int64_t inOffset,
+                                         std::int32_t outFileDescriptor, std::int64_t outOffset, std::uint32_t length,
+                                         std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto tee(io_uring_sqe *handle, std::int32_t inFileDescriptor,
+                                      std::int32_t outFileDescriptor, std::uint32_t length,
+                                      std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto open(io_uring_sqe *handle, const std::filesystem::path &path, std::int32_t flags,
+                                       mode_t mode) noexcept -> Submission;
+
+        [[nodiscard]] static auto open(io_uring_sqe *handle, std::int32_t directoryFileDescriptor,
+                                       const std::filesystem::path &path, std::int32_t flags, mode_t mode) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto open(io_uring_sqe *handle, std::int32_t directoryFileDescriptor,
+                                       const std::filesystem::path &path, open_how &openHow) noexcept -> Submission;
+
+        [[nodiscard]] static auto openDirect(io_uring_sqe *handle, const std::filesystem::path &path,
+                                             std::int32_t flags, mode_t mode,
+                                             std::uint32_t fileDescriptorIndex) noexcept -> Submission;
+
+        [[nodiscard]] static auto openDirect(io_uring_sqe *handle, std::int32_t directoryFileDescriptor,
+                                             const std::filesystem::path &path, std::int32_t flags, mode_t mode,
+                                             std::uint32_t fileDescriptorIndex) noexcept -> Submission;
+
+        [[nodiscard]] static auto openDirect(io_uring_sqe *handle, std::int32_t directoryFileDescriptor,
+                                             const std::filesystem::path &path, open_how &openHow,
+                                             std::uint32_t fileDescriptorIndex) noexcept -> Submission;
+
+        [[nodiscard]] static auto read(io_uring_sqe *handle, std::int32_t fileDescriptor, std::span<std::byte> buffer,
+                                       std::uint64_t offset) noexcept -> Submission;
+
+        [[nodiscard]] static auto read(io_uring_sqe *handle, std::int32_t fileDescriptor, std::span<const iovec> buffer,
+                                       std::uint64_t offset) noexcept -> Submission;
+
+        [[nodiscard]] static auto read(io_uring_sqe *handle, std::int32_t fileDescriptor, std::span<const iovec> buffer,
+                                       std::uint64_t offset, std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto multipleRead(io_uring_sqe *handle, std::int32_t fileDescriptor, std::uint32_t length,
+                                               std::uint64_t offset, std::int32_t bufferGroup) noexcept -> Submission;
+
+        [[nodiscard]] static auto write(io_uring_sqe *handle, std::int32_t fileDescriptor,
+                                        std::span<const std::byte> buffer, std::uint64_t offset) noexcept -> Submission;
+
+        [[nodiscard]] static auto write(io_uring_sqe *handle, std::int32_t fileDescriptor,
+                                        std::span<const iovec> buffer, std::uint64_t offset) noexcept -> Submission;
+
+        [[nodiscard]] static auto write(io_uring_sqe *handle, std::int32_t fileDescriptor,
+                                        std::span<const iovec> buffer, std::uint64_t offset,
+                                        std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto syncFile(io_uring_sqe *handle, std::int32_t fileDescriptor,
+                                           std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto syncFile(io_uring_sqe *handle, std::int32_t fileDescriptor, std::uint64_t offset,
+                                           std::uint32_t length, std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto adviseFile(io_uring_sqe *handle, std::int32_t fileDescriptor, std::uint64_t offset,
+                                             off_t length, std::int32_t advice) noexcept -> Submission;
+
+        [[nodiscard]] static auto truncate(io_uring_sqe *handle, std::int32_t fileDescriptor, loff_t length) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto allocateFile(io_uring_sqe *handle, std::int32_t fileDescriptor, std::int32_t mode,
+                                               std::uint64_t offset, std::uint64_t length) noexcept -> Submission;
+
+        [[nodiscard]] static auto status(io_uring_sqe *handle, std::int32_t directoryFileDescriptor,
+                                         const std::filesystem::path &path, std::int32_t flags, std::uint32_t mask,
+                                         struct statx &buffer) noexcept -> Submission;
+
+        [[nodiscard]] static auto getExtendedAttribute(io_uring_sqe *handle, const std::filesystem::path &path,
+                                                       std::string_view name, std::span<char> value) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto getExtendedAttribute(io_uring_sqe *handle, std::int32_t fileDescriptor,
+                                                       std::string_view name, std::span<char> value) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto setExtendedAttribute(io_uring_sqe *handle, const std::filesystem::path &path,
+                                                       std::string_view name, std::span<char> value,
+                                                       std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto setExtendedAttribute(io_uring_sqe *handle, std::int32_t fileDescriptor,
+                                                       std::string_view name, std::span<char> value,
+                                                       std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto makeDirectory(io_uring_sqe *handle, const std::filesystem::path &path,
+                                                mode_t mode) noexcept -> Submission;
+
+        [[nodiscard]] static auto makeDirectory(io_uring_sqe *handle, std::int32_t directoryFileDescriptor,
+                                                const std::filesystem::path &path, mode_t mode) noexcept -> Submission;
+
+        [[nodiscard]] static auto rename(io_uring_sqe *handle, const std::filesystem::path &oldPath,
+                                         const std::filesystem::path &newPath) noexcept -> Submission;
+
+        [[nodiscard]] static auto rename(io_uring_sqe *handle, std::int32_t oldDirectoryFileDescriptor,
+                                         const std::filesystem::path &oldPath, std::int32_t newDirectoryFileDescriptor,
+                                         const std::filesystem::path &newPath, std::uint32_t flags) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto link(io_uring_sqe *handle, const std::filesystem::path &oldPath,
+                                       const std::filesystem::path &newPath, std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto link(io_uring_sqe *handle, std::int32_t oldDirectoryFileDescriptor,
+                                       const std::filesystem::path &oldPath, std::int32_t newDirectoryFileDescriptor,
+                                       const std::filesystem::path &newPath, std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto symbolicLink(io_uring_sqe *handle, std::string_view target,
+                                               const std::filesystem::path &linkPath) noexcept -> Submission;
+
+        [[nodiscard]] static auto symbolicLink(io_uring_sqe *handle, std::string_view target,
+                                               std::int32_t newDirectoryFileDescriptor,
+                                               const std::filesystem::path &linkPath) noexcept -> Submission;
+
+        [[nodiscard]] static auto unlink(io_uring_sqe *handle, const std::filesystem::path &path,
+                                         std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto unlink(io_uring_sqe *handle, std::int32_t directoryFileDescriptor,
+                                         const std::filesystem::path &path, std::int32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto adviseMemory(io_uring_sqe *handle, std::span<std::byte> buffer,
+                                               std::int32_t advice) noexcept -> Submission;
+
+        [[nodiscard]] static auto wait(io_uring_sqe *handle, idtype_t idType, id_t id, siginfo_t *signalInformation,
+                                       std::int32_t options, std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto waitFutex(io_uring_sqe *handle, std::uint32_t &futex, std::uint64_t value,
+                                            std::uint64_t mask, std::uint32_t futexFlags, std::uint32_t flags) noexcept
+            -> Submission;
+
+        [[nodiscard]] static auto waitFutex(io_uring_sqe *handle, std::span<futex_waitv> vectorizedFutexs,
+                                            std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto wakeFutex(io_uring_sqe *handle, std::uint32_t &futex, std::uint64_t value,
+                                            std::uint64_t mask, std::uint32_t futexFlags, std::uint32_t flags) noexcept
+            -> Submission;
+
         explicit Submission(io_uring_sqe *handle = {}) noexcept;
 
         constexpr Submission(const Submission &) noexcept = default;
@@ -27,201 +270,6 @@ namespace coContext::internal {
         auto setUserData(std::uint64_t userData) const noexcept -> void;
 
         auto setBufferGroup(std::uint16_t bufferGroup) const noexcept -> void;
-
-        auto updateFileDescriptors(std::span<std::int32_t> fileDescriptors, std::int32_t offset) const noexcept -> void;
-
-        auto installDirect(std::int32_t directFileDescriptor, std::uint32_t flags) const noexcept -> void;
-
-        auto linkTimeout(__kernel_timespec &timeSpecification, std::uint32_t flags) const noexcept -> void;
-
-        auto cancel(std::uint64_t userData, std::int32_t flags) const noexcept -> void;
-
-        auto cancel(std::int32_t fileDescriptor, std::uint32_t flags) const noexcept -> void;
-
-        auto timeout(__kernel_timespec &timeSpecification, std::uint32_t count, std::uint32_t flags) const noexcept
-            -> void;
-
-        auto updateTimeout(std::uint64_t userData, __kernel_timespec &timeSpecification,
-                           std::uint32_t flags) const noexcept -> void;
-
-        auto poll(std::int32_t fileDescriptor, std::uint32_t mask) const noexcept -> void;
-
-        auto updatePoll(std::uint64_t oldUserData, std::uint64_t newUserData, std::uint32_t mask,
-                        std::uint32_t flags) const noexcept -> void;
-
-        auto multiplePoll(std::int32_t fileDescriptor, std::uint32_t mask) const noexcept -> void;
-
-        auto close(std::int32_t fileDescriptor) const noexcept -> void;
-
-        auto closeDirect(std::int32_t directFileDescriptor) const noexcept -> void;
-
-        auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol, std::uint32_t flags) const noexcept
-            -> void;
-
-        auto directSocket(std::int32_t domain, std::int32_t type, std::int32_t protocol,
-                          std::uint32_t flags) const noexcept -> void;
-
-        auto socketCommand(std::int32_t operation, std::int32_t socketFileDescriptor, std::int32_t level,
-                           std::int32_t optionName, std::span<std::byte> option) const noexcept -> void;
-
-        auto discardCommand(std::int32_t fileDescriptor, std::uint64_t offset, std::uint64_t length) const noexcept
-            -> void;
-
-        auto bind(std::int32_t socketFileDescriptor, sockaddr &address, socklen_t addressLength) const noexcept -> void;
-
-        auto listen(std::int32_t socketFileDescriptor, std::int32_t backlog) const noexcept -> void;
-
-        auto accept(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
-                    std::int32_t flags) const noexcept -> void;
-
-        auto acceptDirect(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
-                          std::int32_t flags, std::uint32_t fileDescriptorIndex) const noexcept -> void;
-
-        auto multipleAccept(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
-                            std::int32_t flags) const noexcept -> void;
-
-        auto multipleAcceptDirect(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t *addressLength,
-                                  std::int32_t flags) const noexcept -> void;
-
-        auto connect(std::int32_t socketFileDescriptor, sockaddr address, socklen_t addressLength) const noexcept
-            -> void;
-
-        auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) const noexcept -> void;
-
-        auto receive(std::int32_t socketFileDescriptor, std::span<std::byte> buffer, std::int32_t flags) const noexcept
-            -> void;
-
-        auto receive(std::int32_t socketFileDescriptor, msghdr &message, std::uint32_t flags) const noexcept -> void;
-
-        auto multipleReceive(std::int32_t socketFileDescriptor, std::span<std::byte> buffer,
-                             std::int32_t flags) const noexcept -> void;
-
-        auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer,
-                  std::int32_t flags) const noexcept -> void;
-
-        auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
-                  sockaddr destinationAddress, socklen_t destinationAddressLength) const noexcept -> void;
-
-        auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags) const noexcept -> void;
-
-        auto zeroCopySend(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
-                          std::uint32_t zeroCopyFlags) const noexcept -> void;
-
-        auto zeroCopySend(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags) const noexcept
-            -> void;
-
-        auto splice(std::int32_t inFileDescriptor, std::int64_t inOffset, std::int32_t outFileDescriptor,
-                    std::int64_t outOffset, std::uint32_t length, std::uint32_t flags) const noexcept -> void;
-
-        auto tee(std::int32_t inFileDescriptor, std::int32_t outFileDescriptor, std::uint32_t length,
-                 std::uint32_t flags) const noexcept -> void;
-
-        auto open(const std::filesystem::path &path, std::int32_t flags, mode_t mode) const noexcept -> void;
-
-        auto open(std::int32_t directoryFileDescriptor, const std::filesystem::path &path, std::int32_t flags,
-                  mode_t mode) const noexcept -> void;
-
-        auto open(std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
-                  open_how &openHow) const noexcept -> void;
-
-        auto openDirect(const std::filesystem::path &path, std::int32_t flags, mode_t mode,
-                        std::uint32_t fileDescriptorIndex) const noexcept -> void;
-
-        auto openDirect(std::int32_t directoryFileDescriptor, const std::filesystem::path &path, std::int32_t flags,
-                        mode_t mode, std::uint32_t fileDescriptorIndex) const noexcept -> void;
-
-        auto openDirect(std::int32_t directoryFileDescriptor, const std::filesystem::path &path, open_how &openHow,
-                        std::uint32_t fileDescriptorIndex) const noexcept -> void;
-
-        auto read(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::uint64_t offset) const noexcept
-            -> void;
-
-        auto read(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset) const noexcept
-            -> void;
-
-        auto read(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
-                  std::int32_t flags) const noexcept -> void;
-
-        auto multipleRead(std::int32_t fileDescriptor, std::uint32_t length, std::uint64_t offset,
-                          std::int32_t bufferGroup) const noexcept -> void;
-
-        auto write(std::int32_t fileDescriptor, std::span<const std::byte> buffer, std::uint64_t offset) const noexcept
-            -> void;
-
-        auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset) const noexcept
-            -> void;
-
-        auto write(std::int32_t fileDescriptor, std::span<const iovec> buffer, std::uint64_t offset,
-                   std::int32_t flags) const noexcept -> void;
-
-        auto syncFile(std::int32_t fileDescriptor, std::uint32_t flags) const noexcept -> void;
-
-        auto syncFile(std::int32_t fileDescriptor, std::uint64_t offset, std::uint32_t length,
-                      std::int32_t flags) const noexcept -> void;
-
-        auto adviseFile(std::int32_t fileDescriptor, std::uint64_t offset, off_t length,
-                        std::int32_t advice) const noexcept -> void;
-
-        auto truncate(std::int32_t fileDescriptor, loff_t length) const noexcept -> void;
-
-        auto allocateFile(std::int32_t fileDescriptor, std::int32_t mode, std::uint64_t offset,
-                          std::uint64_t length) const noexcept -> void;
-
-        auto status(std::int32_t directoryFileDescriptor, const std::filesystem::path &path, std::int32_t flags,
-                    std::uint32_t mask, struct statx &buffer) const noexcept -> void;
-
-        auto getExtendedAttribute(const std::filesystem::path &path, std::string_view name,
-                                  std::span<char> value) const noexcept -> void;
-
-        auto getExtendedAttribute(std::int32_t fileDescriptor, std::string_view name,
-                                  std::span<char> value) const noexcept -> void;
-
-        auto setExtendedAttribute(const std::filesystem::path &path, std::string_view name, std::span<char> value,
-                                  std::int32_t flags) const noexcept -> void;
-
-        auto setExtendedAttribute(std::int32_t fileDescriptor, std::string_view name, std::span<char> value,
-                                  std::int32_t flags) const noexcept -> void;
-
-        auto makeDirectory(const std::filesystem::path &path, mode_t mode) const noexcept -> void;
-
-        auto makeDirectory(std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
-                           mode_t mode) const noexcept -> void;
-
-        auto rename(const std::filesystem::path &oldPath, const std::filesystem::path &newPath) const noexcept -> void;
-
-        auto rename(std::int32_t oldDirectoryFileDescriptor, const std::filesystem::path &oldPath,
-                    std::int32_t newDirectoryFileDescriptor, const std::filesystem::path &newPath,
-                    std::uint32_t flags) const noexcept -> void;
-
-        auto link(const std::filesystem::path &oldPath, const std::filesystem::path &newPath,
-                  std::int32_t flags) const noexcept -> void;
-
-        auto link(std::int32_t oldDirectoryFileDescriptor, const std::filesystem::path &oldPath,
-                  std::int32_t newDirectoryFileDescriptor, const std::filesystem::path &newPath,
-                  std::int32_t flags) const noexcept -> void;
-
-        auto symbolicLink(std::string_view target, const std::filesystem::path &linkPath) const noexcept -> void;
-
-        auto symbolicLink(std::string_view target, std::int32_t newDirectoryFileDescriptor,
-                          const std::filesystem::path &linkPath) const noexcept -> void;
-
-        auto unlink(const std::filesystem::path &path, std::int32_t flags) const noexcept -> void;
-
-        auto unlink(std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
-                    std::int32_t flags) const noexcept -> void;
-
-        auto adviseMemory(std::span<std::byte> buffer, std::int32_t advice) const noexcept -> void;
-
-        auto wait(idtype_t idType, id_t id, siginfo_t *signalInformation, std::int32_t options,
-                  std::uint32_t flags) const noexcept -> void;
-
-        auto waitFutex(std::uint32_t &futex, std::uint64_t value, std::uint64_t mask, std::uint32_t futexFlags,
-                       std::uint32_t flags) const noexcept -> void;
-
-        auto waitFutex(std::span<futex_waitv> vectorizedFutexs, std::uint32_t flags) const noexcept -> void;
-
-        auto wakeFutex(std::uint32_t &futex, std::uint64_t value, std::uint64_t mask, std::uint32_t futexFlags,
-                       std::uint32_t flags) const noexcept -> void;
 
     private:
         io_uring_sqe *handle;

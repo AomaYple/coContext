@@ -5,8 +5,6 @@
 #include "coContext/coroutine/Coroutine.hpp"
 
 namespace coContext::internal {
-    class Submission;
-
     class Context {
     public:
         Context();
@@ -31,7 +29,7 @@ namespace coContext::internal {
 
         auto spawn(Coroutine coroutine) -> void;
 
-        [[nodiscard]] auto getSubmission() const -> Submission;
+        [[nodiscard]] auto getSubmission() const -> io_uring_sqe *;
 
         [[nodiscard]] auto syncCancel(std::variant<std::uint64_t, std::int32_t> id, std::int32_t flags,
                                       __kernel_timespec timeSpecification) const -> std::int32_t;
