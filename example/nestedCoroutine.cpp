@@ -3,18 +3,14 @@
 
 using namespace std::string_view_literals;
 
-[[nodiscard]] auto functionA() -> coContext::Task<> { co_return; }
-
-[[nodiscard]] auto functionB() -> coContext::Task<std::int32_t> { co_return 1; }
+[[nodiscard]] auto nestedFunction() -> coContext::Task<> { co_return; }
 
 [[nodiscard]] auto function() -> coContext::Task<> {
-    co_await functionA();
+    std::println("nestedFunction calling"sv);
 
-    std::int32_t result{co_await functionB()};
+    co_await nestedFunction();
 
-    result += co_await coContext::noOperation();
-
-    std::println("{}"sv, result);
+    std::println("nestedFunction returned"sv);
 }
 
 auto main() -> int {
