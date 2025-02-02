@@ -19,4 +19,6 @@ namespace coContext::logger {
 
     auto write(Log log) -> void;
 
+    auto flush() -> void;
+
 }    // namespace coContext::logger

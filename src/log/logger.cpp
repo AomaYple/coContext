@@ -91,3 +91,5 @@ auto coContext::logger::write(Log log) -> void {
 
     notify();
 }
+
+auto coContext::logger::flush() -> void { std::osyncstream{*outputStream.load(std::memory_order::relaxed)}.flush(); }
