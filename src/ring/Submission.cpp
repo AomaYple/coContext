@@ -178,7 +178,7 @@ auto coContext::internal::Submission::multipleAcceptDirect(io_uring_sqe *const h
 }
 
 auto coContext::internal::Submission::connect(io_uring_sqe *const handle, const std::int32_t socketFileDescriptor,
-                                              const sockaddr address, const socklen_t addressLength) noexcept
+                                              const sockaddr &address, const socklen_t addressLength) noexcept
     -> Submission {
     io_uring_prep_connect(handle, socketFileDescriptor, std::addressof(address), addressLength);
 
@@ -226,7 +226,7 @@ auto coContext::internal::Submission::send(io_uring_sqe *const handle, const std
 
 auto coContext::internal::Submission::send(io_uring_sqe *const handle, const std::int32_t socketFileDescriptor,
                                            const std::span<const std::byte> buffer, const std::int32_t flags,
-                                           const sockaddr destinationAddress,
+                                           const sockaddr &destinationAddress,
                                            const socklen_t destinationAddressLength) noexcept -> Submission {
     io_uring_prep_sendto(handle, socketFileDescriptor, std::data(buffer), std::size(buffer), flags,
                          std::addressof(destinationAddress), destinationAddressLength);

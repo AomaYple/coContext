@@ -261,7 +261,7 @@ auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)-
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
-auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr address, const socklen_t addressLength)
+auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr &address, const socklen_t addressLength)
     -> internal::AsyncWaiter {
     return internal::AsyncWaiter{
         internal::Submission::connect(context.getSubmission(), socketFileDescriptor, address, addressLength)};
@@ -348,7 +348,7 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<co
 }
 
 auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
-                     const std::int32_t flags, const sockaddr destinationAddress,
+                     const std::int32_t flags, const sockaddr &destinationAddress,
                      const socklen_t destinationAddressLength) -> internal::AsyncWaiter {
     const internal::Submission submission{internal::Submission::send(
         context.getSubmission(), socketFileDescriptor, buffer, flags, destinationAddress, destinationAddressLength)};
