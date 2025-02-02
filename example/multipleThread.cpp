@@ -1,7 +1,9 @@
 #include <coContext/coContext.hpp>
 #include <print>
 
-[[nodiscard]] auto function() -> coContext::Task<> { std::println("{}", co_await coContext::close(-1)); }
+[[nodiscard]] auto function() -> coContext::Task<> {
+    std::println("thread id: {} result: {}", std::this_thread::get_id(), co_await coContext::noOperation());
+}
 
 constexpr auto execute() {
     spawn(function);
