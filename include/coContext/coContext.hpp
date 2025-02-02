@@ -94,6 +94,8 @@ namespace coContext {
     [[nodiscard]] auto timeout(std::chrono::seconds seconds, std::chrono::nanoseconds nanoseconds = {},
                                ClockSource clockSource = {}) -> internal::Marker;
 
+    [[nodiscard]] auto noOperation() -> internal::AsyncWaiter;
+
     [[nodiscard]] auto cancel(std::uint64_t taskId) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto cancel(std::int32_t fileDescriptor, bool isMatchAll = {}) -> internal::AsyncWaiter;

@@ -1,5 +1,11 @@
 #include "coContext/ring/Submission.hpp"
 
+auto coContext::internal::Submission::noOperation(io_uring_sqe *const handle) noexcept -> Submission {
+    io_uring_prep_nop(handle);
+
+    return Submission{handle};
+}
+
 auto coContext::internal::Submission::updateFileDescriptors(io_uring_sqe *const handle,
                                                             const std::span<std::int32_t> fileDescriptors,
                                                             const std::int32_t offset) noexcept -> Submission {

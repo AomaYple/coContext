@@ -6,6 +6,8 @@
 namespace coContext::internal {
     class Submission {
     public:
+        [[nodiscard]] static auto noOperation(io_uring_sqe *handle) noexcept -> Submission;
+
         [[nodiscard]] static auto updateFileDescriptors(io_uring_sqe *handle, std::span<std::int32_t> fileDescriptors,
                                                         std::int32_t offset) noexcept -> Submission;
 

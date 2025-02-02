@@ -91,6 +91,10 @@ auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::n
                             }};
 }
 
+auto coContext::noOperation() -> internal::AsyncWaiter {
+    return internal::AsyncWaiter{internal::Submission::noOperation(context.getSubmission())};
+}
+
 auto coContext::cancel(const std::uint64_t taskId) -> internal::AsyncWaiter {
     return internal::AsyncWaiter{internal::Submission::cancel(context.getSubmission(), taskId, 0)};
 }
