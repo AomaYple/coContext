@@ -20,12 +20,12 @@ namespace {
     };
 
     std::ostream *outputStream{std::addressof(std::clog)};
-    std::atomic<Node *> list;
+    std::atomic<Node *> head;
     std::atomic_flag notifyVariable, isDisableWrite;
     std::atomic level{coContext::Log::Level::info};
 
     constexpr auto output() {
-        Node *node{list.exchange(nullptr, std::memory_order::relaxed)};
+        Node *node{head.exchange(nullptr, std::memory_order::relaxed)};
 
         std::pmr::vector<coContext::Log> logs{coContext::internal::getUnSyncMemoryResource()};
         while (node != nullptr) {
@@ -87,9 +87,9 @@ auto coContext::logger::write(Log log) -> void {
         return;
 
     auto *const node{
-        new Node{std::move(log), list.load(std::memory_order::relaxed)}
+        new Node{std::move(log), head.load(std::memory_order::relaxed)}
     };
-    while (!list.compare_exchange_weak(node->next, node, std::memory_order::release, std::memory_order::relaxed));
+    while (!head.compare_exchange_weak(node->next, node, std::memory_order::release, std::memory_order::relaxed));
 
     notify();
 }
