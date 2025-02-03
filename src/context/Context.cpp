@@ -129,21 +129,24 @@ auto coContext::internal::Context::scheduleUnscheduledCoroutines() -> void {
 }
 
 auto coContext::internal::Context::scheduleCoroutine(Coroutine coroutine) -> void {
-    coroutine();
+    do {
+        coroutine();
 
-    if (!coroutine.isDone()) {
-        Coroutine childCoroutine{std::move(coroutine.getPromise().getChildCoroutine())};
+        if (!coroutine.isDone()) {
+            Coroutine childCoroutine{std::move(coroutine.getPromise().getChildCoroutine())};
 
-        const std::uint64_t id{std::hash<Coroutine>{}(coroutine)};
-        this->schedulingCoroutines.emplace(id, std::move(coroutine));
+            const std::uint64_t id{std::hash<Coroutine>{}(coroutine)};
+            this->schedulingCoroutines.emplace(id, std::move(coroutine));
 
-        if (childCoroutine) this->scheduleCoroutine(std::move(childCoroutine));
-    } else if (const auto result{this->schedulingCoroutines.find(coroutine.getPromise().getParentCoroutineId())};
-               result != std::cend(this->schedulingCoroutines)) {
-        Coroutine parentCoroutine{std::move(result->second)};
-        this->schedulingCoroutines.erase(result);
+            coroutine = std::move(childCoroutine);
+        } else if (const auto result{this->schedulingCoroutines.find(coroutine.getPromise().getParentCoroutineId())};
+                   result != std::cend(this->schedulingCoroutines)) {
+            Coroutine parentCoroutine{std::move(result->second)};
+            this->schedulingCoroutines.erase(result);
 
-        this->scheduleCoroutine(std::move(parentCoroutine));
-    } else if (const std::exception_ptr exception{*coroutine.getPromise().getException()}; exception)
-        std::rethrow_exception(exception);
+            coroutine = std::move(parentCoroutine);
+        } else if (const std::exception_ptr exception{*coroutine.getPromise().getException()}; exception)
+            std::rethrow_exception(exception);
+        else [[likely]] coroutine = Coroutine{nullptr};
+    } while (coroutine);
 }
