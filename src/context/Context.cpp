@@ -40,12 +40,12 @@ auto coContext::internal::Context::swap(Context &other) noexcept -> void {
 auto coContext::internal::Context::getBufferRing() noexcept -> BufferRing & { return this->bufferRing; }
 
 auto coContext::internal::Context::run(const std::source_location sourceLocation) -> void {
+    this->isRunning = true;
+
     logger::write(Log{
         Log::Level::info, std::pmr::string{"context running"sv, getSyncMemoryResource()},
          sourceLocation
     });
-
-    this->isRunning = true;
 
     this->scheduleUnscheduledCoroutines();
 
