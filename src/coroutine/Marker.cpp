@@ -19,7 +19,7 @@ auto coContext::internal::Marker::addFlags(const std::uint32_t flags) noexcept -
 auto coContext::internal::Marker::setAction(Action action) noexcept -> void { this->action = std::move(action); }
 
 auto coContext::internal::Marker::executeAction() const -> void {
-    if (static_cast<bool>(this->action)) this->action();
+    if (this->action) this->action();
 }
 
 auto coContext::internal::operator|(Marker lhs, Marker rhs) noexcept -> Marker {

@@ -10,8 +10,7 @@ auto coContext::internal::BaseTask::swap(BaseTask &other) noexcept -> void {
 auto coContext::internal::BaseTask::getCoroutine() noexcept -> Coroutine & { return this->coroutine; }
 
 auto coContext::internal::BaseTask::throwException() const -> void {
-    if (const std::exception_ptr exception{*this->exception}; static_cast<bool>(exception))
-        std::rethrow_exception(exception);
+    if (const std::exception_ptr exception{*this->exception}; exception) std::rethrow_exception(exception);
 }
 
 auto coContext::internal::BaseTask::await_ready() const noexcept -> bool { return {}; }

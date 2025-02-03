@@ -137,13 +137,13 @@ auto coContext::internal::Context::scheduleCoroutine(Coroutine coroutine) -> voi
         const std::uint64_t id{std::hash<Coroutine>{}(coroutine)};
         this->schedulingCoroutines.emplace(id, std::move(coroutine));
 
-        if (static_cast<bool>(childCoroutine)) this->scheduleCoroutine(std::move(childCoroutine));
+        if (childCoroutine) this->scheduleCoroutine(std::move(childCoroutine));
     } else if (const auto result{this->schedulingCoroutines.find(coroutine.getPromise().getParentCoroutineId())};
                result != std::cend(this->schedulingCoroutines)) {
         Coroutine parentCoroutine{std::move(result->second)};
         this->schedulingCoroutines.erase(result);
 
         this->scheduleCoroutine(std::move(parentCoroutine));
-    } else if (const std::exception_ptr exception{*coroutine.getPromise().getException()}; static_cast<bool>(exception))
+    } else if (const std::exception_ptr exception{*coroutine.getPromise().getException()}; exception)
         std::rethrow_exception(exception);
 }

@@ -19,7 +19,7 @@ auto coContext::internal::Coroutine::operator=(Coroutine &&other) noexcept -> Co
 }
 
 coContext::internal::Coroutine::~Coroutine() {
-    if (static_cast<bool>(this->handle)) this->handle.destroy();
+    if (this->handle) this->handle.destroy();
 }
 
 auto coContext::internal::Coroutine::swap(Coroutine &other) noexcept -> void { std::swap(this->handle, other.handle); }
