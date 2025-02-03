@@ -145,8 +145,8 @@ auto coContext::internal::Context::scheduleCoroutine(Coroutine coroutine) -> voi
             this->schedulingCoroutines.erase(result);
 
             coroutine = std::move(parentCoroutine);
-        } else if (const std::exception_ptr exception{*coroutine.getPromise().getException()}; exception)
+        } else if (const std::exception_ptr exception{*coroutine.getPromise().getException()}; exception) [[unlikely]] {
             std::rethrow_exception(exception);
-        else [[likely]] coroutine = Coroutine{nullptr};
+        } else coroutine = Coroutine{nullptr};
     } while (coroutine);
 }
