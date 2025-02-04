@@ -19,6 +19,8 @@ coContext::internal::LoggerImpl::LoggerImpl() {
 }
 
 coContext::internal::LoggerImpl::~LoggerImpl() {
+    this->stop();
+
     const Node *node{this->head.load(std::memory_order::relaxed)};
     while (node != nullptr) {
         const Node *const next{node->next};
