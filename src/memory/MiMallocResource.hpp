@@ -7,13 +7,13 @@ namespace coContext::internal {
     public:
         constexpr MiMallocResource() noexcept = default;
 
-        constexpr MiMallocResource(const MiMallocResource &) noexcept = default;
+        MiMallocResource(const MiMallocResource &) = delete;
 
-        constexpr auto operator=(const MiMallocResource &) noexcept -> MiMallocResource & = default;
+        auto operator=(const MiMallocResource &) -> MiMallocResource & = delete;
 
-        constexpr MiMallocResource(MiMallocResource &&) noexcept = default;
+        MiMallocResource(MiMallocResource &&) noexcept = delete;
 
-        constexpr auto operator=(MiMallocResource &&) noexcept -> MiMallocResource & = default;
+        auto operator=(MiMallocResource &&) noexcept -> MiMallocResource & = delete;
 
         ~MiMallocResource() override = default;
 
