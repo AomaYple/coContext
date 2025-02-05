@@ -3,7 +3,7 @@
 #include "LoggerImpl.hpp"
 
 namespace {
-    [[nodiscard]] auto getLogger() -> coContext::internal::LoggerImpl & {
+    [[nodiscard]] constexpr auto getLogger() -> coContext::internal::LoggerImpl & {
         static coContext::internal::LoggerImpl logger;
 
         return logger;
