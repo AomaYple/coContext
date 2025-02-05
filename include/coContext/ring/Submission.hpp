@@ -253,16 +253,6 @@ namespace coContext::internal {
 
         explicit Submission(io_uring_sqe *handle = {}) noexcept;
 
-        constexpr Submission(const Submission &) noexcept = default;
-
-        constexpr auto operator=(const Submission &) noexcept -> Submission & = default;
-
-        constexpr Submission(Submission &&) noexcept = default;
-
-        constexpr auto operator=(Submission &&) noexcept -> Submission & = default;
-
-        constexpr ~Submission() = default;
-
         [[nodiscard]] auto get() const noexcept -> io_uring_sqe *;
 
         auto addFlags(std::uint32_t flags) const noexcept -> void;
