@@ -4,12 +4,11 @@
 
 using namespace std::string_view_literals;
 
-coContext::internal::Ring::Ring(const std::uint32_t entries, io_uring_params &parameters) :
+coContext::internal::Ring::Ring(const std::uint32_t entries, io_uring_params *const parameters) :
     handle{
-        [entries, &parameters](const std::source_location sourceLocation = std::source_location::current()) constexpr {
+        [entries, parameters](const std::source_location sourceLocation = std::source_location::current()) constexpr {
             io_uring handle;
-            if (const std::int32_t result{
-                    io_uring_queue_init_params(entries, std::addressof(handle), std::addressof(parameters))};
+            if (const std::int32_t result{io_uring_queue_init_params(entries, std::addressof(handle), parameters)};
                 result != 0) {
                 throw Exception{
                     Log{Log::Level::fatal,
@@ -131,14 +130,14 @@ auto coContext::internal::Ring::submitAndWait(const std::uint32_t count, const s
     }
 }
 
-auto coContext::internal::Ring::poll(std::move_only_function<auto(const io_uring_cqe *)->void> action) const
+auto coContext::internal::Ring::poll(std::move_only_function<auto(const io_uring_cqe &)->void> action) const
     -> std::int32_t {
     std::int32_t count{};
 
     std::uint32_t head;
     const io_uring_cqe *completion;
     io_uring_for_each_cqe(std::addressof(this->handle), head, completion) {
-        action(completion);
+        action(*completion);
         ++count;
     }
 
@@ -150,9 +149,9 @@ auto coContext::internal::Ring::advance(io_uring_buf_ring *const bufferRing, con
     __io_uring_buf_ring_cq_advance(std::addressof(this->handle), bufferRing, completionCount, bufferCount);
 }
 
-auto coContext::internal::Ring::syncCancel(io_uring_sync_cancel_reg &parameters,
+auto coContext::internal::Ring::syncCancel(io_uring_sync_cancel_reg *const parameters,
                                            const std::source_location sourceLocation) -> std::int32_t {
-    const std::int32_t result{io_uring_register_sync_cancel(std::addressof(this->handle), std::addressof(parameters))};
+    const std::int32_t result{io_uring_register_sync_cancel(std::addressof(this->handle), parameters)};
     if (result < 0) {
         throw Exception{
             Log{Log::Level::warn,

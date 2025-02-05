@@ -51,13 +51,13 @@ auto coContext::internal::Context::run(const std::source_location sourceLocation
 
     while (this->isRunning) {
         this->ring->submitAndWait(1);
-        this->bufferRing.advance(this->ring->poll([this](const io_uring_cqe *const completion) constexpr {
-            const auto result{this->schedulingCoroutines.find(completion->user_data)};
+        this->bufferRing.advance(this->ring->poll([this](const io_uring_cqe &completion) constexpr {
+            const auto result{this->schedulingCoroutines.find(completion.user_data)};
             Coroutine coroutine{std::move(result->second)};
             this->schedulingCoroutines.erase(result);
 
-            coroutine.getPromise().setResult(completion->res);
-            coroutine.getPromise().setFlags(completion->flags);
+            coroutine.getPromise().setResult(completion.res);
+            coroutine.getPromise().setFlags(completion.flags);
 
             this->scheduleCoroutine(std::move(coroutine));
         }));
@@ -111,7 +111,7 @@ auto coContext::internal::Context::syncCancel(const std::variant<std::uint64_t, 
     parameters.timeout = timeSpecification;
 
     try {
-        return this->ring->syncCancel(parameters);
+        return this->ring->syncCancel(std::addressof(parameters));
     } catch (Exception &exception) {
         const std::int32_t result{-std::stoi(std::string{exception.getLog().getMessage()})};
 

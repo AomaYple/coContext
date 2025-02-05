@@ -47,7 +47,7 @@ namespace coContext::internal {
                                IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN;
 
             return std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getUnsyncMemoryResource()}, entries,
-                                              parameters);
+                                              std::addressof(parameters));
         }()};
         BufferRing bufferRing{ring, entries, 0, IOU_PBUF_RING_INC};
         std::pmr::vector<Coroutine> unscheduledCoroutines{getUnsyncMemoryResource()};
