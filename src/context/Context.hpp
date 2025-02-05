@@ -46,12 +46,12 @@ namespace coContext::internal {
             parameters.flags = IORING_SETUP_SUBMIT_ALL | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_TASKRUN_FLAG |
                                IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN;
 
-            return std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getUnSyncMemoryResource()}, entries,
+            return std::allocate_shared<Ring>(std::pmr::polymorphic_allocator{getUnsyncMemoryResource()}, entries,
                                               parameters);
         }()};
         BufferRing bufferRing{ring, entries, 0, IOU_PBUF_RING_INC};
-        std::pmr::vector<Coroutine> unscheduledCoroutines{getUnSyncMemoryResource()};
-        std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getUnSyncMemoryResource()};
+        std::pmr::vector<Coroutine> unscheduledCoroutines{getUnsyncMemoryResource()};
+        std::pmr::unordered_map<std::uint64_t, Coroutine> schedulingCoroutines{getUnsyncMemoryResource()};
         bool isRunning{};
     };
 }    // namespace coContext::internal

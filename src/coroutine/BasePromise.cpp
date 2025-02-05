@@ -1,11 +1,11 @@
 #include "coContext/coroutine/BasePromise.hpp"
 
 auto coContext::internal::BasePromise::operator new(const std::size_t bytes) -> void * {
-    return getUnSyncMemoryResource()->allocate(bytes);
+    return getUnsyncMemoryResource()->allocate(bytes);
 }
 
 auto coContext::internal::BasePromise::operator delete(void *const pointer, const std::size_t bytes) noexcept -> void {
-    getUnSyncMemoryResource()->deallocate(pointer, bytes);
+    getUnsyncMemoryResource()->deallocate(pointer, bytes);
 }
 
 auto coContext::internal::BasePromise::swap(BasePromise &other) noexcept -> void {

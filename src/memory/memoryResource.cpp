@@ -22,7 +22,7 @@ auto coContext::internal::getSyncMemoryResource() -> std::pmr::memory_resource *
     return std::addressof(resource);
 }
 
-auto coContext::internal::getUnSyncMemoryResource() -> std::pmr::memory_resource * {
+auto coContext::internal::getUnsyncMemoryResource() -> std::pmr::memory_resource * {
 #ifdef NDEBUG
     thread_local std::pmr::unsynchronized_pool_resource resource{getMiMallocResource()};
 #else     // NDEBUG

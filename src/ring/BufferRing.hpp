@@ -11,7 +11,7 @@ namespace coContext::internal {
 
     class BufferRing {
         struct Buffer {
-            std::pmr::vector<std::byte> data{1024, getUnSyncMemoryResource()};
+            std::pmr::vector<std::byte> data{1024, getUnsyncMemoryResource()};
             std::size_t offset{};
         };
 
@@ -44,7 +44,7 @@ namespace coContext::internal {
     private:
         auto addBuffer(std::uint16_t bufferId) noexcept -> void;
 
-        std::pmr::vector<Buffer> buffers{getUnSyncMemoryResource()};
+        std::pmr::vector<Buffer> buffers{getUnsyncMemoryResource()};
         std::shared_ptr<Ring> ring;
         io_uring_buf_ring *handle;
         std::uint32_t entries;
