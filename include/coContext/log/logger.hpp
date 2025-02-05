@@ -5,17 +5,17 @@
 namespace coContext::logger {
     auto run() -> void;
 
-    auto stop() noexcept -> void;
+    auto stop() -> void;
 
-    auto setOutputStream(std::ostream *outputStream) noexcept -> void;
+    auto setOutputStream(std::ostream *outputStream) -> void;
 
-    auto enableWrite() noexcept -> void;
+    auto enableWrite() -> void;
 
-    auto disableWrite() noexcept -> void;
+    auto disableWrite() -> void;
 
-    [[nodiscard]] auto getLevel() noexcept -> Log::Level;
+    [[nodiscard]] auto getLevel() -> Log::Level;
 
-    auto setLevel(Log::Level level) noexcept -> void;
+    auto setLevel(Log::Level level) -> void;
 
     auto write(Log log) -> void;
 
