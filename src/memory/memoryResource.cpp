@@ -4,25 +4,29 @@
     #include "MiMallocResource.hpp"
 
 namespace {
-    constinit coContext::internal::MiMallocResource miMallocResource;
+    [[nodiscard]] constexpr auto getMiMallocResource() noexcept {
+        static constinit coContext::internal::MiMallocResource miMallocResource;
+
+        return std::addressof(miMallocResource);
+    }
 }    // namespace
 #endif    // NDEBUG
 
 auto coContext::internal::getSyncMemoryResource() -> std::pmr::memory_resource * {
-#ifndef NDEBUG
-    static std::pmr::synchronized_pool_resource resource;
+#ifdef NDEBUG
+    static std::pmr::synchronized_pool_resource resource{getMiMallocResource()};
 #else     // NDEBUG
-    static std::pmr::synchronized_pool_resource resource{std::addressof(miMallocResource)};
+    static std::pmr::synchronized_pool_resource resource;
 #endif    // NDEBUG
 
     return std::addressof(resource);
 }
 
 auto coContext::internal::getUnSyncMemoryResource() -> std::pmr::memory_resource * {
-#ifndef NDEBUG
-    thread_local std::pmr::unsynchronized_pool_resource resource;
+#ifdef NDEBUG
+    thread_local std::pmr::unsynchronized_pool_resource resource{getMiMallocResource()};
 #else     // NDEBUG
-    thread_local std::pmr::unsynchronized_pool_resource resource{std::addressof(miMallocResource)};
+    thread_local std::pmr::unsynchronized_pool_resource resource;
 #endif    // NDEBUG
 
     return std::addressof(resource);
