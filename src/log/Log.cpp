@@ -22,3 +22,15 @@ auto coContext::Log::getThreadId() const noexcept -> std::thread::id { return th
 auto coContext::Log::getSourceLocation() const noexcept -> std::source_location { return this->sourceLocation; }
 
 auto coContext::Log::getMessage() const noexcept -> std::string_view { return this->message; }
+
+auto coContext::operator==(const Log &lhs, const Log &rhs) noexcept -> bool {
+    const std::source_location lhsSourceLocation{lhs.getSourceLocation()}, rhsSourceLocation{rhs.getSourceLocation()};
+
+    return lhs.getLevel() == rhs.getLevel() && lhs.getTimeStamp() == rhs.getTimeStamp() &&
+           lhs.getThreadId() == rhs.getThreadId() && lhsSourceLocation.file_name() == rhsSourceLocation.file_name() &&
+           lhsSourceLocation.line() == rhsSourceLocation.line() &&
+           lhsSourceLocation.column() == rhsSourceLocation.column() &&
+           lhsSourceLocation.function_name() == rhsSourceLocation.function_name() &&
+           lhs.getMessage() == rhs.getMessage();
+}
+

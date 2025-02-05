@@ -37,6 +37,8 @@ namespace coContext {
         std::source_location sourceLocation;
         std::pmr::string message;
     };
+
+    [[nodiscard]] auto operator==(const Log &lhs, const Log &rhs) noexcept -> bool;
 }    // namespace coContext
 
 template<>
