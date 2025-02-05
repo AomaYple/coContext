@@ -3,25 +3,29 @@
 #include "LoggerImpl.hpp"
 
 namespace {
-    coContext::internal::LoggerImpl loggerImpl;
+    [[nodiscard]] auto getLogger() -> coContext::internal::LoggerImpl & {
+        static coContext::internal::LoggerImpl logger;
+
+        return logger;
+    }
 }    // namespace
 
-auto coContext::logger::run() -> void { loggerImpl.run(); }
+auto coContext::logger::run() -> void { getLogger().run(); }
 
-auto coContext::logger::stop() noexcept -> void { loggerImpl.stop(); }
+auto coContext::logger::stop() noexcept -> void { getLogger().stop(); }
 
 auto coContext::logger::setOutputStream(std::ostream *const outputStream) noexcept -> void {
-    loggerImpl.setOutputStream(outputStream);
+    getLogger().setOutputStream(outputStream);
 }
 
-auto coContext::logger::enableWrite() noexcept -> void { loggerImpl.enableWrite(); }
+auto coContext::logger::enableWrite() noexcept -> void { getLogger().enableWrite(); }
 
-auto coContext::logger::disableWrite() noexcept -> void { loggerImpl.disableWrite(); }
+auto coContext::logger::disableWrite() noexcept -> void { getLogger().disableWrite(); }
 
-auto coContext::logger::getLevel() noexcept -> Log::Level { return loggerImpl.getLevel(); }
+auto coContext::logger::getLevel() noexcept -> Log::Level { return getLogger().getLevel(); }
 
-auto coContext::logger::setLevel(const Log::Level level) noexcept -> void { loggerImpl.setLevel(level); }
+auto coContext::logger::setLevel(const Log::Level level) noexcept -> void { getLogger().setLevel(level); }
 
-auto coContext::logger::write(Log log) -> void { loggerImpl.write(std::move(log)); }
+auto coContext::logger::write(Log log) -> void { getLogger().write(std::move(log)); }
 
-auto coContext::logger::flush() -> void { loggerImpl.flush(); }
+auto coContext::logger::flush() -> void { getLogger().flush(); }
