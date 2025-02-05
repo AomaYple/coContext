@@ -11,12 +11,18 @@ namespace coContext::internal {
 
         [[nodiscard]] auto what() const noexcept -> const char * override;
 
+        [[nodiscard]] auto getMessage() const noexcept -> std::string_view;
+
+        [[nodiscard]] auto getLog() const noexcept -> const Log &;
+
         [[nodiscard]] auto getLog() noexcept -> Log &;
 
     private:
         std::pmr::string message;
         Log log;
     };
+
+    [[nodiscard]] auto operator==(const Exception &lhs, const Exception &rhs) noexcept -> bool;
 }    // namespace coContext::internal
 
 template<>
