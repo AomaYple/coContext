@@ -165,7 +165,7 @@ namespace coContext {
                                             socklen_t *addressLength, std::int32_t flags = {},
                                             internal::Marker marker = none()) -> Task<>;
 
-    [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength)
+    [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr *address, socklen_t addressLength)
         -> internal::AsyncWaiter;
 
     [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, std::span<std::byte> buffer, std::int32_t flags)

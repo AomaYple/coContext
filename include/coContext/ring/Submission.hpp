@@ -83,7 +83,7 @@ namespace coContext::internal {
                                                        std::int32_t flags) noexcept -> Submission;
 
         [[nodiscard]] static auto connect(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
-                                          const sockaddr &address, socklen_t addressLength) noexcept -> Submission;
+                                          const sockaddr *address, socklen_t addressLength) noexcept -> Submission;
 
         [[nodiscard]] static auto receive(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
                                           std::span<std::byte> buffer, std::int32_t flags) noexcept -> Submission;
