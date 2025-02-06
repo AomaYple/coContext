@@ -7,7 +7,7 @@
 - 绝大部分系统调用，如`read` `write` `send` `recv`等
 - 纳秒级别的定时器`sleep(1s, 1ns)`
 - IO超时`recv(socketFileDescriptor, buffer, 0) | timeout(1s)`
-- IO取消`cancel(taskIdentify)` `cancel(fileDescriptor)` `cancelAny()`
+- IO取消`cancel(taskId)` `cancel(fileDescriptor)` `cancelAny()`
 - 嵌套**任意数量**的**任意返回值**的协程
 - 多线程
 - **异步高性能**且**多级别**的日志系统
