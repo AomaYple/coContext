@@ -280,7 +280,7 @@ auto coContext::receive(const std::int32_t socketFileDescriptor, const std::span
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::receive(const std::int32_t socketFileDescriptor, msghdr &message, const std::uint32_t flags)
+auto coContext::receive(const std::int32_t socketFileDescriptor, msghdr *const message, const std::uint32_t flags)
     -> internal::AsyncWaiter {
     const internal::Submission submission{
         internal::Submission::receive(context.getSubmission(), socketFileDescriptor, message, flags)};

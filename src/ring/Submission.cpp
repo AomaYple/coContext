@@ -203,8 +203,8 @@ auto coContext::internal::Submission::receive(io_uring_sqe *const handle, const 
 }
 
 auto coContext::internal::Submission::receive(io_uring_sqe *const handle, const std::int32_t socketFileDescriptor,
-                                              msghdr &message, const std::uint32_t flags) noexcept -> Submission {
-    io_uring_prep_recvmsg(handle, socketFileDescriptor, std::addressof(message), flags);
+                                              msghdr *const message, const std::uint32_t flags) noexcept -> Submission {
+    io_uring_prep_recvmsg(handle, socketFileDescriptor, message, flags);
 
     return Submission{handle};
 }

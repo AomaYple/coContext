@@ -171,7 +171,7 @@ namespace coContext {
     [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, std::span<std::byte> buffer, std::int32_t flags)
         -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, msghdr &message, std::uint32_t flags)
+    [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, msghdr *message, std::uint32_t flags)
         -> internal::AsyncWaiter;
 
     [[nodiscard]] auto

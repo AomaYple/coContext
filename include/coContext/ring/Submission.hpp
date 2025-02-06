@@ -88,7 +88,7 @@ namespace coContext::internal {
         [[nodiscard]] static auto receive(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
                                           std::span<std::byte> buffer, std::int32_t flags) noexcept -> Submission;
 
-        [[nodiscard]] static auto receive(io_uring_sqe *handle, std::int32_t socketFileDescriptor, msghdr &message,
+        [[nodiscard]] static auto receive(io_uring_sqe *handle, std::int32_t socketFileDescriptor, msghdr *message,
                                           std::uint32_t flags) noexcept -> Submission;
 
         [[nodiscard]] static auto multipleReceive(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
