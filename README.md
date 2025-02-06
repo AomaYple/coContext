@@ -88,7 +88,8 @@ target_link_libraries(your_target
 
 ## 注意事项
 
-- 用户只能使用`coContext`和`coContext::logger`命名空间下的函数和类，不得使用`coContext::internal`命名空间下的函数和类
+- 用户只能使用`coContext`和`coContext::logger`命名空间下的函数和类
+- `coContext::Tast<T>`只能用于声明协程函数的返回值
 
 ## 性能
 
