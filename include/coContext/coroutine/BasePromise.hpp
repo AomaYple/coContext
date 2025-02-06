@@ -49,7 +49,7 @@ namespace coContext::internal {
         auto unhandled_exception() const noexcept -> void;
 
     protected:
-        constexpr BasePromise() noexcept = default;
+        constexpr BasePromise() = default;
 
     private:
         std::int32_t result{};
