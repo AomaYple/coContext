@@ -562,11 +562,11 @@ auto coContext::internal::Submission::wait(io_uring_sqe *const handle, const idt
     return Submission{handle};
 }
 
-auto coContext::internal::Submission::waitFutex(io_uring_sqe *const handle, std::uint32_t &futex,
+auto coContext::internal::Submission::waitFutex(io_uring_sqe *const handle, std::uint32_t *const futex,
                                                 const std::uint64_t value, const std::uint64_t mask,
                                                 const std::uint32_t futexFlags, const std::uint32_t flags) noexcept
     -> Submission {
-    io_uring_prep_futex_wait(handle, std::addressof(futex), value, mask, futexFlags, flags);
+    io_uring_prep_futex_wait(handle, futex, value, mask, futexFlags, flags);
 
     return Submission{handle};
 }
@@ -579,11 +579,11 @@ auto coContext::internal::Submission::waitFutex(io_uring_sqe *const handle,
     return Submission{handle};
 }
 
-auto coContext::internal::Submission::wakeFutex(io_uring_sqe *const handle, std::uint32_t &futex,
+auto coContext::internal::Submission::wakeFutex(io_uring_sqe *const handle, std::uint32_t *const futex,
                                                 const std::uint64_t value, const std::uint64_t mask,
                                                 const std::uint32_t futexFlags, const std::uint32_t flags) noexcept
     -> Submission {
-    io_uring_prep_futex_wake(handle, std::addressof(futex), value, mask, futexFlags, flags);
+    io_uring_prep_futex_wake(handle, futex, value, mask, futexFlags, flags);
 
     return Submission{handle};
 }

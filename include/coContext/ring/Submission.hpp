@@ -240,14 +240,14 @@ namespace coContext::internal {
         [[nodiscard]] static auto wait(io_uring_sqe *handle, idtype_t idType, id_t id, siginfo_t *signalInformation,
                                        std::int32_t options, std::uint32_t flags) noexcept -> Submission;
 
-        [[nodiscard]] static auto waitFutex(io_uring_sqe *handle, std::uint32_t &futex, std::uint64_t value,
+        [[nodiscard]] static auto waitFutex(io_uring_sqe *handle, std::uint32_t *futex, std::uint64_t value,
                                             std::uint64_t mask, std::uint32_t futexFlags, std::uint32_t flags) noexcept
             -> Submission;
 
         [[nodiscard]] static auto waitFutex(io_uring_sqe *handle, std::span<futex_waitv> vectorizedFutexs,
                                             std::uint32_t flags) noexcept -> Submission;
 
-        [[nodiscard]] static auto wakeFutex(io_uring_sqe *handle, std::uint32_t &futex, std::uint64_t value,
+        [[nodiscard]] static auto wakeFutex(io_uring_sqe *handle, std::uint32_t *futex, std::uint64_t value,
                                             std::uint64_t mask, std::uint32_t futexFlags, std::uint32_t flags) noexcept
             -> Submission;
 

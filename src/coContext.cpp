@@ -658,7 +658,7 @@ auto coContext::wait(const idtype_t idType, const id_t id, siginfo_t *const sign
         internal::Submission::wait(context.getSubmission(), idType, id, signalInformation, options, 0)};
 }
 
-auto coContext::waitFutex(std::uint32_t &futex, const std::uint64_t value, const std::uint64_t mask,
+auto coContext::waitFutex(std::uint32_t *const futex, const std::uint64_t value, const std::uint64_t mask,
                           const std::uint32_t flags) -> internal::AsyncWaiter {
     return internal::AsyncWaiter{
         internal::Submission::waitFutex(context.getSubmission(), futex, value, mask, flags, 0)};
@@ -668,7 +668,7 @@ auto coContext::waitFutex(const std::span<futex_waitv> vectorizedFutexs) -> inte
     return internal::AsyncWaiter{internal::Submission::waitFutex(context.getSubmission(), vectorizedFutexs, 0)};
 }
 
-auto coContext::wakeFutex(std::uint32_t &futex, const std::uint64_t value, const std::uint64_t mask,
+auto coContext::wakeFutex(std::uint32_t *const futex, const std::uint64_t value, const std::uint64_t mask,
                           const std::uint32_t flags) -> internal::AsyncWaiter {
     return internal::AsyncWaiter{
         internal::Submission::waitFutex(context.getSubmission(), futex, value, mask, flags, 0)};
