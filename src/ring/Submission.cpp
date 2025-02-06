@@ -421,8 +421,9 @@ auto coContext::internal::Submission::allocateFile(io_uring_sqe *const handle, c
 
 auto coContext::internal::Submission::status(io_uring_sqe *const handle, const std::int32_t directoryFileDescriptor,
                                              const std::filesystem::path &path, const std::int32_t flags,
-                                             const std::uint32_t mask, struct statx &buffer) noexcept -> Submission {
-    io_uring_prep_statx(handle, directoryFileDescriptor, path.c_str(), flags, mask, std::addressof(buffer));
+                                             const std::uint32_t mask, struct statx *const buffer) noexcept
+    -> Submission {
+    io_uring_prep_statx(handle, directoryFileDescriptor, path.c_str(), flags, mask, buffer);
 
     return Submission{handle};
 }

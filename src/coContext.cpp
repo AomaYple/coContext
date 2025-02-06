@@ -563,7 +563,7 @@ auto coContext::allocateFile(const std::int32_t fileDescriptor, const std::int32
 }
 
 auto coContext::status(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
-                       const std::int32_t flags, const std::uint32_t mask, struct statx &buffer)
+                       const std::int32_t flags, const std::uint32_t mask, struct statx *const buffer)
     -> internal::AsyncWaiter {
     return internal::AsyncWaiter{
         internal::Submission::status(context.getSubmission(), directoryFileDescriptor, path, flags, mask, buffer)};

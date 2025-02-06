@@ -258,7 +258,7 @@ namespace coContext {
                                     std::uint64_t length) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto status(std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
-                              std::int32_t flags, std::uint32_t mask, struct statx &buffer) -> internal::AsyncWaiter;
+                              std::int32_t flags, std::uint32_t mask, struct statx *buffer) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto getExtendedAttribute(const std::filesystem::path &path, std::string_view name,
                                             std::span<char> value) -> internal::AsyncWaiter;

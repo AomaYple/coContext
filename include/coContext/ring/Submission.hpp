@@ -182,7 +182,7 @@ namespace coContext::internal {
 
         [[nodiscard]] static auto status(io_uring_sqe *handle, std::int32_t directoryFileDescriptor,
                                          const std::filesystem::path &path, std::int32_t flags, std::uint32_t mask,
-                                         struct statx &buffer) noexcept -> Submission;
+                                         struct statx *buffer) noexcept -> Submission;
 
         [[nodiscard]] static auto getExtendedAttribute(io_uring_sqe *handle, const std::filesystem::path &path,
                                                        std::string_view name, std::span<char> value) noexcept
