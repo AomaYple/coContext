@@ -129,7 +129,7 @@ namespace coContext::internal {
             -> Submission;
 
         [[nodiscard]] static auto open(io_uring_sqe *handle, std::int32_t directoryFileDescriptor,
-                                       const std::filesystem::path &path, open_how &openHow) noexcept -> Submission;
+                                       const std::filesystem::path &path, open_how *openHow) noexcept -> Submission;
 
         [[nodiscard]] static auto openDirect(io_uring_sqe *handle, const std::filesystem::path &path,
                                              std::int32_t flags, mode_t mode,
@@ -140,7 +140,7 @@ namespace coContext::internal {
                                              std::uint32_t fileDescriptorIndex) noexcept -> Submission;
 
         [[nodiscard]] static auto openDirect(io_uring_sqe *handle, std::int32_t directoryFileDescriptor,
-                                             const std::filesystem::path &path, open_how &openHow,
+                                             const std::filesystem::path &path, open_how *openHow,
                                              std::uint32_t fileDescriptorIndex) noexcept -> Submission;
 
         [[nodiscard]] static auto read(io_uring_sqe *handle, std::int32_t fileDescriptor, std::span<std::byte> buffer,

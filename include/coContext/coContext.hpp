@@ -210,7 +210,7 @@ namespace coContext {
     [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, const std::filesystem::path &path, std::int32_t flags,
                             mode_t mode = {}) -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, const std::filesystem::path &path, open_how &openHow)
+    [[nodiscard]] auto open(std::int32_t directoryFileDescriptor, const std::filesystem::path &path, open_how *openHow)
         -> internal::AsyncWaiter;
 
     [[nodiscard]] auto openDirect(const std::filesystem::path &path, std::int32_t flags, mode_t mode = {})
@@ -220,7 +220,7 @@ namespace coContext {
                                   std::int32_t flags, mode_t mode = {}) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto openDirect(std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
-                                  open_how &openHow) -> internal::AsyncWaiter;
+                                  open_how *openHow) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto read(std::int32_t fileDescriptor, std::span<std::byte> buffer, std::uint64_t offset = -1)
         -> internal::AsyncWaiter;

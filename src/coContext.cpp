@@ -433,8 +433,8 @@ auto coContext::open(const std::int32_t directoryFileDescriptor, const std::file
         internal::Submission::open(context.getSubmission(), directoryFileDescriptor, path, flags, mode)};
 }
 
-auto coContext::open(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path, open_how &openHow)
-    -> internal::AsyncWaiter {
+auto coContext::open(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
+                     open_how *const openHow) -> internal::AsyncWaiter {
     return internal::AsyncWaiter{
         internal::Submission::open(context.getSubmission(), directoryFileDescriptor, path, openHow)};
 }
@@ -452,7 +452,7 @@ auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std
 }
 
 auto coContext::openDirect(const std::int32_t directoryFileDescriptor, const std::filesystem::path &path,
-                           open_how &openHow) -> internal::AsyncWaiter {
+                           open_how *const openHow) -> internal::AsyncWaiter {
     return internal::AsyncWaiter{internal::Submission::openDirect(context.getSubmission(), directoryFileDescriptor,
                                                                   path, openHow, IORING_FILE_INDEX_ALLOC)};
 }

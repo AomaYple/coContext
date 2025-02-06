@@ -293,9 +293,9 @@ auto coContext::internal::Submission::open(io_uring_sqe *const handle, const std
 }
 
 auto coContext::internal::Submission::open(io_uring_sqe *const handle, const std::int32_t directoryFileDescriptor,
-                                           const std::filesystem::path &path, open_how &openHow) noexcept
+                                           const std::filesystem::path &path, open_how *const openHow) noexcept
     -> Submission {
-    io_uring_prep_openat2(handle, directoryFileDescriptor, path.c_str(), std::addressof(openHow));
+    io_uring_prep_openat2(handle, directoryFileDescriptor, path.c_str(), openHow);
 
     return Submission{handle};
 }
@@ -318,10 +318,9 @@ auto coContext::internal::Submission::openDirect(io_uring_sqe *const handle, con
 }
 
 auto coContext::internal::Submission::openDirect(io_uring_sqe *const handle, const std::int32_t directoryFileDescriptor,
-                                                 const std::filesystem::path &path, open_how &openHow,
+                                                 const std::filesystem::path &path, open_how *const openHow,
                                                  const std::uint32_t fileDescriptorIndex) noexcept -> Submission {
-    io_uring_prep_openat2_direct(handle, directoryFileDescriptor, path.c_str(), std::addressof(openHow),
-                                 fileDescriptorIndex);
+    io_uring_prep_openat2_direct(handle, directoryFileDescriptor, path.c_str(), openHow, fileDescriptorIndex);
 
     return Submission{handle};
 }
