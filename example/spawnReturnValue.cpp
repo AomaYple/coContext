@@ -7,7 +7,7 @@ using namespace std::string_view_literals;
 
 auto main() -> int {
     coContext::SpawnResult result{spawn<std::int32_t>(function)};
-    const std::jthread worker{[&result] { std::println("{}"sv, result.value.get()); }};
+    const std::jthread worker{[&result] { std::println("spawn result: {}"sv, result.value.get()); }};
 
     coContext::run();
 }
