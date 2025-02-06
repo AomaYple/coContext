@@ -94,4 +94,5 @@ install(EXPORT ${PROJECT_NAME}Targets
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
+add_subdirectory(benchmark)
 add_subdirectory(example)
