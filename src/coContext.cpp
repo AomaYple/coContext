@@ -30,7 +30,7 @@ namespace {
         auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
 
         coContext::internal::AsyncWaiter asyncWaiter{
-            coContext::internal::Submission::timeout(context.getSubmission(), *timeSpecification, 0, flags)};
+            coContext::internal::Submission::timeout(context.getSubmission(), timeSpecification.get(), 0, flags)};
         asyncWaiter.setTimeSpecification(std::move(timeSpecification));
 
         return asyncWaiter;
@@ -109,7 +109,7 @@ auto coContext::updateSleep(const std::uint64_t taskId, const std::chrono::secon
     auto timeSpecification{std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
 
     internal::AsyncWaiter asyncWaiter{internal::Submission::updateTimeout(
-        context.getSubmission(), taskId, *timeSpecification, setClockSource(clockSource))};
+        context.getSubmission(), taskId, timeSpecification.get(), setClockSource(clockSource))};
     asyncWaiter.setTimeSpecification(std::move(timeSpecification));
 
     return asyncWaiter;

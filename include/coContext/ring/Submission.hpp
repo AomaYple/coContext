@@ -17,11 +17,11 @@ namespace coContext::internal {
         [[nodiscard]] static auto cancel(io_uring_sqe *handle, std::int32_t fileDescriptor,
                                          std::uint32_t flags) noexcept -> Submission;
 
-        [[nodiscard]] static auto timeout(io_uring_sqe *handle, __kernel_timespec &timeSpecification,
+        [[nodiscard]] static auto timeout(io_uring_sqe *handle, __kernel_timespec *timeSpecification,
                                           std::uint32_t count, std::uint32_t flags) noexcept -> Submission;
 
         [[nodiscard]] static auto updateTimeout(io_uring_sqe *handle, std::uint64_t userData,
-                                                __kernel_timespec &timeSpecification, std::uint32_t flags) noexcept
+                                                __kernel_timespec *timeSpecification, std::uint32_t flags) noexcept
             -> Submission;
 
         [[nodiscard]] static auto poll(io_uring_sqe *handle, std::int32_t fileDescriptor, std::uint32_t mask) noexcept

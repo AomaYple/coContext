@@ -28,18 +28,18 @@ auto coContext::internal::Submission::cancel(io_uring_sqe *const handle, const s
     return Submission{handle};
 }
 
-auto coContext::internal::Submission::timeout(io_uring_sqe *const handle, __kernel_timespec &timeSpecification,
+auto coContext::internal::Submission::timeout(io_uring_sqe *const handle, __kernel_timespec *const timeSpecification,
                                               const std::uint32_t count, const std::uint32_t flags) noexcept
     -> Submission {
-    io_uring_prep_timeout(handle, std::addressof(timeSpecification), count, flags);
+    io_uring_prep_timeout(handle, timeSpecification, count, flags);
 
     return Submission{handle};
 }
 
 auto coContext::internal::Submission::updateTimeout(io_uring_sqe *const handle, const std::uint64_t userData,
-                                                    __kernel_timespec &timeSpecification,
+                                                    __kernel_timespec *const timeSpecification,
                                                     const std::uint32_t flags) noexcept -> Submission {
-    io_uring_prep_timeout_update(handle, std::addressof(timeSpecification), userData, flags);
+    io_uring_prep_timeout_update(handle, timeSpecification, userData, flags);
 
     return Submission{handle};
 }
