@@ -125,6 +125,8 @@ namespace coContext {
 
     [[nodiscard]] auto closeDirect(std::int32_t directFileDescriptor) -> internal::AsyncWaiter;
 
+    [[nodiscard]] auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) -> internal::AsyncWaiter;
+
     [[nodiscard]] auto socket(std::int32_t domain, std::int32_t type, std::int32_t protocol) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto directSocket(std::int32_t domain, std::int32_t type, std::int32_t protocol)
@@ -143,7 +145,7 @@ namespace coContext {
     [[nodiscard]] auto discardData(std::int32_t fileDescriptor, std::uint64_t offset, std::uint64_t length)
         -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto bind(std::int32_t socketFileDescriptor, sockaddr &address, socklen_t addressLength)
+    [[nodiscard]] auto bind(std::int32_t socketFileDescriptor, sockaddr *address, socklen_t addressLength)
         -> internal::AsyncWaiter;
 
     [[nodiscard]] auto listen(std::int32_t socketFileDescriptor, std::int32_t backlog) -> internal::AsyncWaiter;
@@ -165,8 +167,6 @@ namespace coContext {
 
     [[nodiscard]] auto connect(std::int32_t socketFileDescriptor, const sockaddr &address, socklen_t addressLength)
         -> internal::AsyncWaiter;
-
-    [[nodiscard]] auto shutdown(std::int32_t socketFileDescriptor, std::int32_t how) -> internal::AsyncWaiter;
 
     [[nodiscard]] auto receive(std::int32_t socketFileDescriptor, std::span<std::byte> buffer, std::int32_t flags)
         -> internal::AsyncWaiter;

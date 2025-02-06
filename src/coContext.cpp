@@ -164,6 +164,10 @@ auto coContext::closeDirect(const std::int32_t directFileDescriptor) -> internal
     return internal::AsyncWaiter{internal::Submission::closeDirect(context.getSubmission(), directFileDescriptor)};
 }
 
+auto coContext::shutdown(const std::int32_t socketFileDescriptor, const std::int32_t how) -> internal::AsyncWaiter {
+    return internal::AsyncWaiter{internal::Submission::shutdown(context.getSubmission(), socketFileDescriptor, how)};
+}
+
 auto coContext::socket(const std::int32_t domain, const std::int32_t type, const std::int32_t protocol)
     -> internal::AsyncWaiter {
     return internal::AsyncWaiter{internal::Submission::socket(context.getSubmission(), domain, type, protocol, 0)};
@@ -205,7 +209,7 @@ auto coContext::discardData(const std::int32_t fileDescriptor, const std::uint64
         internal::Submission::discardCommand(context.getSubmission(), fileDescriptor, offset, length)};
 }
 
-auto coContext::bind(const std::int32_t socketFileDescriptor, sockaddr &address, const socklen_t addressLength)
+auto coContext::bind(const std::int32_t socketFileDescriptor, sockaddr *const address, const socklen_t addressLength)
     -> internal::AsyncWaiter {
     return internal::AsyncWaiter{
         internal::Submission::bind(context.getSubmission(), socketFileDescriptor, address, addressLength)};
@@ -265,10 +269,6 @@ auto coContext::connect(const std::int32_t socketFileDescriptor, const sockaddr 
     -> internal::AsyncWaiter {
     return internal::AsyncWaiter{
         internal::Submission::connect(context.getSubmission(), socketFileDescriptor, address, addressLength)};
-}
-
-auto coContext::shutdown(const std::int32_t socketFileDescriptor, const std::int32_t how) -> internal::AsyncWaiter {
-    return internal::AsyncWaiter{internal::Submission::shutdown(context.getSubmission(), socketFileDescriptor, how)};
 }
 
 auto coContext::receive(const std::int32_t socketFileDescriptor, const std::span<std::byte> buffer,

@@ -44,6 +44,9 @@ namespace coContext::internal {
         [[nodiscard]] static auto closeDirect(io_uring_sqe *handle, std::int32_t directFileDescriptor) noexcept
             -> Submission;
 
+        [[nodiscard]] static auto shutdown(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
+                                           std::int32_t how) noexcept -> Submission;
+
         [[nodiscard]] static auto socket(io_uring_sqe *handle, std::int32_t domain, std::int32_t type,
                                          std::int32_t protocol, std::uint32_t flags) noexcept -> Submission;
 
@@ -58,7 +61,7 @@ namespace coContext::internal {
         [[nodiscard]] static auto discardCommand(io_uring_sqe *handle, std::int32_t fileDescriptor,
                                                  std::uint64_t offset, std::uint64_t length) noexcept -> Submission;
 
-        [[nodiscard]] static auto bind(io_uring_sqe *handle, std::int32_t socketFileDescriptor, sockaddr &address,
+        [[nodiscard]] static auto bind(io_uring_sqe *handle, std::int32_t socketFileDescriptor, sockaddr *address,
                                        socklen_t addressLength) noexcept -> Submission;
 
         [[nodiscard]] static auto listen(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
@@ -81,9 +84,6 @@ namespace coContext::internal {
 
         [[nodiscard]] static auto connect(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
                                           const sockaddr &address, socklen_t addressLength) noexcept -> Submission;
-
-        [[nodiscard]] static auto shutdown(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
-                                           std::int32_t how) noexcept -> Submission;
 
         [[nodiscard]] static auto receive(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
                                           std::span<std::byte> buffer, std::int32_t flags) noexcept -> Submission;

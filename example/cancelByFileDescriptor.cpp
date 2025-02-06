@@ -14,7 +14,7 @@
     address.sin_port = htons(12345);
     address.sin_addr.s_addr = INADDR_ANY;
 
-    co_await coContext::bind(socket, reinterpret_cast<sockaddr &>(address), sizeof(address));
+    co_await coContext::bind(socket, reinterpret_cast<sockaddr *>(std::addressof(address)), sizeof(address));
 
     co_await coContext::listen(socket, SOMAXCONN);
 

@@ -46,7 +46,8 @@ constexpr auto acceptAction(const std::int32_t socket) {
     address.sin_family = AF_INET;
     address.sin_port = htons(8080);
 
-    co_await (coContext::bind(socket, reinterpret_cast<sockaddr &>(address), sizeof(address)) | coContext::direct());
+    co_await (coContext::bind(socket, reinterpret_cast<sockaddr *>(std::addressof(address)), sizeof(address)) |
+              coContext::direct());
 
     co_await (coContext::listen(socket, SOMAXCONN) | coContext::direct());
 

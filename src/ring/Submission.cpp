@@ -95,6 +95,13 @@ auto coContext::internal::Submission::closeDirect(io_uring_sqe *const handle,
     return Submission{handle};
 }
 
+auto coContext::internal::Submission::shutdown(io_uring_sqe *const handle, const std::int32_t socketFileDescriptor,
+                                               const std::int32_t how) noexcept -> Submission {
+    io_uring_prep_shutdown(handle, socketFileDescriptor, how);
+
+    return Submission{handle};
+}
+
 auto coContext::internal::Submission::socket(io_uring_sqe *const handle, const std::int32_t domain,
                                              const std::int32_t type, const std::int32_t protocol,
                                              const std::uint32_t flags) noexcept -> Submission {
@@ -130,8 +137,9 @@ auto coContext::internal::Submission::discardCommand(io_uring_sqe *const handle,
 }
 
 auto coContext::internal::Submission::bind(io_uring_sqe *const handle, const std::int32_t socketFileDescriptor,
-                                           sockaddr &address, const socklen_t addressLength) noexcept -> Submission {
-    io_uring_prep_bind(handle, socketFileDescriptor, std::addressof(address), addressLength);
+                                           sockaddr *const address, const socklen_t addressLength) noexcept
+    -> Submission {
+    io_uring_prep_bind(handle, socketFileDescriptor, address, addressLength);
 
     return Submission{handle};
 }
@@ -182,13 +190,6 @@ auto coContext::internal::Submission::connect(io_uring_sqe *const handle, const 
                                               const sockaddr &address, const socklen_t addressLength) noexcept
     -> Submission {
     io_uring_prep_connect(handle, socketFileDescriptor, std::addressof(address), addressLength);
-
-    return Submission{handle};
-}
-
-auto coContext::internal::Submission::shutdown(io_uring_sqe *const handle, const std::int32_t socketFileDescriptor,
-                                               const std::int32_t how) noexcept -> Submission {
-    io_uring_prep_shutdown(handle, socketFileDescriptor, how);
 
     return Submission{handle};
 }
