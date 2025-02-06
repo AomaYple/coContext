@@ -1,29 +1,15 @@
 #include "coContext/ring/Submission.hpp"
 
+auto coContext::internal::Submission::linkTimeout(io_uring_sqe *const handle,
+                                                  __kernel_timespec *const timeSpecification,
+                                                  const std::uint32_t flags) noexcept -> Submission {
+    io_uring_prep_link_timeout(handle, timeSpecification, flags);
+
+    return Submission{handle};
+}
+
 auto coContext::internal::Submission::noOperation(io_uring_sqe *const handle) noexcept -> Submission {
     io_uring_prep_nop(handle);
-
-    return Submission{handle};
-}
-
-auto coContext::internal::Submission::updateFileDescriptors(io_uring_sqe *const handle,
-                                                            const std::span<std::int32_t> fileDescriptors,
-                                                            const std::int32_t offset) noexcept -> Submission {
-    io_uring_prep_files_update(handle, std::data(fileDescriptors), std::size(fileDescriptors), offset);
-
-    return Submission{handle};
-}
-
-auto coContext::internal::Submission::installDirect(io_uring_sqe *const handle, const std::int32_t directFileDescriptor,
-                                                    const std::uint32_t flags) noexcept -> Submission {
-    io_uring_prep_fixed_fd_install(handle, directFileDescriptor, flags);
-
-    return Submission{handle};
-}
-
-auto coContext::internal::Submission::linkTimeout(io_uring_sqe *const handle, __kernel_timespec &timeSpecification,
-                                                  const std::uint32_t flags) noexcept -> Submission {
-    io_uring_prep_link_timeout(handle, std::addressof(timeSpecification), flags);
 
     return Submission{handle};
 }
@@ -76,6 +62,21 @@ auto coContext::internal::Submission::updatePoll(io_uring_sqe *const handle, con
 auto coContext::internal::Submission::multiplePoll(io_uring_sqe *const handle, const std::int32_t fileDescriptor,
                                                    const std::uint32_t mask) noexcept -> Submission {
     io_uring_prep_poll_multishot(handle, fileDescriptor, mask);
+
+    return Submission{handle};
+}
+
+auto coContext::internal::Submission::updateFileDescriptors(io_uring_sqe *const handle,
+                                                            const std::span<std::int32_t> fileDescriptors,
+                                                            const std::int32_t offset) noexcept -> Submission {
+    io_uring_prep_files_update(handle, std::data(fileDescriptors), std::size(fileDescriptors), offset);
+
+    return Submission{handle};
+}
+
+auto coContext::internal::Submission::installDirect(io_uring_sqe *const handle, const std::int32_t directFileDescriptor,
+                                                    const std::uint32_t flags) noexcept -> Submission {
+    io_uring_prep_fixed_fd_install(handle, directFileDescriptor, flags);
 
     return Submission{handle};
 }

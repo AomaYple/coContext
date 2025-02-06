@@ -6,16 +6,10 @@
 namespace coContext::internal {
     class Submission {
     public:
-        [[nodiscard]] static auto noOperation(io_uring_sqe *handle) noexcept -> Submission;
-
-        [[nodiscard]] static auto updateFileDescriptors(io_uring_sqe *handle, std::span<std::int32_t> fileDescriptors,
-                                                        std::int32_t offset) noexcept -> Submission;
-
-        [[nodiscard]] static auto installDirect(io_uring_sqe *handle, std::int32_t directFileDescriptor,
-                                                std::uint32_t flags) noexcept -> Submission;
-
-        [[nodiscard]] static auto linkTimeout(io_uring_sqe *handle, __kernel_timespec &timeSpecification,
+        [[nodiscard]] static auto linkTimeout(io_uring_sqe *handle, __kernel_timespec *timeSpecification,
                                               std::uint32_t flags) noexcept -> Submission;
+
+        [[nodiscard]] static auto noOperation(io_uring_sqe *handle) noexcept -> Submission;
 
         [[nodiscard]] static auto cancel(io_uring_sqe *handle, std::uint64_t userData, std::int32_t flags) noexcept
             -> Submission;
@@ -38,6 +32,12 @@ namespace coContext::internal {
 
         [[nodiscard]] static auto multiplePoll(io_uring_sqe *handle, std::int32_t fileDescriptor,
                                                std::uint32_t mask) noexcept -> Submission;
+
+        [[nodiscard]] static auto updateFileDescriptors(io_uring_sqe *handle, std::span<std::int32_t> fileDescriptors,
+                                                        std::int32_t offset) noexcept -> Submission;
+
+        [[nodiscard]] static auto installDirect(io_uring_sqe *handle, std::int32_t directFileDescriptor,
+                                                std::uint32_t flags) noexcept -> Submission;
 
         [[nodiscard]] static auto close(io_uring_sqe *handle, std::int32_t fileDescriptor) noexcept -> Submission;
 

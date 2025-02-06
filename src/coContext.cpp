@@ -60,17 +60,6 @@ auto coContext::syncCancelAny(const std::chrono::seconds seconds, const std::chr
                               __kernel_timespec{seconds.count(), nanoseconds.count()});
 }
 
-auto coContext::toDirect(const std::span<std::int32_t> fileDescriptors) -> internal::AsyncWaiter {
-    return internal::AsyncWaiter{
-        internal::Submission::updateFileDescriptors(context.getSubmission(), fileDescriptors, IORING_FILE_INDEX_ALLOC)};
-}
-
-auto coContext::installDirect(const std::int32_t directFileDescriptor, const bool isCloseOnExecute)
-    -> internal::AsyncWaiter {
-    return internal::AsyncWaiter{internal::Submission::installDirect(
-        context.getSubmission(), directFileDescriptor, isCloseOnExecute ? 0 : IORING_FIXED_FD_NO_CLOEXEC)};
-}
-
 auto coContext::none() noexcept -> internal::Marker { return internal::Marker{}; }
 
 auto coContext::direct() noexcept -> internal::Marker { return internal::Marker{IOSQE_FIXED_FILE}; }
@@ -83,7 +72,7 @@ auto coContext::timeout(const std::chrono::seconds seconds, const std::chrono::n
                                         std::make_unique<__kernel_timespec>(seconds.count(), nanoseconds.count())};
 
                                     internal::AsyncWaiter asyncWaiter{internal::Submission::linkTimeout(
-                                        context.getSubmission(), *timeSpecification, setClockSource(clockSource))};
+                                        context.getSubmission(), timeSpecification.get(), setClockSource(clockSource))};
                                     asyncWaiter.setTimeSpecification(std::move(timeSpecification));
 
                                     co_await asyncWaiter;
@@ -154,6 +143,17 @@ auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> a
 
     do action(co_await asyncWaiter);
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
+}
+
+auto coContext::toDirect(const std::span<std::int32_t> fileDescriptors) -> internal::AsyncWaiter {
+    return internal::AsyncWaiter{
+        internal::Submission::updateFileDescriptors(context.getSubmission(), fileDescriptors, IORING_FILE_INDEX_ALLOC)};
+}
+
+auto coContext::installDirect(const std::int32_t directFileDescriptor, const bool isCloseOnExecute)
+    -> internal::AsyncWaiter {
+    return internal::AsyncWaiter{internal::Submission::installDirect(
+        context.getSubmission(), directFileDescriptor, isCloseOnExecute ? 0 : IORING_FIXED_FD_NO_CLOEXEC)};
 }
 
 auto coContext::close(const std::int32_t fileDescriptor) -> internal::AsyncWaiter {
