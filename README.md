@@ -69,6 +69,8 @@ ninja
 额外CMake选项
 
 - `-DNATIVE=ON` 启用本机指令集（只在`Release`下生效）
+- `-DEXAMPLE=ON` 启用示例
+- `-DBENCHMARK=ON` 启用性能测试
 
 ## 安装
 
@@ -103,7 +105,7 @@ target_link_libraries(your_target
 测试：
 
 使用 [wrk](https://github.com/wg/wrk)
-进行压力测试 [example/benchmark.cpp](https://github.com/AomaYple/coContext/blob/main/example/benchmark.cpp)
+进行压力测试 [benchmark/coContext.cpp](https://github.com/AomaYple/coContext/blob/main/benchmark/coContext.cpp)
 
 ```
 ❯ wrk -t 16 -c 1024 http://localhost:8080
