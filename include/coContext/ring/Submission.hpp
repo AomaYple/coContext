@@ -111,7 +111,7 @@ namespace coContext::internal {
                                                std::uint32_t zeroCopyFlags) noexcept -> Submission;
 
         [[nodiscard]] static auto zeroCopySend(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
-                                               const msghdr &message, std::uint32_t flags) noexcept -> Submission;
+                                               const msghdr *message, std::uint32_t flags) noexcept -> Submission;
 
         [[nodiscard]] static auto splice(io_uring_sqe *handle, std::int32_t inFileDescriptor, std::int64_t inOffset,
                                          std::int32_t outFileDescriptor, std::int64_t outOffset, std::uint32_t length,

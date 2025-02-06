@@ -388,7 +388,7 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
 }
 
 auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
-                             const std::int32_t socketFileDescriptor, const msghdr &message, std::int32_t flags,
+                             const std::int32_t socketFileDescriptor, const msghdr *const message, std::int32_t flags,
                              const internal::Marker marker) -> Task<> {
     if ((marker.getFlags() & IOSQE_IO_LINK) != 0) flags |= MSG_WAITALL;
 

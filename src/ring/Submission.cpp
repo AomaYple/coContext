@@ -253,9 +253,9 @@ auto coContext::internal::Submission::zeroCopySend(io_uring_sqe *const handle, c
 }
 
 auto coContext::internal::Submission::zeroCopySend(io_uring_sqe *const handle, const std::int32_t socketFileDescriptor,
-                                                   const msghdr &message, const std::uint32_t flags) noexcept
+                                                   const msghdr *const message, const std::uint32_t flags) noexcept
     -> Submission {
-    io_uring_prep_sendmsg_zc(handle, socketFileDescriptor, std::addressof(message), flags);
+    io_uring_prep_sendmsg_zc(handle, socketFileDescriptor, message, flags);
 
     return Submission{handle};
 }
