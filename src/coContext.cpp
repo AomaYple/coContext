@@ -348,7 +348,7 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<co
 }
 
 auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
-                     const std::int32_t flags, const sockaddr &destinationAddress,
+                     const std::int32_t flags, const sockaddr *const destinationAddress,
                      const socklen_t destinationAddressLength) -> internal::AsyncWaiter {
     const internal::Submission submission{internal::Submission::send(
         context.getSubmission(), socketFileDescriptor, buffer, flags, destinationAddress, destinationAddressLength)};
@@ -357,7 +357,7 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const std::span<co
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr &message, const std::uint32_t flags)
+auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr *const message, const std::uint32_t flags)
     -> internal::AsyncWaiter {
     const internal::Submission submission{
         internal::Submission::send(context.getSubmission(), socketFileDescriptor, message, flags)};

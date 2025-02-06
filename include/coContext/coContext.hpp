@@ -183,10 +183,10 @@ namespace coContext {
         -> internal::AsyncWaiter;
 
     [[nodiscard]] auto send(std::int32_t socketFileDescriptor, std::span<const std::byte> buffer, std::int32_t flags,
-                            const sockaddr &destinationAddress, socklen_t destinationAddressLength)
+                            const sockaddr *destinationAddress, socklen_t destinationAddressLength)
         -> internal::AsyncWaiter;
 
-    [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr &message, std::uint32_t flags)
+    [[nodiscard]] auto send(std::int32_t socketFileDescriptor, const msghdr *message, std::uint32_t flags)
         -> internal::AsyncWaiter;
 
     [[nodiscard]] auto zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,

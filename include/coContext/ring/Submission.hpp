@@ -100,10 +100,10 @@ namespace coContext::internal {
 
         [[nodiscard]] static auto send(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
                                        std::span<const std::byte> buffer, std::int32_t flags,
-                                       const sockaddr &destinationAddress, socklen_t destinationAddressLength) noexcept
+                                       const sockaddr *destinationAddress, socklen_t destinationAddressLength) noexcept
             -> Submission;
 
-        [[nodiscard]] static auto send(io_uring_sqe *handle, std::int32_t socketFileDescriptor, const msghdr &message,
+        [[nodiscard]] static auto send(io_uring_sqe *handle, std::int32_t socketFileDescriptor, const msghdr *message,
                                        std::uint32_t flags) noexcept -> Submission;
 
         [[nodiscard]] static auto zeroCopySend(io_uring_sqe *handle, std::int32_t socketFileDescriptor,
