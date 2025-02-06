@@ -105,7 +105,7 @@ target_link_libraries(your_target
 测试：
 
 使用 [wrk](https://github.com/wg/wrk)
-进行压力测试 [benchmark/coContext.cpp](https://github.com/AomaYple/coContext/blob/main/benchmark/coContext.cpp)
+进行性能测试 [benchmark/coContext.cpp](https://github.com/AomaYple/coContext/blob/main/benchmark/coContext.cpp)
 
 ```
 ❯ wrk -t 16 -c 1024 http://localhost:8080
