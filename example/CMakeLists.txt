@@ -5,9 +5,11 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 foreach (SOURCE ${SOURCES})
     get_filename_component(FILE_NAME ${SOURCE} NAME_WE)
 
-    add_executable(${FILE_NAME} ${SOURCE})
+    set(EXECUTION "example-${FILE_NAME}")
 
-    set_target_properties(${FILE_NAME}
+    add_executable(${EXECUTION} ${SOURCE})
+
+    set_target_properties(${EXECUTION}
             PROPERTIES
             CXX_STANDARD ${CMAKE_CXX_STANDARD_LATEST}
             CXX_STANDARD_REQUIRED ON
@@ -15,19 +17,19 @@ foreach (SOURCE ${SOURCES})
             INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
     )
 
-    target_compile_options(${FILE_NAME}
+    target_compile_options(${EXECUTION}
             PRIVATE
             -Wall -Wextra -Wpedantic
             $<$<CONFIG:Debug>:-g3 -ggdb3 -Og -fsanitize=address -fsanitize=leak -fsanitize=undefined>
             $<$<CONFIG:Release>:-Ofast -march=native>
     )
 
-    target_link_options(${FILE_NAME}
+    target_link_options(${EXECUTION}
             PRIVATE
             $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=leak -fsanitize=undefined>
     )
 
-    target_link_libraries(${FILE_NAME}
+    target_link_libraries(${EXECUTION}
             PRIVATE
             ${PROJECT_NAME}
     )
