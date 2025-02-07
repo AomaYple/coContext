@@ -102,6 +102,7 @@ target_link_libraries(your_target
 - `Arch Linux` `6.12.10-zen1-1-zen (64 位)`
 - `gcc (GCC) 14.2.1 20240910`
 - `liburing 2.8`
+- `mimalloc 2.1.7`
 
 测试：
 
