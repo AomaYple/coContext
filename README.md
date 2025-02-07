@@ -101,6 +101,7 @@ target_link_libraries(your_target
 - `2 × 8GB` `DDR4 3200MHz`
 - `Arch Linux` `6.12.10-zen1-1-zen (64 位)`
 - `gcc (GCC) 14.2.1 20240910`
+- `liburing 2.8`
 
 测试：
 
