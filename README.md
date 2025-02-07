@@ -99,10 +99,10 @@ target_link_libraries(your_target
 
 - `16 × 11th Gen Intel® Core™ i7-11800H @ 2.30GHz`
 - `2 × 8GB` `DDR4 3200MHz`
-- `Arch Linux` `6.12.10-zen1-1-zen (64 位)`
+- `Arch Linux` `6.13.1-zen1-1-zen (64 位)`
 - `gcc (GCC) 14.2.1 20240910`
-- `liburing 2.8`
-- `mimalloc 2.1.7`
+- `liburing 2.9`
+- `mimalloc 2.1.9`
 
 测试：
 
@@ -114,10 +114,10 @@ target_link_libraries(your_target
 Running 10s test @ http://localhost:8080
   16 threads and 1024 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   666.64us  812.07us   9.38ms   85.13%
-    Req/Sec   114.66k    11.52k  233.68k    78.67%
-  18309263 requests in 10.10s, 663.52MB read
+    Latency   717.57us    2.11ms  70.66ms   95.42%
+    Req/Sec   111.08k    48.60k  210.66k    62.73%
+  17715516 requests in 10.10s, 642.00MB read
   Socket errors: connect 19, read 0, write 0, timeout 0
-Requests/sec: 1813041.55
-Transfer/sec:     65.70MB
+Requests/sec: 1754646.46
+Transfer/sec:     63.59MB
 ```
