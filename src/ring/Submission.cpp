@@ -604,8 +604,8 @@ auto coContext::internal::Submission::setUserData(const std::uint64_t userData) 
     io_uring_sqe_set_data64(this->handle, userData);
 }
 
-auto coContext::internal::Submission::setBufferGroup(const std::uint16_t bufferGroup) const noexcept -> void {
-    this->handle->buf_group = bufferGroup;
+auto coContext::internal::Submission::setBufferGroup(const std::int32_t bufferGroup) const noexcept -> void {
+    io_uring_sqe_set_buf_group(this->handle, bufferGroup);
 }
 
 auto coContext::internal::operator==(const Submission lhs, const Submission rhs) noexcept -> bool {

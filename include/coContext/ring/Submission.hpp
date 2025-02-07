@@ -261,7 +261,7 @@ namespace coContext::internal {
 
         auto setUserData(std::uint64_t userData) const noexcept -> void;
 
-        auto setBufferGroup(std::uint16_t bufferGroup) const noexcept -> void;
+        auto setBufferGroup(std::int32_t bufferGroup) const noexcept -> void;
 
     private:
         io_uring_sqe *handle;
