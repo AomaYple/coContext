@@ -1,6 +1,7 @@
 #include "Context.hpp"
 
 #include "../log/Exception.hpp"
+#include "../ring/Completion.hpp"
 #include "coContext/coroutine/BasePromise.hpp"
 #include "coContext/log/logger.hpp"
 
@@ -51,13 +52,13 @@ auto coContext::internal::Context::run(const std::source_location sourceLocation
 
     while (this->isRunning) {
         this->ring->submitAndWait(1);
-        this->bufferRing.advance(this->ring->poll([this](const io_uring_cqe &completion) constexpr {
-            const auto result{this->schedulingCoroutines.find(completion.user_data)};
+        this->bufferRing.advance(this->ring->poll([this](const Completion completion) constexpr {
+            const auto result{this->schedulingCoroutines.find(completion.getUserData())};
             Coroutine coroutine{std::move(result->second)};
             this->schedulingCoroutines.erase(result);
 
-            coroutine.getPromise().setResult(completion.res);
-            coroutine.getPromise().setFlags(completion.flags);
+            coroutine.getPromise().setResult(completion.getResult());
+            coroutine.getPromise().setFlags(completion.getFlags());
 
             this->scheduleCoroutine(std::move(coroutine));
         }));

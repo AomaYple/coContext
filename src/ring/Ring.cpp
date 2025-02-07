@@ -1,6 +1,7 @@
 #include "Ring.hpp"
 
 #include "../log/Exception.hpp"
+#include "Completion.hpp"
 
 using namespace std::string_view_literals;
 
@@ -130,14 +131,13 @@ auto coContext::internal::Ring::submitAndWait(const std::uint32_t count, const s
     }
 }
 
-auto coContext::internal::Ring::poll(std::move_only_function<auto(const io_uring_cqe &)->void> action) const
-    -> std::int32_t {
+auto coContext::internal::Ring::poll(std::move_only_function<auto(Completion)->void> action) const -> std::int32_t {
     std::int32_t count{};
 
     std::uint32_t head;
     const io_uring_cqe *completion;
     io_uring_for_each_cqe(std::addressof(this->handle), head, completion) {
-        action(*completion);
+        action(Completion{completion});
         ++count;
     }
 

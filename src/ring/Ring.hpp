@@ -5,6 +5,8 @@
 #include <source_location>
 
 namespace coContext::internal {
+    class Completion;
+
     class Ring {
     public:
         Ring(std::uint32_t entries, io_uring_params *parameters);
@@ -42,7 +44,7 @@ namespace coContext::internal {
         auto submitAndWait(std::uint32_t count, std::source_location sourceLocation = std::source_location::current())
             -> void;
 
-        [[nodiscard]] auto poll(std::move_only_function<auto(const io_uring_cqe &)->void> action) const -> std::int32_t;
+        [[nodiscard]] auto poll(std::move_only_function<auto(Completion)->void> action) const -> std::int32_t;
 
         auto advance(io_uring_buf_ring *bufferRing, std::int32_t completionCount, std::int32_t bufferCount) noexcept
             -> void;
