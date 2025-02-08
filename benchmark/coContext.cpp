@@ -66,7 +66,7 @@ auto main() -> int {
     coContext::logger::stop();
     coContext::logger::disableWrite();
 
-    std::pmr::vector<std::jthread> workers;
+    std::vector<std::jthread> workers;
     for (std::uint8_t i{}; i != std::thread::hardware_concurrency() - 1; ++i) workers.emplace_back(execute);
 
     execute();

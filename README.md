@@ -14,7 +14,7 @@
 - 直接文件描述符，可以与普通文件描述符**相互转换**
 - 多发射IO
 - **零拷贝**发送
-- **百万**级并发
+- **百万**级并发，`RPS`比`libevent`高`9.36%`左右
 
 ## 基础用法
 
@@ -50,11 +50,13 @@ auto main() -> int {
     - [Ninja](https://ninja-build.org) >= 1.8.2
     - [liburing](https://github.com/axboe/liburing) >= 2.9
     - [mimalloc](https://github.com/microsoft/mimalloc)
+    - [libevent](https://libevent.org)（可选）
 - 运行
     - [Linux 内核](https://www.kernel.org) >= 6.12
     - [GCC](https://gcc.gnu.org) >= 14
     - [liburing](https://github.com/axboe/liburing) >= 2.9
     - [mimalloc](https://github.com/microsoft/mimalloc)
+    - [libevent](https://libevent.org)（可选）
 
 建议使用[Arch Linux](https://archlinux.org)
 
@@ -103,21 +105,34 @@ target_link_libraries(your_target
 - `gcc (GCC) 14.2.1 20240910`
 - `liburing 2.9`
 - `mimalloc 2.1.9`
+- `libevent 2.1.12`
 
-测试：
+测试：  
+使用 [wrk](https://github.com/wg/wrk)进行性能测试
 
-使用 [wrk](https://github.com/wg/wrk)
-进行性能测试 [benchmark/coContext.cpp](https://github.com/AomaYple/coContext/blob/main/benchmark/coContext.cpp)
-
-```
-❯ wrk -t 16 -c 1024 http://localhost:8080
-Running 10s test @ http://localhost:8080
-  16 threads and 1024 connections
-  Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency   717.57us    2.11ms  70.66ms   95.42%
-    Req/Sec   111.08k    48.60k  210.66k    62.73%
-  17715516 requests in 10.10s, 642.00MB read
-  Socket errors: connect 19, read 0, write 0, timeout 0
-Requests/sec: 1754646.46
-Transfer/sec:     63.59MB
-```
+- coContext
+  [benchmark/coContext.cpp](https://github.com/AomaYple/coContext/blob/main/benchmark/coContext.cpp)
+  ```
+  ❯ wrk -t $(nproc) -c 950 http://localhost:8080
+  Running 10s test @ http://localhost:8080
+    16 threads and 950 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+      Latency     1.37ms    5.24ms 178.03ms   96.44%
+      Req/Sec   102.89k    53.92k  198.21k    58.47%
+    16258208 requests in 10.10s, 589.19MB read
+  Requests/sec: 1609945.61
+  Transfer/sec:     58.34MB
+  ```
+- libevent
+  [benchmark/libevent.cpp](https://github.com/AomaYple/coContext/blob/main/benchmark/libevent.cpp)
+  ```
+  ❯ wrk -t $(nproc) -c 950 http://localhost:8080
+  Running 10s test @ http://localhost:8080
+    16 threads and 950 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+      Latency   791.73us    0.94ms  17.01ms   86.78%
+      Req/Sec    93.05k     8.99k  208.01k    78.04%
+    14866255 requests in 10.10s, 538.75MB read
+  Requests/sec: 1472208.89
+  Transfer/sec:     53.35MB
+  ```

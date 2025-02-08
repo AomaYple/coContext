@@ -29,8 +29,15 @@ foreach (SOURCE ${SOURCES})
             $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=leak -fsanitize=undefined>
     )
 
-    target_link_libraries(${EXECUTION}
-            PRIVATE
-            ${PROJECT_NAME}
-    )
+    if (${FILE_NAME} STREQUAL ${PROJECT_NAME})
+        target_link_libraries(${EXECUTION}
+                PRIVATE
+                ${PROJECT_NAME}
+        )
+    elseif (${FILE_NAME} STREQUAL "libevent")
+        target_link_libraries(${EXECUTION}
+                PRIVATE
+                event
+        )
+    endif ()
 endforeach ()
