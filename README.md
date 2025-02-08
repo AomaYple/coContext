@@ -110,13 +110,13 @@ target_link_libraries(your_target
 - coContext
   [benchmark/coContext.cpp](https://github.com/AomaYple/coContext/blob/main/benchmark/coContext.cpp)
   ```
-  ❯ wrk -t $(nproc) -c 950 http://localhost:8080
+  ❯ wrk -t $(nproc) -c 1007 http://localhost:8080
   Running 10s test @ http://localhost:8080
-    16 threads and 950 connections
+    16 threads and 1007 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
-      Latency     1.37ms    5.24ms 178.03ms   96.44%
-      Req/Sec   102.89k    53.92k  198.21k    58.47%
-    16258208 requests in 10.10s, 589.19MB read
-  Requests/sec: 1609945.61
-  Transfer/sec:     58.34MB
+      Latency   756.25us    1.92ms  73.42ms   94.36%
+      Req/Sec   110.05k    38.55k  211.14k    72.11%
+    17569104 requests in 10.09s, 636.70MB read
+  Requests/sec: 1741463.45
+  Transfer/sec:     63.11MB
   ```
