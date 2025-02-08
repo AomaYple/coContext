@@ -15,7 +15,7 @@ using namespace std::string_view_literals;
 
     const std::int32_t result{
         co_await (coContext::send(socket, std::as_bytes(std::span{response}), 0) | coContext::direct())};
-    if (result <= 0) co_await coContext::closeDirect(socket);
+    if (result <= 0) co_await closeAction(socket);
 }
 
 constexpr auto receiveAction(const std::int32_t socket, const std::int32_t result,
