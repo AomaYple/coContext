@@ -115,13 +115,13 @@ auto coContext::updateSleep(const std::uint64_t taskId, const std::chrono::secon
     return asyncWaiter;
 }
 
-auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->void> action,
+auto coContext::multipleSleep(std::move_only_function<auto(std::int32_t)->Task<>> action,
                               const std::chrono::seconds seconds, const std::chrono::nanoseconds nanoseconds,
                               const ClockSource clockSource, const internal::Marker marker) -> Task<> {
     internal::AsyncWaiter asyncWaiter{
         rawSleep(seconds, nanoseconds, setClockSource(clockSource) | IORING_TIMEOUT_MULTISHOT) | marker};
 
-    do action(co_await asyncWaiter);
+    do co_await action(co_await asyncWaiter);
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
@@ -134,14 +134,14 @@ auto coContext::updatePoll(const std::uint64_t taskId, const std::uint32_t mask)
         internal::Submission::updatePoll(context.getSubmission(), taskId, 0, mask, IORING_POLL_UPDATE_EVENTS)};
 }
 
-auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->void> action,
+auto coContext::multiplePoll(std::move_only_function<auto(std::int32_t)->Task<>> action,
                              const std::int32_t fileDescriptor, const std::uint32_t mask, const internal::Marker marker)
     -> Task<> {
     internal::AsyncWaiter asyncWaiter{
         internal::AsyncWaiter{internal::Submission::multiplePoll(context.getSubmission(), fileDescriptor, mask)} |
         marker};
 
-    do action(co_await asyncWaiter);
+    do co_await action(co_await asyncWaiter);
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
@@ -237,7 +237,7 @@ auto coContext::acceptDirect(const std::int32_t socketFileDescriptor, sockaddr *
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void> action,
+auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->Task<>> action,
                                const std::int32_t socketFileDescriptor, sockaddr *const address,
                                socklen_t *const addressLength, const std::int32_t flags, const internal::Marker marker)
     -> Task<> {
@@ -247,11 +247,11 @@ auto coContext::multipleAccept(std::move_only_function<auto(std::int32_t)->void>
 
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
 
-    do action(co_await asyncWaiter);
+    do co_await action(co_await asyncWaiter);
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
-auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)->void> action,
+auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)->Task<>> action,
                                      const std::int32_t socketFileDescriptor, sockaddr *const address,
                                      socklen_t *const addressLength, const std::int32_t flags,
                                      const internal::Marker marker) -> Task<> {
@@ -261,7 +261,7 @@ auto coContext::multipleAcceptDirect(std::move_only_function<auto(std::int32_t)-
 
     internal::AsyncWaiter asyncWaiter{internal::AsyncWaiter{submission} | marker};
 
-    do action(co_await asyncWaiter);
+    do co_await action(co_await asyncWaiter);
     while ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0);
 }
 
@@ -289,7 +289,7 @@ auto coContext::receive(const std::int32_t socketFileDescriptor, msghdr *const m
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
+auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->Task<>> action,
                                 const std::int32_t socketFileDescriptor, const std::int32_t flags,
                                 const internal::Marker marker) -> Task<> {
     bool isRestart;
@@ -333,7 +333,7 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
                 if ((resumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.getBufferRing().markBufferUsed(bufferId);
             }
 
-            action(result, data);
+            co_await action(result, data);
         } while ((resumeFlags & IORING_CQE_F_MORE) != 0);
     } while (isRestart);
 }
@@ -366,7 +366,7 @@ auto coContext::send(const std::int32_t socketFileDescriptor, const msghdr *cons
     return internal::AsyncWaiter{submission};
 }
 
-auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
+auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->Task<>> action,
                              const std::int32_t socketFileDescriptor, const std::span<const std::byte> buffer,
                              std::int32_t flags, const internal::Marker marker) -> Task<> {
     if ((marker.getFlags() & IOSQE_IO_LINK) != 0) flags |= MSG_WAITALL;
@@ -384,10 +384,10 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
         });
     }
 
-    action(result);
+    co_await action(result);
 }
 
-auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> action,
+auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->Task<>> action,
                              const std::int32_t socketFileDescriptor, const msghdr *const message, std::int32_t flags,
                              const internal::Marker marker) -> Task<> {
     if ((marker.getFlags() & IOSQE_IO_LINK) != 0) flags |= MSG_WAITALL;
@@ -406,7 +406,7 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->void> a
         });
     }
 
-    action(result);
+    co_await action(result);
 }
 
 auto coContext::splice(const std::int32_t inFileDescriptor, const std::int64_t inOffset,
@@ -473,7 +473,7 @@ auto coContext::read(const std::int32_t fileDescriptor, const std::span<const io
         internal::Submission::read(context.getSubmission(), fileDescriptor, buffer, offset, flags)};
 }
 
-auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->void> action,
+auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::span<const std::byte>)->Task<>> action,
                              const std::int32_t fileDescriptor, const std::int32_t offset,
                              const internal::Marker marker) -> Task<> {
     bool isRestart;
@@ -514,7 +514,7 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
                 if ((resumeFlags & IORING_CQE_F_BUF_MORE) == 0) context.getBufferRing().markBufferUsed(bufferId);
             }
 
-            action(result, data);
+            co_await action(result, data);
         } while ((resumeFlags & IORING_CQE_F_MORE) != 0);
     } while (isRestart);
 }

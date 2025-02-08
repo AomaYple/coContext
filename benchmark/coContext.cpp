@@ -3,34 +3,20 @@
 
 using namespace std::string_view_literals;
 
-[[nodiscard]] auto closeAction(const std::int32_t socket) -> coContext::Task<> {
-    co_await coContext::closeDirect(socket);
-}
+[[nodiscard]] auto acceptAction(const std::int32_t socket) -> coContext::Task<> {
+    co_await coContext::multipleReceive(
+        [socket]([[maybe_unused]] const std::int32_t result,
+                 [[maybe_unused]] const std::span<const std::byte> receivedData) -> coContext::Task<> {
+            static constexpr auto response{
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Length: 0\r\n"
+                "\r\n"sv};
 
-[[nodiscard]] auto sendAction(const std::int32_t socket) -> coContext::Task<> {
-    static constexpr auto response{
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Length: 0\r\n"
-        "\r\n"sv};
-
-    const std::int32_t result{
-        co_await (coContext::send(socket, std::as_bytes(std::span{response}), 0) | coContext::direct())};
-    if (result <= 0) co_await closeAction(socket);
-}
-
-constexpr auto receiveAction(const std::int32_t socket, const std::int32_t result,
-                             [[maybe_unused]] const std::span<const std::byte> receivedData) -> void {
-    if (result > 0) spawn(sendAction, socket);
-    else spawn(closeAction, socket);
-}
-
-constexpr auto acceptAction(const std::int32_t socket) {
-    spawn(
-        coContext::multipleReceive,
-        [socket](const std::int32_t result, const std::span<const std::byte> data) constexpr {
-            receiveAction(socket, result, data);
+            co_await (coContext::send(socket, std::as_bytes(std::span{response}), 0) | coContext::direct());
         },
         socket, 0, coContext::direct());
+
+    co_await coContext::closeDirect(socket);
 }
 
 [[nodiscard]] auto server() -> coContext::Task<> {
@@ -51,7 +37,7 @@ constexpr auto acceptAction(const std::int32_t socket) {
 
     co_await (coContext::listen(socket, SOMAXCONN) | coContext::direct());
 
-    co_await coContext::multipleAcceptDirect(acceptAction, socket, nullptr, nullptr, 0, coContext::direct());
+    co_await multipleAcceptDirect(acceptAction, socket, nullptr, nullptr, 0, coContext::direct());
 
     co_await coContext::closeDirect(socket);
 }
