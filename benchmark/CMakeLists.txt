@@ -34,10 +34,5 @@ foreach (SOURCE ${SOURCES})
                 PRIVATE
                 ${PROJECT_NAME}
         )
-    elseif (${FILE_NAME} STREQUAL "libevent")
-        target_link_libraries(${EXECUTION}
-                PRIVATE
-                event
-        )
     endif ()
 endforeach ()

@@ -14,7 +14,7 @@
 - 直接文件描述符，可以与普通文件描述符**相互转换**
 - 多发射IO
 - **零拷贝**发送
-- **百万**级并发，`RPS`比`libevent`高`9.36%`左右
+- **百万**级并发
 
 ## 基础用法
 
@@ -50,13 +50,11 @@ auto main() -> int {
     - [Ninja](https://ninja-build.org) >= 1.8.2
     - [liburing](https://github.com/axboe/liburing) >= 2.9
     - [mimalloc](https://github.com/microsoft/mimalloc)
-    - [libevent](https://libevent.org)（可选）
 - 运行
     - [Linux 内核](https://www.kernel.org) >= 6.12
     - [GCC](https://gcc.gnu.org) >= 14
     - [liburing](https://github.com/axboe/liburing) >= 2.9
     - [mimalloc](https://github.com/microsoft/mimalloc)
-    - [libevent](https://libevent.org)（可选）
 
 建议使用[Arch Linux](https://archlinux.org)
 
@@ -105,7 +103,6 @@ target_link_libraries(your_target
 - `gcc (GCC) 14.2.1 20240910`
 - `liburing 2.9`
 - `mimalloc 2.1.9`
-- `libevent 2.1.12`
 
 测试：  
 使用 [wrk](https://github.com/wg/wrk)进行性能测试
@@ -122,17 +119,4 @@ target_link_libraries(your_target
     16258208 requests in 10.10s, 589.19MB read
   Requests/sec: 1609945.61
   Transfer/sec:     58.34MB
-  ```
-- libevent
-  [benchmark/libevent.cpp](https://github.com/AomaYple/coContext/blob/main/benchmark/libevent.cpp)
-  ```
-  ❯ wrk -t $(nproc) -c 950 http://localhost:8080
-  Running 10s test @ http://localhost:8080
-    16 threads and 950 connections
-    Thread Stats   Avg      Stdev     Max   +/- Stdev
-      Latency   791.73us    0.94ms  17.01ms   86.78%
-      Req/Sec    93.05k     8.99k  208.01k    78.04%
-    14866255 requests in 10.10s, 538.75MB read
-  Requests/sec: 1472208.89
-  Transfer/sec:     53.35MB
   ```
