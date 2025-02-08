@@ -114,9 +114,9 @@ target_link_libraries(your_target
   Running 10s test @ http://localhost:8080
     16 threads and 1007 connections
     Thread Stats   Avg      Stdev     Max   +/- Stdev
-      Latency   756.25us    1.92ms  73.42ms   94.36%
-      Req/Sec   110.05k    38.55k  211.14k    72.11%
-    17569104 requests in 10.09s, 636.70MB read
-  Requests/sec: 1741463.45
-  Transfer/sec:     63.11MB
+      Latency   571.64us    3.43ms 233.47ms   98.17%
+      Req/Sec   104.55k    43.06k  196.86k    67.78%
+    16600241 requests in 10.10s, 601.59MB read
+  Requests/sec: 1644235.82
+  Transfer/sec:     59.59MB
   ```
