@@ -14,7 +14,7 @@
 - 直接文件描述符，可以与普通文件描述符**相互转换**
 - 多发射IO
 - **零拷贝**发送
-- **百万**级并发，比`asio`的吞吐量高`388%`
+- **百万**级并发，比`Asio`的吞吐量高`388%`
 
 ## 基础用法
 
@@ -104,7 +104,7 @@ target_link_libraries(your_target
 - `gcc (GCC) 14.2.1 20250207`
 - `liburing 2.9`
 - `mimalloc 2.1.9`
-- `asio 1.30.2`
+- `Asio 1.30.2`
 - `wrk 358c286 [epoll] Copyright (C) 2012 Will Glozer`
 
 测试：  
