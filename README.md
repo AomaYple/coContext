@@ -14,7 +14,7 @@
 - 直接文件描述符，可以与普通文件描述符**相互转换**
 - 多发射IO
 - **零拷贝**发送
-- **百万**级并发
+- **百万**级并发，比`asio`的吞吐量高`388%`
 
 ## 基础用法
 
@@ -50,6 +50,7 @@ auto main() -> int {
     - [Ninja](https://ninja-build.org) >= 1.8.2
     - [liburing](https://github.com/axboe/liburing) >= 2.9
     - [mimalloc](https://github.com/microsoft/mimalloc)
+    - [asio](https://think-async.com/Asio) >= 1.18.0（可选）
 - 运行
     - [Linux 内核](https://www.kernel.org) >= 6.12
     - [GCC](https://gcc.gnu.org) >= 14
@@ -99,10 +100,11 @@ target_link_libraries(your_target
 
 - `16 × 11th Gen Intel® Core™ i7-11800H @ 2.30GHz`
 - `2 × 8GB` `DDR4 3200MHz`
-- `Arch Linux` `6.13.1-zen1-1-zen (64 位)`
-- `gcc (GCC) 14.2.1 20240910`
+- `Arch Linux` `6.13.2-zen1-1-zen (64 位)`
+- `gcc (GCC) 14.2.1 20250207`
 - `liburing 2.9`
 - `mimalloc 2.1.9`
+- `wrk 358c286 [epoll] Copyright (C) 2012 Will Glozer`
 
 测试：  
 使用 [wrk](https://github.com/wg/wrk)进行性能测试
@@ -119,4 +121,17 @@ target_link_libraries(your_target
     16600241 requests in 10.10s, 601.59MB read
   Requests/sec: 1644235.82
   Transfer/sec:     59.59MB
+  ```
+- asio（使用`io_uring`作为后端，并且设置`ASIO_CONCURRENCY_HINT_UNSAFE`提高性能）
+  [benchmark/asio.cpp](https://github.com/AomaYple/coContext/blob/main/benchmark/asio.cpp)
+  ```
+  ❯ wrk -t $(nproc) -c 1007 http://localhost:8080
+  Running 10s test @ http://localhost:8080
+    16 threads and 1007 connections
+    Thread Stats   Avg      Stdev     Max   +/- Stdev
+      Latency     7.74ms   41.10ms 733.58ms   98.14%
+      Req/Sec    21.45k     3.55k   64.27k    95.61%
+    3403478 requests in 10.10s, 123.34MB read
+  Requests/sec: 336977.45
+  Transfer/sec:     12.21MB
   ```

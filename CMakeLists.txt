@@ -31,6 +31,10 @@ target_sources(${PROJECT_NAME}
         ${SOURCES}
 )
 
+include_directories(SYSTEM BEFORE
+        /home/AomaYple/projects/liburing-2.9/include
+)
+
 target_include_directories(${PROJECT_NAME}
         PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
