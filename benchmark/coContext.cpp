@@ -48,7 +48,7 @@ constexpr auto execute() {
     coContext::run();
 }
 
-auto main() -> int {
+[[nodiscard]] auto main() -> int {
     coContext::logger::stop();
     coContext::logger::disableWrite();
 

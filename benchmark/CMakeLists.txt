@@ -34,5 +34,16 @@ foreach (SOURCE ${SOURCES})
                 PRIVATE
                 ${PROJECT_NAME}
         )
+    elseif (${FILE_NAME} STREQUAL "asio")
+        target_compile_definitions(${EXECUTION}
+                PRIVATE
+                ASIO_HAS_IO_URING=1
+                ASIO_DISABLE_EPOLL=1
+                ASIO_CONCURRENCY_HINT_1=ASIO_CONCURRENCY_HINT_UNSAFE
+        )
+        target_link_libraries(${EXECUTION}
+                PRIVATE
+                uring
+        )
     endif ()
 endforeach ()
