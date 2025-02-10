@@ -50,7 +50,7 @@ auto main() -> int {
     - [Ninja](https://ninja-build.org) >= 1.8.2
     - [liburing](https://github.com/axboe/liburing) >= 2.9
     - [mimalloc](https://github.com/microsoft/mimalloc)
-    - [asio](https://think-async.com/Asio) >= 1.18.0（可选）
+    - [Asio](https://think-async.com/Asio) >= 1.18.0（可选）
 - 运行
     - [Linux 内核](https://www.kernel.org) >= 6.12
     - [GCC](https://gcc.gnu.org) >= 14
