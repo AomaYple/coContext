@@ -19,7 +19,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    find_package(mimalloc 1.0.0 REQUIRED)
+    find_package(mimalloc REQUIRED)
 else ()
     list(REMOVE_ITEM SOURCES
             ${CMAKE_CURRENT_SOURCE_DIR}/src/memory/MiMallocResource.cpp
