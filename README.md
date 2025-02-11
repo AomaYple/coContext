@@ -49,13 +49,13 @@ auto main() -> int {
     - [CMake](https://cmake.org) >= 3.30
     - [Ninja](https://ninja-build.org) >= 1.8.2
     - [liburing](https://github.com/axboe/liburing) >= 2.9
-    - [mimalloc](https://github.com/microsoft/mimalloc)
+    - [mimalloc](https://github.com/microsoft/mimalloc) >= 1.0.0
     - [Asio](https://think-async.com/Asio) >= 1.17.0（可选）
 - 运行
     - [Linux 内核](https://www.kernel.org) >= 6.12
     - [GCC](https://gcc.gnu.org) >= 14
     - [liburing](https://github.com/axboe/liburing) >= 2.9
-    - [mimalloc](https://github.com/microsoft/mimalloc)
+    - [mimalloc](https://github.com/microsoft/mimalloc) >= 1.0.0
 
 建议使用[Arch Linux](https://archlinux.org)
 
