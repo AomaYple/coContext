@@ -23,7 +23,7 @@
     std::println("accept result: {}", co_await coContext::accept(socket, nullptr, nullptr));
 }
 
-auto main() -> int {
+[[nodiscard]] auto main() -> int {
     spawn(function);
 
     coContext::run();

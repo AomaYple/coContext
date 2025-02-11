@@ -13,7 +13,7 @@ using namespace std::string_view_literals;
     std::println("nestedFunction returned"sv);
 }
 
-auto main() -> int {
+[[nodiscard]] auto main() -> int {
     spawn(function);
 
     coContext::run();

@@ -11,7 +11,7 @@ constexpr auto execute() {
     coContext::run();
 }
 
-auto main() -> int {
+[[nodiscard]] auto main() -> int {
     std::vector<std::jthread> workers;
     for (std::uint32_t i{}; i != std::thread::hardware_concurrency() - 1; ++i) workers.emplace_back(execute);
 

@@ -9,7 +9,7 @@ using namespace std::chrono_literals;
     std::println("cancel result: {}", co_await coContext::cancel(taskId));
 }
 
-auto main() -> int {
+[[nodiscard]] auto main() -> int {
     const auto [value, taskId]{spawn(function)};
     spawn(cancelFunction, taskId);
 
