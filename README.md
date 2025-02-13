@@ -123,7 +123,7 @@ target_link_libraries(your_target
   Requests/sec: 1644235.82
   Transfer/sec:     59.59MB
   ```
-- asio（使用`io_uring`作为后端，并且设置`ASIO_CONCURRENCY_HINT_UNSAFE`提高性能）
+- asio（使用`io_uring`作为后端，并且设置`ASIO_CONCURRENCY_HINT_UNSAFE`免去锁的开销）
   [benchmark/asio.cpp](https://github.com/AomaYple/coContext/blob/main/benchmark/asio.cpp)
   ```
   ❯ wrk -t $(nproc) -c 1007 http://localhost:8080
