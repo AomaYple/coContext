@@ -70,7 +70,6 @@ ninja
 额外CMake选项
 
 - `-DNATIVE=ON` 启用本机指令集（只在`Release`下生效）
-- `-DEXAMPLE=ON` 启用示例
 - `-DBENCHMARK=ON` 启用性能测试
 
 ## 安装

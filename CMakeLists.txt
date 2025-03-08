@@ -94,11 +94,6 @@ install(EXPORT ${PROJECT_NAME}Targets
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
-option(EXAMPLE "Enable example")
-if (EXAMPLE)
-    add_subdirectory(example)
-endif ()
-
 option(BENCHMARK "Enable benchmark")
 if (BENCHMARK)
     add_subdirectory(benchmark)
