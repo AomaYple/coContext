@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 
-project(coContext VERSION 1.3.0)
+project(coContext VERSION 1.3.1)
 
 add_library(${PROJECT_NAME} SHARED)
 
