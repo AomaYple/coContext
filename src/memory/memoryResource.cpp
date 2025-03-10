@@ -5,7 +5,7 @@
 
 namespace {
     [[nodiscard]] constexpr auto getUpstreamResource() noexcept {
-        static constinit coContext::MiMallocResource resource;
+        static constinit coContext::internal::MiMallocResource resource;
 
         return std::addressof(resource);
     }
