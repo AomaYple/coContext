@@ -12,7 +12,8 @@ namespace coContext {
     public:
         enum class Level : std::uint8_t { trace, debug, info, warn, error, fatal };
 
-        explicit Log(Level level = Level::info, std::pmr::string message = std::pmr::string{getSyncMemoryResource()},
+        explicit Log(Level level = Level::info,
+                     std::pmr::string message = std::pmr::string{internal::getSyncMemoryResource()},
                      std::source_location sourceLocation = std::source_location::current(),
                      std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now(),
                      std::thread::id threadId = std::this_thread::get_id());

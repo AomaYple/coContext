@@ -311,7 +311,7 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
                 logger::write(Log{
                     Log::Level::warn,
                     std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                     getSyncMemoryResource()}
+                                     internal::getSyncMemoryResource()}
                 });
 
                 try {
@@ -380,7 +380,7 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->Task<>>
     if ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
     else {
         logger::write(Log{
-            Log::Level::warn, std::pmr::string{"no notification", getSyncMemoryResource()}
+            Log::Level::warn, std::pmr::string{"no notification", internal::getSyncMemoryResource()}
         });
     }
 
@@ -402,7 +402,7 @@ auto coContext::zeroCopySend(std::move_only_function<auto(std::int32_t)->Task<>>
     if ((asyncWaiter.getResumeFlags() & IORING_CQE_F_MORE) != 0) co_await asyncWaiter;
     else {
         logger::write(Log{
-            Log::Level::warn, std::pmr::string{"no notification", getSyncMemoryResource()}
+            Log::Level::warn, std::pmr::string{"no notification", internal::getSyncMemoryResource()}
         });
     }
 
@@ -492,7 +492,7 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
                 logger::write(Log{
                     Log::Level::warn,
                     std::pmr::string{std::error_code{std::abs(result), std::generic_category()}.message(),
-                                     getSyncMemoryResource()}
+                                     internal::getSyncMemoryResource()}
                 });
 
                 try {

@@ -3,7 +3,7 @@
 using namespace std::string_view_literals;
 
 coContext::Exception::Exception(Log log) :
-    message{std::format("{}"sv, log), getSyncMemoryResource()}, log{std::move(log)} {}
+    message{std::format("{}"sv, log), internal::getSyncMemoryResource()}, log{std::move(log)} {}
 
 auto coContext::Exception::swap(Exception &other) noexcept -> void {
     std::swap(this->message, other.message);
