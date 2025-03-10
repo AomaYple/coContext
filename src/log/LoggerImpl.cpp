@@ -39,8 +39,7 @@ auto coContext::internal::LoggerImpl::run() -> void {
             do {
                 const Node *node{reverseList(this->head.exchange(nullptr, std::memory_order::relaxed))};
                 while (node != nullptr) {
-                    std::osyncstream syncOutputStream{*this->outputStream.load(std::memory_order::relaxed)};
-                    std::println(syncOutputStream, "{}"sv, node->log);
+                    std::println(*this->outputStream.load(std::memory_order::relaxed), "{}"sv, node->log);
 
                     const Node *const next{node->next};
                     delete node;
