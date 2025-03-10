@@ -316,7 +316,7 @@ auto coContext::multipleReceive(std::move_only_function<auto(std::int32_t, std::
 
                 try {
                     context.getBufferRing().expandBuffer();
-                } catch (internal::Exception &exception) { logger::write(std::move(exception.getLog())); }
+                } catch (Exception &exception) { logger::write(std::move(exception.getLog())); }
 
                 isRestart = true;
 
@@ -497,7 +497,7 @@ auto coContext::multipleRead(std::move_only_function<auto(std::int32_t, std::spa
 
                 try {
                     context.getBufferRing().expandBuffer();
-                } catch (internal::Exception &exception) { logger::write(std::move(exception.getLog())); }
+                } catch (Exception &exception) { logger::write(std::move(exception.getLog())); }
 
                 isRestart = true;
 

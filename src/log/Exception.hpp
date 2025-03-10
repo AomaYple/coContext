@@ -2,7 +2,7 @@
 
 #include "coContext/log/Log.hpp"
 
-namespace coContext::internal {
+namespace coContext {
     class Exception final : public std::exception {
     public:
         explicit Exception(Log log = Log{});
@@ -23,9 +23,9 @@ namespace coContext::internal {
     };
 
     [[nodiscard]] auto operator==(const Exception &lhs, const Exception &rhs) noexcept -> bool;
-}    // namespace coContext::internal
+}    // namespace coContext
 
 template<>
-constexpr auto std::swap(coContext::internal::Exception &lhs, coContext::internal::Exception &rhs) noexcept -> void {
+constexpr auto std::swap(coContext::Exception &lhs, coContext::Exception &rhs) noexcept -> void {
     lhs.swap(rhs);
 }
