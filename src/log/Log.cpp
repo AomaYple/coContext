@@ -3,7 +3,7 @@
 coContext::Log::Log(const Level level, std::pmr::string message, const std::source_location sourceLocation,
                     const std::chrono::system_clock::time_point timestamp, const std::thread::id threadId) :
     level{level}, timestamp{timestamp}, threadId{threadId}, sourceLocation{sourceLocation},
-    message{std::move(message), internal::getSyncMemoryResource()} {}
+    message{std::move(message), getSyncMemoryResource()} {}
 
 auto coContext::Log::swap(Log &other) noexcept -> void {
     std::swap(this->level, other.level);
