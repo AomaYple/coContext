@@ -69,6 +69,7 @@ ninja
 
 额外CMake选项
 
+- `-DCCACHE=ON` 启用`ccache`加速编译
 - `-DNATIVE=ON` 启用本机指令集（构建类型为`Release`时生效）
 - `-DBENCHMARK=ON` 启用性能测试
 

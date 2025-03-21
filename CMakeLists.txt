@@ -14,6 +14,20 @@ set_target_properties(${PROJECT_NAME}
         INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
 )
 
+option(CCACHE "Enable ccache")
+if (CCACHE)
+    find_program(CCACHE_FOUND ccache)
+    if (CCACHE_FOUND)
+        set_target_properties(${PROJECT_NAME}
+                PROPERTIES
+                RULE_LAUNCH_COMPILE ${CCACHE_FOUND}
+                RULE_LAUNCH_LINK ${CCACHE_FOUND}
+        )
+    else ()
+        message(FATAL_ERROR "ccache not found")
+    endif ()
+endif ()
+
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
         src/*.cpp
 )
