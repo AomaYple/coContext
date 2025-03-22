@@ -37,8 +37,9 @@ foreach (SOURCE ${SOURCES})
     elseif (${FILE_NAME} STREQUAL "asio")
         target_compile_definitions(${EXECUTION}
                 PRIVATE
-                ASIO_HAS_IO_URING=1
-                ASIO_DISABLE_EPOLL=1
+                ASIO_NO_DEPRECATED
+                ASIO_HAS_IO_URING
+                ASIO_DISABLE_EPOLL
                 ASIO_CONCURRENCY_HINT_1=ASIO_CONCURRENCY_HINT_UNSAFE
         )
         target_link_libraries(${EXECUTION}
